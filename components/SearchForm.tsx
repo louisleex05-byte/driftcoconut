@@ -1,19 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-// A short starter list. Expand with the full Agoda cityId reference file.
-const CITIES = [
-  { id: 9395, name: "Bangkok, Thailand" },
-  { id: 17193, name: "Bali, Indonesia" },
-  { id: 4064, name: "Tokyo, Japan" },
-  { id: 4562, name: "Singapore" },
-  { id: 18773, name: "Kuala Lumpur, Malaysia" },
-  { id: 5085, name: "Hong Kong" },
-  { id: 14257, name: "Seoul, South Korea" },
-  { id: 16440, name: "Ho Chi Minh City, Vietnam" },
-];
+import { useMemo, useState } from "react";
+import { CITIES } from "@/lib/cities";
 
 function tomorrow(offset = 0) {
   const d = new Date();
@@ -27,6 +16,15 @@ export default function SearchForm() {
   const [checkIn, setCheckIn] = useState(tomorrow(0));
   const [checkOut, setCheckOut] = useState(tomorrow(2));
   const [adults, setAdults] = useState(2);
+
+  // Group cities by region for the dropdown
+  const grouped = useMemo(() => {
+    const g: Record<string, typeof CITIES> = {};
+    for (const c of CITIES) {
+      (g[c.region] ??= []).push(c);
+    }
+    return g;
+  }, []);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,8 +49,12 @@ export default function SearchForm() {
           value={cityId}
           onChange={(e) => setCityId(Number(e.target.value))}
         >
-          {CITIES.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+          {Object.entries(grouped).map(([region, cities]) => (
+            <optgroup key={region} label={region}>
+              {cities.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </label>

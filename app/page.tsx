@@ -1,18 +1,9 @@
-import SearchForm from "@/components/SearchForm";
+import Hero from "@/components/Hero";
 
 export default function HomePage() {
   return (
     <div className="space-y-10">
-      <section className="text-center pt-6">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          Find your next stay
-        </h1>
-        <p className="mt-3 text-slate-600 max-w-xl mx-auto">
-          Compare thousands of hotels worldwide and book the perfect room in seconds.
-        </p>
-      </section>
-
-      <SearchForm />
+      <Hero />
 
       <section id="deals" className="grid md:grid-cols-3 gap-4">
         {[

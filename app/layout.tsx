@@ -33,15 +33,48 @@ export default function RootLayout({
               TravelSite
             </Link>
             <nav className="flex gap-5 text-sm text-slate-600">
-              <Link href="/">Search</Link>
-              <Link href="/#deals">Deals</Link>
-              <Link href="/#about">About</Link>
+              <Link href="/" className="hover:text-brand">Search</Link>
+              <Link href="/#deals" className="hover:text-brand">Deals</Link>
+              <Link href="/about" className="hover:text-brand">About</Link>
             </nav>
           </div>
         </header>
         <main className="max-w-6xl mx-auto px-4 py-8">{children}</main>
-        <footer className="mt-16 border-t border-slate-200 py-8 text-center text-sm text-slate-500">
-          Powered by Agoda affiliate API. Prices and availability are subject to change.
+        <footer className="mt-16 border-t border-slate-200 py-10">
+          <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+            <div>
+              <div className="font-semibold text-slate-900 mb-2">TravelSite</div>
+              <p className="text-slate-500 text-xs leading-relaxed">
+                Search and compare hotels worldwide.
+              </p>
+            </div>
+            <div>
+              <div className="font-semibold text-slate-900 mb-2">Company</div>
+              <ul className="space-y-1.5 text-slate-500">
+                <li><Link href="/about" className="hover:text-brand">About</Link></li>
+                <li><a href="mailto:hello@travelsite.example" className="hover:text-brand">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="font-semibold text-slate-900 mb-2">Legal</div>
+              <ul className="space-y-1.5 text-slate-500">
+                <li><Link href="/privacy" className="hover:text-brand">Privacy</Link></li>
+                <li><Link href="/terms" className="hover:text-brand">Terms</Link></li>
+              </ul>
+            </div>
+            <div>
+              <div className="font-semibold text-slate-900 mb-2">Partners</div>
+              <ul className="space-y-1.5 text-slate-500 text-xs">
+                <li>Agoda</li>
+                <li>Expedia · Hotels.com</li>
+                <li>Booking.com</li>
+                <li>Tripadvisor</li>
+              </ul>
+            </div>
+          </div>
+          <div className="max-w-6xl mx-auto px-4 mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400 text-center">
+            © {new Date().getFullYear()} TravelSite. Powered by affiliate partners. Prices and availability subject to change.
+          </div>
         </footer>
       </body>
     </html>

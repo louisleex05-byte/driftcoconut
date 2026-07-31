@@ -1,12 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { AgodaHotel } from "@/lib/agoda";
 
 export default function HotelCard({ hotel }: { hotel: AgodaHotel }) {
   return (
-    <a
-      href={hotel.landingURL}
-      target="_blank"
-      rel="noopener sponsored"
+    <Link
+      href={`/hotel/${hotel.hotelId}`}
       className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
     >
       <div className="relative aspect-[4/3] bg-slate-100">
@@ -42,6 +41,6 @@ export default function HotelCard({ hotel }: { hotel: AgodaHotel }) {
           <span className="text-xs text-slate-500">/ night</span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

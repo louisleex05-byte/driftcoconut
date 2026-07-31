@@ -2,6 +2,10 @@
 
 A minimal Next.js 15 (App Router) scaffold that searches hotels through the Agoda Long Tail Affiliate API and monetizes clicks via affiliate deep links.
 
+**→ To deploy live, see [DEPLOY.md](./DEPLOY.md)**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-username%2Ftravel-site&env=AGODA_MOCK,AGODA_SITE_ID,AGODA_API_KEY&envDescription=Set%20AGODA_MOCK%3Dtrue%20to%20use%20sample%20data%20before%20API%20approval)
+
 ## Stack
 
 - Next.js 15 (App Router, React 19, Server Components)
