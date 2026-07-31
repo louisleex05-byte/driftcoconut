@@ -1,6 +1,7 @@
 import { searchAgoda } from "@/lib/agoda";
 import HotelCard from "@/components/HotelCard";
 import Link from "next/link";
+import { PalmLeaf, Wave, Conch } from "@/components/Decorations";
 
 type SearchParams = {
   cityId?: string;
@@ -40,7 +41,11 @@ export default async function SearchPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Ambient corner accents on results page */}
+      <PalmLeaf className="hidden lg:block absolute -top-4 -right-8 w-24 text-sea-200 opacity-55 rotate-45 pointer-events-none" />
+      <Conch className="hidden lg:block fixed bottom-24 left-4 w-14 text-sea-300 opacity-45 pointer-events-none -z-10" />
+
       <div>
         <Link href="/" className="text-sm text-slate-500 hover:text-sea-700">
           ← New search

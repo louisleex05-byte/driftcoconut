@@ -2,6 +2,7 @@ import { MOCK_HOTELS, getHotelDetail } from "@/lib/mockHotels";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PalmLeaf, Shell } from "@/components/Decorations";
 
 type Params = { id: string };
 
@@ -18,7 +19,11 @@ export default async function HotelDetailPage({
   const detail = getHotelDetail(hotelId);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* Corner accents */}
+      <PalmLeaf className="hidden lg:block fixed top-24 -right-8 w-32 text-sea-200 opacity-50 rotate-12 pointer-events-none -z-10" />
+      <Shell className="hidden lg:block fixed bottom-8 left-4 w-14 text-sea-300 opacity-50 pointer-events-none -z-10" />
+
       <Link href="/" className="text-sm text-slate-500 hover:text-sea-700">
         ← Back to search
       </Link>

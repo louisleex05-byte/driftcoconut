@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PalmLeaf, Shell, Hibiscus, Boat, StrawHat } from "@/components/Decorations";
 
 export const metadata: Metadata = {
   title: "About — Drifting Coconut",
@@ -7,7 +8,14 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="max-w-3xl mx-auto prose prose-slate">
+    <div className="max-w-3xl mx-auto prose prose-slate relative">
+      {/* Corner accents */}
+      <PalmLeaf className="hidden md:block absolute -top-4 -right-8 w-24 text-sea-300 opacity-55 rotate-12 pointer-events-none" />
+      <StrawHat className="hidden md:block absolute top-8 -left-14 w-16 text-sea-300 opacity-55 -rotate-6 pointer-events-none" />
+      <Hibiscus className="hidden md:block absolute top-1/2 -right-12 w-20 text-sea-200 opacity-60 rotate-45 pointer-events-none" />
+      <Boat className="hidden md:block absolute bottom-1/3 -left-16 w-20 text-sea-300 opacity-55 pointer-events-none" />
+      <Shell className="hidden sm:block absolute bottom-8 -right-6 w-14 text-sea-300 opacity-55 -rotate-12 pointer-events-none" />
+
       <h1 className="text-3xl font-bold">About Drifting Coconut</h1>
 
       <p className="text-slate-600 mt-4">
