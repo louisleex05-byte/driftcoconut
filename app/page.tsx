@@ -1,9 +1,11 @@
 import Hero from "@/components/Hero";
+import PartnerStrip from "@/components/PartnerStrip";
 
 export default function HomePage() {
   return (
     <div className="space-y-10">
       <Hero />
+      <PartnerStrip />
 
       <section id="deals" className="grid md:grid-cols-3 gap-4">
         {[
