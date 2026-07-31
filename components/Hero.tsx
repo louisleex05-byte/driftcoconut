@@ -20,7 +20,7 @@ export default function Hero() {
   const current = HERO_PHOTOS[index];
 
   return (
-    <section className="relative -mt-8 mb-10 rounded-b-3xl overflow-hidden">
+    <section className="relative -mt-6 sm:-mt-8 mb-10 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
       {/* Panoramic image container — 3:1 aspect ratio on desktop, gracefully falls back on mobile */}
       <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[380px]">
         {HERO_PHOTOS.map((photo, i) => (
@@ -49,12 +49,12 @@ export default function Hero() {
         />
 
         {/* Centered content — headline + subhead */}
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 md:pb-14 px-4">
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-14 sm:pb-10 md:pb-14 px-4">
           <div className="w-full max-w-3xl text-center text-white">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight drop-shadow-lg">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight drop-shadow-lg">
               Find your next stay
             </h1>
-            <p className="mt-3 text-sm md:text-lg drop-shadow-md opacity-95">
+            <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-lg drop-shadow-md opacity-95 px-2">
               Compare thousands of hotels worldwide and book the perfect room.
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function Hero() {
       </div>
 
       {/* Search bar overlaps up into the image */}
-      <div className="relative -mt-8 md:-mt-12 mx-4 md:mx-8 z-10">
+      <div className="relative -mt-6 md:-mt-12 mx-3 sm:mx-4 md:mx-8 z-10">
         <SearchForm />
       </div>
 

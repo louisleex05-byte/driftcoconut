@@ -21,7 +21,7 @@ export default function PartnerStrip() {
           Live inventory from trusted booking partners
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-8 gap-y-4">
           {PARTNERS.map((p) => (
             <div
               key={p.name}
@@ -29,7 +29,7 @@ export default function PartnerStrip() {
               title={p.note}
             >
               <span
-                className="text-lg md:text-xl font-bold tracking-tight"
+                className="text-base sm:text-lg md:text-xl font-bold tracking-tight"
                 style={{ color: p.color }}
               >
                 {p.name}

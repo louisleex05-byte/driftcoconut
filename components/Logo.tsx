@@ -1,16 +1,17 @@
 // Drifting coconut logo — a half-shell drifting on subtle waves with a young palm sprout.
 
 export default function Logo({
-  size = 40,
+  size,
   className = "",
 }: {
   size?: number;
   className?: string;
 }) {
+  // If size prop is passed, use it as width/height. Otherwise rely on className (w-*/h-*).
+  const sizeProps = size ? { width: size, height: size } : {};
   return (
     <svg
-      width={size}
-      height={size}
+      {...sizeProps}
       viewBox="0 0 64 64"
       xmlns="http://www.w3.org/2000/svg"
       className={className}

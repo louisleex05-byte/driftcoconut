@@ -27,26 +27,37 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header className="bg-white/70 backdrop-blur border-b border-sea-100 sticky top-0 z-30">
-          <div className="max-w-screen-2xl mx-auto px-4 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <Logo size={40} className="transition-transform group-hover:-rotate-6" />
-              <span className="font-display text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 leading-none">
+          <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+            <Link
+              href="/"
+              className="flex items-center gap-2 group min-w-0 flex-shrink"
+            >
+              <Logo
+                className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 transition-transform group-hover:-rotate-6"
+              />
+              <span className="font-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 leading-none truncate">
                 driftcoconut
               </span>
             </Link>
-            <nav className="flex gap-6 text-sm text-slate-600">
-              <Link href="/" className="hover:text-sea-600 transition-colors">Search</Link>
-              <Link href="/#deals" className="hover:text-sea-600 transition-colors">Deals</Link>
-              <Link href="/about" className="hover:text-sea-600 transition-colors">About</Link>
+            <nav className="flex items-center gap-3 sm:gap-6 text-sm text-slate-600 flex-shrink-0">
+              <Link href="/" className="hidden sm:inline hover:text-sea-600 transition-colors">
+                Search
+              </Link>
+              <Link href="/#deals" className="hover:text-sea-600 transition-colors">
+                Deals
+              </Link>
+              <Link href="/about" className="hover:text-sea-600 transition-colors">
+                About
+              </Link>
             </nav>
           </div>
         </header>
-        <main className="max-w-screen-2xl mx-auto px-4 py-8">{children}</main>
+        <main className="max-w-screen-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">{children}</main>
         <footer className="mt-16 border-t border-sea-100 py-10 bg-white/50">
           <div className="max-w-screen-2xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Logo size={24} />
+                <Logo className="w-6 h-6" />
                 <span className="font-display text-lg font-semibold text-sea-700">driftcoconut</span>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed">
