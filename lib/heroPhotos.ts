@@ -40,4 +40,19 @@ export const HERO_PHOTOS: HeroPhoto[] = [
     // Shift crop so the person sits slightly off-center under the headline
     position: "center 35%",
   },
+  {
+    src: "/hero/maldives-dhoni.jpg",
+    alt: "Traditional Maldivian dhoni boat at a resort dock with turquoise lagoon",
+    caption: "Resort dhoni, Maldives",
+    credit: "Photo: Csehokel / Pixabay",
+    position: "center center",
+  },
+  {
+    src: "/hero/maldives-palm-beach.jpg",
+    alt: "Coconut palm tree leaning over a Maldives beach and turquoise sea",
+    caption: "Palm beach, Maldives",
+    credit: "Photo: Da1374 / Pixabay",
+    // Slight left position keeps the palm anchor visible, leaves right for headline
+    position: "30% center",
+  },
 ];
