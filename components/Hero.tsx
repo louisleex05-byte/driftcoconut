@@ -1,23 +1,45 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { HERO_PHOTOS } from "@/lib/heroPhotos";
 import SearchForm from "./SearchForm";
 
+const ROTATE_MS = 7000;
+
 export default function Hero() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % HERO_PHOTOS.length);
+    }, ROTATE_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  const current = HERO_PHOTOS[index];
+
   return (
     <section className="relative -mt-8 mb-10 rounded-b-3xl overflow-hidden">
-      {/* Panoramic image container — 3:1 aspect ratio on desktop, 4:3 on mobile */}
+      {/* Panoramic image container — 3:1 aspect ratio on desktop, gracefully falls back on mobile */}
       <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[380px]">
-        <Image
-          src="/hero/bali-sanur.jpg"
-          alt="Traditional jukung fishing boat at sunrise on Sanur Beach, Bali"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-          // Off-center crop: boat sits on the left third, right two-thirds clean for text
-          style={{ objectPosition: "left center" }}
-        />
+        {HERO_PHOTOS.map((photo, i) => (
+          <Image
+            key={photo.src}
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            className="object-cover transition-opacity duration-1000 ease-in-out"
+            style={{
+              objectPosition: photo.position,
+              opacity: i === index ? 1 : 0,
+            }}
+          />
+        ))}
 
-        {/* Dark gradient overlay at the bottom for text legibility */}
+        {/* Dark gradient overlay for text legibility */}
         <div
           className="absolute inset-0"
           style={{
@@ -26,7 +48,7 @@ export default function Hero() {
           }}
         />
 
-        {/* Centered content — headline, subhead, search bar sit on right two-thirds */}
+        {/* Centered content — headline + subhead */}
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 md:pb-14 px-4">
           <div className="w-full max-w-3xl text-center text-white">
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight drop-shadow-lg">
@@ -37,16 +59,30 @@ export default function Hero() {
             </p>
           </div>
         </div>
+
+        {/* Slide indicator dots — bottom center of image */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          {HERO_PHOTOS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Show slide ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Search bar floats below the image on desktop, overlaps upward */}
+      {/* Search bar overlaps up into the image */}
       <div className="relative -mt-8 md:-mt-12 mx-4 md:mx-8 z-10">
         <SearchForm />
       </div>
 
-      {/* Photo credit */}
-      <div className="text-center text-xs text-slate-400 mt-3">
-        Sanur Beach, Bali · Photo: Wande Mokkori / Pixabay
+      {/* Photo credit — updates as the slide rotates */}
+      <div className="text-center text-xs text-slate-400 mt-3 transition-opacity duration-500">
+        {current.caption} · {current.credit}
       </div>
     </section>
   );
