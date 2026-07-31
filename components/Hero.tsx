@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
 import SearchForm from "./SearchForm";
+import { PalmLeaf, Shell } from "./Decorations";
 
 const ROTATE_MS = 7000;
 
@@ -21,6 +22,10 @@ export default function Hero() {
 
   return (
     <section className="relative -mt-6 sm:-mt-8 mb-10 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
+      {/* Decorative palm leaf — top-right corner, subtle overlay above image */}
+      <PalmLeaf className="hidden md:block absolute top-4 right-6 w-32 lg:w-40 text-white/25 rotate-[35deg] z-10 pointer-events-none" />
+      {/* Decorative shell — bottom-left, half-hidden */}
+      <Shell className="hidden md:block absolute -bottom-4 -left-3 w-24 text-white/20 -rotate-12 z-10 pointer-events-none" />
       {/* Panoramic image container — 3:1 aspect ratio on desktop, gracefully falls back on mobile */}
       <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[380px]">
         {HERO_PHOTOS.map((photo, i) => (

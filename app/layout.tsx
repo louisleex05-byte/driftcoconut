@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { Wave, Shell } from "@/components/Decorations";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -53,8 +54,12 @@ export default function RootLayout({
           </div>
         </header>
         <main className="max-w-screen-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">{children}</main>
-        <footer className="mt-16 border-t border-sea-100 py-10 bg-white/50">
-          <div className="max-w-screen-2xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+        <footer className="relative mt-16 border-t border-sea-100 py-10 bg-white/50 overflow-hidden">
+          {/* Ambient wave & shell in footer */}
+          <Wave className="absolute top-0 left-0 w-full h-6 text-sea-200 opacity-60 pointer-events-none" />
+          <Shell className="hidden md:block absolute bottom-4 right-6 w-16 text-sea-300 opacity-30 pointer-events-none" />
+
+          <div className="max-w-screen-2xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm relative">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Logo className="w-6 h-6" />
