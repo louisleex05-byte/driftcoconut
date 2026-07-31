@@ -1,13 +1,23 @@
-# Deploy in 5 steps — get a live URL for Agoda verification
+# Connect driftcoconut.com — Cloudflare DNS + Vercel hosting
 
-Total time: ~15 minutes. Everything is free.
+Total time: ~15 minutes. Domain cost: whatever you paid for `driftcoconut.com` (~$10/yr). Cloudflare DNS + Vercel Hobby are free.
+
+## The setup you'll end up with
+
+```
+Visitor → Cloudflare (DNS + optional CDN) → Vercel (Next.js hosting) → driftcoconut
+```
+
+Vercel handles the app runtime; Cloudflare manages your DNS and can add another CDN/security layer.
+
+---
 
 ## Prerequisites (one-time)
 
-Install these on your computer if you don't have them:
+Install these if you don't have them:
 
 ```bash
-# GitHub CLI (for pushing to GitHub)
+# GitHub CLI (for pushing code)
 # Windows: winget install --id GitHub.cli
 # Mac:     brew install gh
 
@@ -15,109 +25,142 @@ Install these on your computer if you don't have them:
 npm install -g vercel
 ```
 
-Sign in once:
+Sign in:
 
 ```bash
-gh auth login          # follow browser prompts
-vercel login           # follow browser prompts (use your GitHub account)
+gh auth login
+vercel login
 ```
+
+The repo is already on GitHub at `github.com/louisleex05-byte/travel-site` and deploys to Vercel on every push.
 
 ---
 
-## Step 1 — Push to GitHub
+## Step 1 — Add driftcoconut.com to Cloudflare
 
-The git repo is already initialized with an initial commit. Just create the remote and push:
+1. Sign up / log in at **https://dash.cloudflare.com**
+2. Click **"+ Add a domain"** → type `driftcoconut.com` → **Continue**
+3. Choose the **Free plan** → **Continue**
+4. Cloudflare shows you 2 nameservers, e.g.:
+   ```
+   xxx.ns.cloudflare.com
+   yyy.ns.cloudflare.com
+   ```
+   **Copy both.**
 
-```bash
-cd "C:\Users\Admin\Downloads\Travel Site"
-gh repo create travel-site --public --source=. --push
-```
+## Step 2 — Point your registrar to Cloudflare
 
-This creates `github.com/<your-username>/travel-site` and pushes.
+Go to the registrar you bought the domain from → Nameservers section → change from default to **Custom** → paste both Cloudflare nameservers.
 
-## Step 2 — Deploy to Vercel
+Wait 5–30 min. Cloudflare will email when active.
 
-From the same folder:
+*(If you bought via Cloudflare Registrar, skip this — DNS is already there.)*
 
-```bash
-vercel
-```
+## Step 3 — Add the domain to Vercel
 
-Answers to the prompts:
-- **Set up and deploy?** → `Y`
-- **Which scope?** → your personal account
-- **Link to existing project?** → `N`
-- **Project name?** → `travel-site` (or press Enter)
-- **Directory?** → `.` (press Enter)
-- **Modify settings?** → `N`
+1. **https://vercel.com/dashboard** → **travel-site** → **Settings → Domains**
+2. Type `driftcoconut.com` → **Add**
+3. Also add `www.driftcoconut.com`
+4. Vercel gives you 2 DNS records — an **A** for root and a **CNAME** for `www`:
+   ```
+   Type: A       Name: @      Value: 76.76.21.21
+   Type: CNAME   Name: www    Value: cname.vercel-dns.com
+   ```
+   **Keep this tab open.**
 
-You'll get a URL like `https://travel-site-abc123.vercel.app`. **Copy it.**
+## Step 4 — Add DNS records in Cloudflare
 
-## Step 3 — Add env vars in Vercel
+1. Cloudflare → click `driftcoconut.com` → **DNS → Records**
+2. Add the A record:
+   - Type: `A`
+   - Name: `@`
+   - IPv4: `76.76.21.21`
+   - Proxy status: **DNS only** (grey cloud) — Vercel handles HTTPS
+   - **Save**
+3. Add the CNAME:
+   - Type: `CNAME`
+   - Name: `www`
+   - Target: `cname.vercel-dns.com`
+   - Proxy status: **DNS only**
+   - **Save**
 
-Open the Vercel dashboard → your project → **Settings → Environment Variables**.
+## Step 5 — Verify + go live
 
-Add these (all three environments: Production, Preview, Development):
+Back in Vercel → Settings → Domains — both entries should show **"Valid Configuration"** with a green check within 2–5 min. HTTPS certificate provisions automatically.
+
+Visit **https://driftcoconut.com** — you're live. 🥥
+
+---
+
+## Environment variables
+
+In Vercel dashboard → Settings → Environment Variables, make sure these are set for **Production + Preview + Development**:
 
 | Name | Value | Notes |
 |---|---|---|
-| `AGODA_MOCK` | `true` | Keeps mock data active while API pending |
-| `AGODA_SITE_ID` | *(leave blank for now)* | Fill in once approved |
-| `AGODA_API_KEY` | *(leave blank for now)* | Fill in once approved |
+| `NEXT_PUBLIC_SITE_URL` | `https://driftcoconut.com` | Used for canonical URLs |
+| `AGODA_MOCK` | `true` | Serves sample hotels while Agoda API pending |
+| `AGODA_SITE_ID` | *(leave blank until approved)* | Fill once Agoda approves you |
+| `AGODA_API_KEY` | *(leave blank until approved)* | Fill once Agoda approves you |
 
-Then redeploy so the env vars take effect:
+After changing any env var, redeploy:
 
 ```bash
 vercel --prod
 ```
 
-## Step 4 — Submit URL to Agoda
+Or just push a commit — auto-deploy picks up new env vars.
 
-1. Go to `partners.agoda.com` → **Profile → Manage Your Sites**
-2. Add your Vercel URL (from Step 2)
-3. Click **Verify Domain** at the top of the page
+---
 
-Agoda will give you one of two verification methods:
-- **Meta tag** — copy the tag content and add it as `NEXT_PUBLIC_AGODA_VERIFICATION` in Vercel env vars (Step 5)
-- **File upload** — save the file they give you as `public/agoda-verification.html` in the project, commit, and Vercel redeploys automatically
+## Submit driftcoconut.com to Agoda for verification
 
-## Step 5 — Add the verification meta tag (if that method)
+1. Log into `partners.agoda.com` → **Profile → Manage Your Sites**
+2. Add `https://driftcoconut.com` and click **Verify Domain**
+3. Agoda gives you ONE of:
+   - **Meta tag** — copy the `content` value, add to Vercel env vars as `NEXT_PUBLIC_AGODA_VERIFICATION`, redeploy
+   - **File upload** — save the file to `public/agoda-verification.html`, commit, push
+4. Click **Verify** in the Agoda dashboard
 
-If Agoda gives you a meta tag like:
-
-```html
-<meta name="agoda-site-verification" content="xxxxx-yyyyy-zzzzz" />
-```
-
-Just add the `content` value to Vercel:
-
-```
-NEXT_PUBLIC_AGODA_VERIFICATION=xxxxx-yyyyy-zzzzz
-```
-
-Redeploy: `vercel --prod`. Then click **Verify** in the Agoda dashboard.
-
-The `layout.tsx` file already injects this tag automatically when the env var is set — no code changes needed.
+The `layout.tsx` auto-injects the meta tag when the env var is present — no code changes needed.
 
 ---
 
 ## Once Agoda approves your account
 
-1. Go to Agoda dashboard → **Tools → API** → generate your API key
-2. Update Vercel env vars:
+1. Agoda dashboard → **Tools → API** → generate API key
+2. Vercel env vars:
    - `AGODA_MOCK` → `false`
    - `AGODA_SITE_ID` → your CID
    - `AGODA_API_KEY` → your key
-3. `vercel --prod` — your site now serves live hotel data with your affiliate tracking
+3. `vercel --prod` — the site now serves real live hotel data with your affiliate tracking
+
+## Also submit driftcoconut.com to:
+
+- **Booking.com** (via Partnerships Hub or Awin)
+- **Expedia** (via Partnerize signup)
+- **Tripadvisor** (via CJ Affiliate)
+
+Same domain, same verification pattern — one URL to rule them all.
+
+---
+
+## Optional: Cloudflare speed boosters
+
+Once the domain works via DNS-only, you can flip the proxy status to **Proxied** (orange cloud) for extra CDN + DDoS protection:
+
+- **SSL/TLS → Overview** → set to **Full (strict)**
+- **Rules → Page Rules** → force HTTPS redirect
+- **Speed → Optimization** → enable Auto Minify (JS, CSS, HTML)
+- **Email → Email Routing** → forward `hello@driftcoconut.com` to your Gmail (free)
 
 ## Future updates
 
-Any `git push` to `main` triggers automatic Vercel deploy. Workflow:
+Any `git push` to `main` auto-deploys:
 
 ```bash
-# make changes
 git add -A
-git commit -m "add hotel detail page"
+git commit -m "your change"
 git push
-# → live in ~30 seconds
+# → live at driftcoconut.com in ~30 seconds
 ```

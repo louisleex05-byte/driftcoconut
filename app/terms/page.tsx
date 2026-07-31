@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — Drifting Coconut",
-  description: "Terms for using Drifting Coconut.",
+  title: "Terms of Use — driftcoconut",
+  description: "Terms for using driftcoconut.",
 };
 
 export default function TermsPage() {
@@ -13,7 +13,7 @@ export default function TermsPage() {
 
       <h2 className="text-xl font-semibold mt-8">1. About this service</h2>
       <p className="text-slate-600">
-        Drifting Coconut is a hotel search and comparison service. We display hotel listings, photos,
+        driftcoconut is a hotel search and comparison service. We display hotel listings, photos,
         and prices supplied by third-party booking partners. We do not sell hotel accommodations
         directly.
       </p>
@@ -27,7 +27,7 @@ export default function TermsPage() {
 
       <h2 className="text-xl font-semibold mt-8">3. Pricing and availability</h2>
       <p className="text-slate-600">
-        Prices and availability shown on Drifting Coconut are provided by our partners and are subject
+        Prices and availability shown on driftcoconut are provided by our partners and are subject
         to change at any time without notice. Final pricing (including taxes, fees, and any
         discounts) is confirmed on the partner's booking page. We make reasonable efforts to
         ensure accuracy but are not liable for pricing errors or discrepancies.
@@ -35,7 +35,7 @@ export default function TermsPage() {
 
       <h2 className="text-xl font-semibold mt-8">4. Photos and content</h2>
       <p className="text-slate-600">
-        Hotel photos, descriptions, and reviews displayed on Drifting Coconut are the property of the
+        Hotel photos, descriptions, and reviews displayed on driftcoconut are the property of the
         respective hotels or our booking partners and are used with permission under our affiliate
         agreements. You may not copy, redistribute, or reuse this content without explicit
         permission from the rights holder.
@@ -55,7 +55,7 @@ export default function TermsPage() {
 
       <h2 className="text-xl font-semibold mt-8">7. Limitation of liability</h2>
       <p className="text-slate-600">
-        Drifting Coconut provides search results "as is." We are not responsible for the quality,
+        driftcoconut provides search results "as is." We are not responsible for the quality,
         safety, availability, or accuracy of any hotel listed, nor for any losses arising from
         your booking with a partner site.
       </p>
@@ -69,7 +69,7 @@ export default function TermsPage() {
       <h2 className="text-xl font-semibold mt-8">9. Contact</h2>
       <p className="text-slate-600">
         For questions about these terms, email{" "}
-        <a href="mailto:legal@driftingcoconut.com" className="text-sea-700">legal@driftingcoconut.com</a>.
+        <a href="mailto:legal@driftcoconut.com" className="text-sea-700">legal@driftcoconut.com</a>.
       </p>
     </div>
   );

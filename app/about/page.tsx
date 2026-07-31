@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { PalmLeaf, Shell, Hibiscus, Boat, StrawHat } from "@/components/Decorations";
 
 export const metadata: Metadata = {
-  title: "About — Drifting Coconut",
-  description: "Learn about Drifting Coconut — your hotel search and booking companion for effortless getaways.",
+  title: "About — driftcoconut",
+  description: "Learn about driftcoconut — your hotel search and booking companion for effortless getaways.",
 };
 
 export default function AboutPage() {
@@ -16,10 +16,10 @@ export default function AboutPage() {
       <Boat className="hidden md:block absolute bottom-1/3 -left-16 w-20 text-sea-300 opacity-55 pointer-events-none" />
       <Shell className="hidden sm:block absolute bottom-8 -right-6 w-14 text-sea-300 opacity-55 -rotate-12 pointer-events-none" />
 
-      <h1 className="text-3xl font-bold">About Drifting Coconut</h1>
+      <h1 className="text-3xl font-bold">About driftcoconut</h1>
 
       <p className="text-slate-600 mt-4">
-        Drifting Coconut helps travelers discover and compare hotels across Asia and beyond. We aggregate
+        driftcoconut helps travelers discover and compare hotels across Asia and beyond. We aggregate
         listings, photos, and real guest reviews from trusted booking partners so you can find the
         right room, in the right neighborhood, at the right price — without opening a dozen tabs.
       </p>
@@ -43,11 +43,11 @@ export default function AboutPage() {
       <h2 className="text-xl font-semibold mt-8">Contact</h2>
       <p className="text-slate-600">
         Questions, feedback, or partnership inquiries? Email{" "}
-        <a href="mailto:hello@driftingcoconut.com" className="text-sea-700">hello@driftingcoconut.com</a>.
+        <a href="mailto:hello@driftcoconut.com" className="text-sea-700">hello@driftcoconut.com</a>.
       </p>
 
       <p className="text-xs text-slate-400 mt-12">
-        Drifting Coconut is an independent hotel discovery service. Prices and availability are provided
+        driftcoconut is an independent hotel discovery service. Prices and availability are provided
         by our partners and are subject to change. All bookings and payment are handled by the
         respective booking partner.
       </p>

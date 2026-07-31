@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Drifting Coconut",
-  description: "How Drifting Coconut handles your data.",
+  title: "Privacy Policy — driftcoconut",
+  description: "How driftcoconut handles your data.",
 };
 
 export default function PrivacyPage() {
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
 
       <h2 className="text-xl font-semibold mt-8">What we collect</h2>
       <p className="text-slate-600">
-        When you use Drifting Coconut, we collect only the information necessary to help you search for
+        When you use driftcoconut, we collect only the information necessary to help you search for
         hotels — your search parameters (destination, dates, number of guests). We do not require
         you to create an account, and we do not collect personal information such as your name,
         email, phone number, or payment details on this site.
@@ -31,12 +31,12 @@ export default function PrivacyPage() {
         When you click "Book Now" on a hotel, you are directed to a partner site (Agoda, Expedia,
         Booking.com, etc.) to complete your reservation. Your booking, payment, and any personal
         information you enter on the partner's site are governed by that partner's own privacy
-        policy. Drifting Coconut does not receive or store your payment information.
+        policy. driftcoconut does not receive or store your payment information.
       </p>
 
       <h2 className="text-xl font-semibold mt-8">Affiliate disclosure</h2>
       <p className="text-slate-600">
-        Drifting Coconut participates in affiliate partnerships. When you book a hotel through our links,
+        driftcoconut participates in affiliate partnerships. When you book a hotel through our links,
         the partner may pay us a small commission at no additional cost to you. This does not
         influence which properties we display — inventory and pricing come directly from the
         partner's live data.
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
       <h2 className="text-xl font-semibold mt-8">Your rights</h2>
       <p className="text-slate-600">
         You can clear cookies at any time through your browser. For any privacy-related questions,
-        contact us at <a href="mailto:privacy@driftingcoconut.com" className="text-sea-700">privacy@driftingcoconut.com</a>.
+        contact us at <a href="mailto:privacy@driftcoconut.com" className="text-sea-700">privacy@driftcoconut.com</a>.
       </p>
 
       <h2 className="text-xl font-semibold mt-8">Changes</h2>

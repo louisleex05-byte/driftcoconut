@@ -4,9 +4,27 @@ import Logo from "@/components/Logo";
 import { Wave, Shell, Coral, Conch, Starfish } from "@/components/Decorations";
 import "./globals.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://driftcoconut.com";
+
 export const metadata: Metadata = {
-  title: "driftcoconut — find your next stay",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "driftcoconut — find your next stay",
+    template: "%s · driftcoconut",
+  },
   description: "Discover and compare hotels worldwide. Drift into your next getaway.",
+  openGraph: {
+    title: "driftcoconut — find your next stay",
+    description: "Discover and compare hotels worldwide. Drift into your next getaway.",
+    url: SITE_URL,
+    siteName: "driftcoconut",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "driftcoconut — find your next stay",
+    description: "Discover and compare hotels worldwide. Drift into your next getaway.",
+  },
   other: {
     ...(process.env.NEXT_PUBLIC_AGODA_VERIFICATION && {
       "agoda-site-verification": process.env.NEXT_PUBLIC_AGODA_VERIFICATION,
