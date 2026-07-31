@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header className="bg-white border-b border-slate-200">
-          <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="max-w-screen-2xl mx-auto px-4 h-14 flex items-center justify-between">
             <Link href="/" className="font-bold text-brand text-lg">
               TravelSite
             </Link>
@@ -39,9 +39,9 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <main className="max-w-6xl mx-auto px-4 py-8">{children}</main>
+        <main className="max-w-screen-2xl mx-auto px-4 py-8">{children}</main>
         <footer className="mt-16 border-t border-slate-200 py-10">
-          <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+          <div className="max-w-screen-2xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
             <div>
               <div className="font-semibold text-slate-900 mb-2">TravelSite</div>
               <p className="text-slate-500 text-xs leading-relaxed">
@@ -72,7 +72,7 @@ export default function RootLayout({
               </ul>
             </div>
           </div>
-          <div className="max-w-6xl mx-auto px-4 mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400 text-center">
+          <div className="max-w-screen-2xl mx-auto px-4 mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400 text-center">
             © {new Date().getFullYear()} TravelSite. Powered by affiliate partners. Prices and availability subject to change.
           </div>
         </footer>
