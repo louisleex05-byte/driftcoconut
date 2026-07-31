@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { Wave, Shell } from "@/components/Decorations";
+import { Wave, Shell, Coral, Conch, Starfish } from "@/components/Decorations";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -55,9 +55,12 @@ export default function RootLayout({
         </header>
         <main className="max-w-screen-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">{children}</main>
         <footer className="relative mt-16 border-t border-sea-100 py-10 bg-white/50 overflow-hidden">
-          {/* Ambient wave & shell in footer */}
-          <Wave className="absolute top-0 left-0 w-full h-6 text-sea-200 opacity-60 pointer-events-none" />
-          <Shell className="hidden md:block absolute bottom-4 right-6 w-16 text-sea-300 opacity-30 pointer-events-none" />
+          {/* Ambient waves, corals, and shells in footer */}
+          <Wave className="absolute top-0 left-0 w-full h-6 text-sea-300 opacity-80 pointer-events-none" />
+          <Coral className="hidden md:block absolute bottom-2 left-4 w-16 text-sea-400 opacity-50 pointer-events-none" />
+          <Conch className="hidden md:block absolute bottom-6 right-24 w-12 text-sea-500 opacity-45 pointer-events-none -rotate-12" />
+          <Shell className="absolute bottom-4 right-6 w-14 md:w-20 text-sea-400 opacity-55 pointer-events-none" />
+          <Starfish className="hidden sm:block absolute top-8 right-1/3 w-10 text-sand-100 opacity-70 pointer-events-none" />
 
           <div className="max-w-screen-2xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm relative">
             <div>

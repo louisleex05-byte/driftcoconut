@@ -114,6 +114,137 @@ export function Hibiscus({ className = "" }: IconProps) {
   );
 }
 
+export function Boat({ className = "" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 140 100"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+    >
+      {/* Triangular sail */}
+      <path d="M70 15 L70 68 L30 68 Z" opacity="0.85" />
+      {/* Second smaller sail */}
+      <path d="M72 20 L72 68 L108 68 Z" opacity="0.65" />
+      {/* Mast */}
+      <line x1="70" y1="12" x2="70" y2="72" stroke="currentColor" strokeWidth="2" />
+      {/* Hull */}
+      <path d="M15 72 Q70 92 125 72 Q120 82 70 84 Q20 82 15 72 Z" opacity="0.9" />
+      {/* Water line ripple */}
+      <path d="M0 92 Q30 88 60 92 T120 92 T140 92" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.5" />
+    </svg>
+  );
+}
+
+export function StrawHat({ className = "" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 120 90"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+    >
+      {/* Wide brim */}
+      <ellipse cx="60" cy="65" rx="55" ry="12" opacity="0.75" />
+      {/* Crown */}
+      <path d="M25 65 Q30 25 60 20 Q90 25 95 65 Z" opacity="0.9" />
+      {/* Band */}
+      <path d="M27 58 Q60 66 93 58 L92 64 Q60 71 28 64 Z" opacity="0.5" />
+      {/* Woven texture — subtle lines on crown */}
+      <path d="M35 55 Q60 60 85 55" stroke="currentColor" strokeWidth="0.6" fill="none" opacity="0.4" />
+      <path d="M32 45 Q60 51 88 45" stroke="currentColor" strokeWidth="0.6" fill="none" opacity="0.4" />
+      <path d="M32 35 Q60 40 88 35" stroke="currentColor" strokeWidth="0.6" fill="none" opacity="0.4" />
+    </svg>
+  );
+}
+
+export function Coral({ className = "" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 100 120"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+    >
+      {/* Base */}
+      <ellipse cx="50" cy="115" rx="28" ry="4" opacity="0.4" />
+      {/* Main trunk */}
+      <path
+        d="M50 115 Q48 90 45 75 Q42 60 45 45 Q48 30 46 15"
+        stroke="currentColor"
+        strokeWidth="7"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.85"
+      />
+      {/* Left branch */}
+      <path
+        d="M45 60 Q30 55 22 40 Q18 30 22 20"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.75"
+      />
+      {/* Right branch */}
+      <path
+        d="M46 70 Q65 65 72 50 Q78 40 76 28"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.75"
+      />
+      {/* Small side branch */}
+      <path
+        d="M45 85 Q35 80 32 72"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.65"
+      />
+      {/* Polyps — small dots for texture */}
+      <circle cx="22" cy="22" r="3" opacity="0.7" />
+      <circle cx="76" cy="30" r="3" opacity="0.7" />
+      <circle cx="46" cy="17" r="3" opacity="0.7" />
+      <circle cx="32" cy="70" r="2.5" opacity="0.6" />
+    </svg>
+  );
+}
+
+export function Conch({ className = "" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    >
+      {/* Outer shell body */}
+      <path
+        d="M20 78 Q10 55 20 32 Q35 12 60 15 Q85 22 88 45 Q88 68 72 82 Q52 92 30 88 Z"
+        fill="currentColor"
+        opacity="0.2"
+      />
+      <path d="M20 78 Q10 55 20 32 Q35 12 60 15 Q85 22 88 45 Q88 68 72 82 Q52 92 30 88 Z" />
+      {/* Inner spiral swirl */}
+      <path d="M50 82 Q30 75 32 55 Q38 40 55 42 Q68 46 66 60 Q60 70 50 68" />
+      <path d="M52 60 Q47 58 47 54" />
+      {/* Ribs */}
+      <path d="M25 40 Q40 25 60 22" opacity="0.6" />
+      <path d="M30 55 Q45 45 65 45" opacity="0.6" />
+    </svg>
+  );
+}
+
 export function Starfish({ className = "" }: IconProps) {
   return (
     <svg

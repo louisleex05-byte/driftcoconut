@@ -10,7 +10,7 @@ const PARTNERS: { name: string; color: string; note: string }[] = [
   { name: "Tripadvisor", color: "#00AF87", note: "Real reviews" },
 ];
 
-import { Wave, Pebble } from "./Decorations";
+import { Wave, Pebble, Coral, Conch } from "./Decorations";
 
 export default function PartnerStrip() {
   return (
@@ -19,10 +19,13 @@ export default function PartnerStrip() {
       className="relative mt-6 mb-10 border-y border-sea-100 bg-white/50 overflow-hidden"
     >
       {/* Wave divider top */}
-      <Wave className="absolute -top-3 left-0 w-full h-6 text-sea-200" />
+      <Wave className="absolute -top-3 left-0 w-full h-6 text-sea-300" />
+      {/* Coral on the left, conch on the right — flanking partners */}
+      <Coral className="hidden sm:block absolute -bottom-2 left-4 w-14 md:w-20 text-sea-400 opacity-60 pointer-events-none" />
+      <Conch className="hidden sm:block absolute bottom-3 right-6 w-14 md:w-18 text-sea-500 opacity-60 -rotate-12 pointer-events-none" />
       {/* Pebble accents at edges */}
-      <Pebble className="hidden sm:block absolute bottom-2 left-4 w-16 text-sea-300 opacity-40 pointer-events-none" />
-      <Pebble className="hidden sm:block absolute bottom-2 right-4 w-16 text-sea-300 opacity-40 -scale-x-100 pointer-events-none" />
+      <Pebble className="hidden md:block absolute bottom-2 left-32 w-16 text-sea-300 opacity-60 pointer-events-none" />
+      <Pebble className="hidden md:block absolute bottom-2 right-32 w-16 text-sea-300 opacity-60 -scale-x-100 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 py-6 relative z-10">
         <div className="text-center text-xs uppercase tracking-widest text-slate-500 mb-4">
