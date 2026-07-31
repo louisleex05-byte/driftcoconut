@@ -20,7 +20,7 @@ export default async function SearchPage({
     return (
       <div className="text-center py-16">
         <p>Missing search parameters.</p>
-        <Link href="/" className="text-brand underline">Go back</Link>
+        <Link href="/" className="text-sea-700 underline">Go back</Link>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export default async function SearchPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/" className="text-sm text-slate-500 hover:text-brand">
+        <Link href="/" className="text-sm text-slate-500 hover:text-sea-700">
           ← New search
         </Link>
         <h1 className="text-2xl font-bold mt-2">

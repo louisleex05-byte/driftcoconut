@@ -19,7 +19,7 @@ export default async function HotelDetailPage({
 
   return (
     <div className="space-y-8">
-      <Link href="/" className="text-sm text-slate-500 hover:text-brand">
+      <Link href="/" className="text-sm text-slate-500 hover:text-sea-700">
         ← Back to search
       </Link>
 
@@ -58,7 +58,7 @@ export default async function HotelDetailPage({
             <h1 className="text-3xl font-bold mt-1">{hotel.hotelName}</h1>
             <p className="text-slate-500 text-sm mt-1">{detail.address}</p>
             {hotel.reviewScore ? (
-              <div className="mt-3 inline-flex items-center gap-2 bg-brand text-white rounded-lg px-3 py-1 text-sm font-semibold">
+              <div className="mt-3 inline-flex items-center gap-2 bg-sea-600 text-white rounded-lg px-3 py-1 text-sm font-semibold">
                 {hotel.reviewScore.toFixed(1)}
                 <span className="font-normal opacity-90">
                   · {hotel.reviewCount} reviews
@@ -77,7 +77,7 @@ export default async function HotelDetailPage({
             <ul className="grid grid-cols-2 gap-2 text-sm text-slate-700">
               {detail.amenities.map((a) => (
                 <li key={a} className="flex items-center gap-2">
-                  <span className="text-brand">✓</span>
+                  <span className="text-sea-700">✓</span>
                   {a}
                 </li>
               ))}
@@ -90,7 +90,7 @@ export default async function HotelDetailPage({
               {detail.rooms.map((room) => (
                 <div
                   key={room.name}
-                  className="bg-white border border-slate-200 rounded-lg p-4 flex items-center justify-between gap-4"
+                  className="bg-white border border-sea-100 rounded-lg p-4 flex items-center justify-between gap-4"
                 >
                   <div>
                     <h3 className="font-semibold">{room.name}</h3>
@@ -99,7 +99,7 @@ export default async function HotelDetailPage({
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-brand">
+                    <div className="text-lg font-bold text-sea-700">
                       {hotel.currency} {room.price}
                     </div>
                     <div className="text-xs text-slate-500">/ night</div>
@@ -112,14 +112,14 @@ export default async function HotelDetailPage({
 
         {/* Sticky book box */}
         <aside className="lg:col-span-1">
-          <div className="sticky top-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <div className="sticky top-4 bg-white border border-sea-100 rounded-xl p-5 shadow-sm">
             <div className="flex items-baseline gap-2">
               {hotel.crossedOutRate && hotel.crossedOutRate > hotel.dailyRate ? (
                 <span className="text-sm text-slate-400 line-through">
                   {hotel.currency} {Math.round(hotel.crossedOutRate)}
                 </span>
               ) : null}
-              <span className="text-2xl font-bold text-brand">
+              <span className="text-2xl font-bold text-sea-700">
                 {hotel.currency} {Math.round(hotel.dailyRate)}
               </span>
               <span className="text-sm text-slate-500">/ night</span>
@@ -128,7 +128,7 @@ export default async function HotelDetailPage({
               href={hotel.landingURL}
               target="_blank"
               rel="noopener sponsored"
-              className="mt-4 block w-full bg-brand hover:bg-brand-dark text-white text-center font-semibold py-3 rounded-lg"
+              className="mt-4 block w-full bg-sea-600 hover:bg-sea-700 text-white text-center font-semibold py-3 rounded-lg"
             >
               Book on Agoda
             </a>

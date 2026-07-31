@@ -40,12 +40,12 @@ export default function SearchForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 grid grid-cols-1 md:grid-cols-5 gap-3"
+      className="bg-white rounded-xl shadow-sm border border-sea-100 p-5 grid grid-cols-1 md:grid-cols-5 gap-3"
     >
       <label className="md:col-span-2">
         <div className="text-xs font-medium text-slate-600 mb-1">Destination</div>
         <select
-          className="w-full border border-slate-300 rounded-lg px-3 py-2"
+          className="w-full border border-sea-200 rounded-lg px-3 py-2"
           value={cityId}
           onChange={(e) => setCityId(Number(e.target.value))}
         >
@@ -62,7 +62,7 @@ export default function SearchForm() {
         <div className="text-xs font-medium text-slate-600 mb-1">Check-in</div>
         <input
           type="date"
-          className="w-full border border-slate-300 rounded-lg px-3 py-2"
+          className="w-full border border-sea-200 rounded-lg px-3 py-2"
           value={checkIn}
           onChange={(e) => setCheckIn(e.target.value)}
         />
@@ -71,7 +71,7 @@ export default function SearchForm() {
         <div className="text-xs font-medium text-slate-600 mb-1">Check-out</div>
         <input
           type="date"
-          className="w-full border border-slate-300 rounded-lg px-3 py-2"
+          className="w-full border border-sea-200 rounded-lg px-3 py-2"
           value={checkOut}
           onChange={(e) => setCheckOut(e.target.value)}
         />
@@ -82,7 +82,7 @@ export default function SearchForm() {
           type="number"
           min={1}
           max={10}
-          className="w-full border border-slate-300 rounded-lg px-3 py-2"
+          className="w-full border border-sea-200 rounded-lg px-3 py-2"
           value={adults}
           onChange={(e) => setAdults(Number(e.target.value))}
         />
@@ -90,7 +90,7 @@ export default function SearchForm() {
       <div className="md:col-span-5">
         <button
           type="submit"
-          className="w-full md:w-auto bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-2.5 rounded-lg"
+          className="w-full md:w-auto bg-sea-600 hover:bg-sea-700 text-white font-semibold px-6 py-2.5 rounded-lg"
         >
           Search hotels
         </button>

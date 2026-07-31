@@ -14,7 +14,7 @@ export default function PartnerStrip() {
   return (
     <section
       aria-label="Our booking partners"
-      className="mt-6 mb-10 border-y border-slate-200 bg-white/50"
+      className="mt-6 mb-10 border-y border-sea-100 bg-white/50"
     >
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="text-center text-xs uppercase tracking-widest text-slate-500 mb-4">

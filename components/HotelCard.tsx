@@ -6,7 +6,7 @@ export default function HotelCard({ hotel }: { hotel: AgodaHotel }) {
   return (
     <Link
       href={`/hotel/${hotel.hotelId}`}
-      className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
+      className="group bg-white rounded-xl border border-sea-100 overflow-hidden hover:shadow-md transition-shadow"
     >
       <div className="relative aspect-[4/3] bg-slate-100">
         {hotel.imageURL ? (
@@ -23,7 +23,7 @@ export default function HotelCard({ hotel }: { hotel: AgodaHotel }) {
         <div className="flex items-center gap-1 text-amber-500 text-xs mb-1">
           {"★".repeat(Math.round(hotel.starRating))}
         </div>
-        <h3 className="font-semibold line-clamp-2 group-hover:text-brand">
+        <h3 className="font-semibold line-clamp-2 group-hover:text-sea-700">
           {hotel.hotelName}
         </h3>
         <div className="mt-1 text-xs text-slate-500">
@@ -35,7 +35,7 @@ export default function HotelCard({ hotel }: { hotel: AgodaHotel }) {
               {hotel.currency} {Math.round(hotel.crossedOutRate)}
             </span>
           ) : null}
-          <span className="text-lg font-bold text-brand">
+          <span className="text-lg font-bold text-sea-700">
             {hotel.currency} {Math.round(hotel.dailyRate)}
           </span>
           <span className="text-xs text-slate-500">/ night</span>
