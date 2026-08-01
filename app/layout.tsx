@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import HeaderSearch from "@/components/HeaderSearch";
 import { Wave, Shell, Coral, Conch, Starfish } from "@/components/Decorations";
 import "./globals.css";
 
@@ -46,22 +47,34 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <header className="bg-white/70 backdrop-blur border-b border-sea-100 sticky top-0 z-30">
-          <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+          <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 h-16 sm:h-20 flex items-center justify-between gap-3">
             <Link
               href="/"
-              className="flex items-center gap-2 group min-w-0 flex-shrink"
+              className="flex items-center gap-2 sm:gap-3 group min-w-0 flex-shrink"
             >
+              {/* Logo — dominant, bigger than wordmark */}
               <Logo
-                className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 transition-transform group-hover:-rotate-6"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0 transition-transform group-hover:-rotate-6"
               />
-              <span className="font-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 leading-none truncate">
+              <span className="font-display text-lg sm:text-xl md:text-2xl font-semibold tracking-tight text-sea-700 leading-none truncate">
                 driftcoconut
               </span>
             </Link>
-            <nav className="flex items-center gap-3 sm:gap-6 text-sm text-slate-600 flex-shrink-0">
-              <Link href="/" className="hidden sm:inline hover:text-sea-600 transition-colors">
-                Search
-              </Link>
+
+            {/* Center search field — magnify icon + input */}
+            <HeaderSearch />
+
+            <nav className="flex items-center gap-3 sm:gap-5 text-sm text-slate-600 flex-shrink-0">
+              <a
+                href="/#search-form"
+                className="md:hidden flex items-center gap-1 hover:text-sea-600 transition-colors"
+                aria-label="Search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+              </a>
               <Link href="/#deals" className="hover:text-sea-600 transition-colors">
                 Deals
               </Link>
@@ -83,7 +96,7 @@ export default function RootLayout({
           <div className="max-w-screen-2xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm relative">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Logo className="w-6 h-6" />
+                <Logo className="w-9 h-9" />
                 <span className="font-display text-lg font-semibold text-sea-700">driftcoconut</span>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed">

@@ -16,7 +16,7 @@ export default function PartnerStrip() {
   return (
     <section
       aria-label="Our booking partners"
-      className="relative mt-6 mb-10 border-y border-sea-100 bg-white/50 overflow-hidden"
+      className="relative -mt-1 border-b border-sea-100 bg-white/70 overflow-hidden rounded-b-2xl sm:rounded-b-3xl shadow-sm"
     >
       {/* Wave divider top */}
       <Wave className="absolute -top-3 left-0 w-full h-6 text-sea-300" />

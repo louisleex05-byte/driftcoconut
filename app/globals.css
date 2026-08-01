@@ -5,6 +5,12 @@
 @tailwind utilities;
 
 html, body { height: 100%; }
+/* Scale root font-size by ~18% on mobile, full 20% on tablet+.
+   Since Tailwind uses rem for both text and spacing, this proportionally enlarges everything. */
+html { font-size: 115%; }
+@media (min-width: 640px) { html { font-size: 118%; } }
+@media (min-width: 1024px) { html { font-size: 120%; } }
+
 body {
   @apply text-slate-800 antialiased;
   background: linear-gradient(180deg, #F0F9FB 0%, #F8FAFC 100%);

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
-import SearchForm from "./SearchForm";
 import { PalmLeaf, Shell, Boat, StrawHat } from "./Decorations";
 
 const ROTATE_MS = 7000;
@@ -21,7 +20,7 @@ export default function Hero() {
   const current = HERO_PHOTOS[index];
 
   return (
-    <section className="relative -mt-6 sm:-mt-8 mb-10 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
+    <section className="relative -mt-6 sm:-mt-8 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
       {/* Decorative palm leaf — top-right corner overlay */}
       <PalmLeaf className="absolute top-3 right-4 w-24 md:w-36 lg:w-44 text-white/50 rotate-[35deg] z-10 pointer-events-none" />
       {/* Straw hat — top-left */}
@@ -84,13 +83,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Search bar overlaps up into the image */}
-      <div className="relative -mt-6 md:-mt-12 mx-3 sm:mx-4 md:mx-8 z-10">
-        <SearchForm />
-      </div>
-
-      {/* Photo credit — updates as the slide rotates */}
-      <div className="text-center text-xs text-slate-400 mt-3 transition-opacity duration-500">
+      {/* Photo credit — sits inside hero, subtle bottom-right */}
+      <div className="absolute bottom-2 right-3 text-[10px] sm:text-xs text-white/80 transition-opacity duration-500 z-10 drop-shadow">
         {current.caption} · {current.credit}
       </div>
     </section>
