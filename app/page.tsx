@@ -13,7 +13,7 @@ export default function HomePage() {
       </div>
 
       {/* Main search form — its own section, anchored for the header search icon */}
-      <section id="search-form" className="mb-10 scroll-mt-24">
+      <section id="search-form" className="mb-6 scroll-mt-24">
         <div className="text-center mb-4">
           <div className="text-xs uppercase tracking-widest text-sea-600 font-semibold">
             Where to?
@@ -25,14 +25,14 @@ export default function HomePage() {
         <SearchForm />
       </section>
 
-      {/* Between-sections dispersed decorations */}
-      <div className="relative h-6 -my-2">
-        <Boat className="hidden md:block absolute -top-4 left-1/4 w-16 text-sea-400 opacity-55 pointer-events-none" />
-        <StrawHat className="hidden md:block absolute -top-3 right-1/3 w-14 text-sea-400 opacity-55 pointer-events-none rotate-6" />
-        <Conch className="hidden lg:block absolute -top-2 left-2/3 w-10 text-sea-500 opacity-55 pointer-events-none -rotate-12" />
+      {/* Tight decorative dividers between search and deals */}
+      <div className="relative h-3 flex items-center justify-center">
+        <Boat className="hidden md:block absolute left-1/4 w-12 text-sea-400 opacity-45 pointer-events-none" />
+        <StrawHat className="hidden md:block absolute right-1/4 w-10 text-sea-400 opacity-45 pointer-events-none rotate-6" />
+        <Conch className="hidden lg:block absolute left-2/3 w-8 text-sea-500 opacity-45 pointer-events-none -rotate-12" />
       </div>
 
-      <section id="deals" className="relative py-6 mb-10">
+      <section id="deals" className="relative pt-2 pb-6 mb-10">
         <Hibiscus className="absolute -top-6 -right-2 w-20 md:w-28 text-sea-300 opacity-70 rotate-12 pointer-events-none" />
         <Starfish className="hidden sm:block absolute -bottom-4 -left-4 w-20 md:w-24 text-sea-400 opacity-70 -rotate-12 pointer-events-none" />
 
