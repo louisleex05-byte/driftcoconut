@@ -2,15 +2,27 @@
 // Uses styled text logotypes (no official logo images) — this is the safe route
 // until each affiliate program approves your account and provides co-branded assets.
 
-const PARTNERS: { name: string; color: string; note: string }[] = [
+import { Wave, Pebble, Coral, Conch } from "./Decorations";
+
+type Partner = {
+  name: string;
+  color: string;
+  note: string;
+  parent?: string; // Optional: "By Tripadvisor Group" style credit
+};
+
+const PARTNERS: Partner[] = [
   { name: "agoda", color: "#F41B4A", note: "Asia-Pacific specialist" },
   { name: "Booking.com", color: "#003580", note: "Global inventory" },
   { name: "Expedia", color: "#FFC72C", note: "Bundle & save" },
   { name: "Hotels.com", color: "#D32F2F", note: "Rewards program" },
-  { name: "Tripadvisor", color: "#00AF87", note: "Real reviews" },
+  {
+    name: "Viator",
+    color: "#328E68",
+    note: "Tours & experiences",
+    parent: "By Tripadvisor Group",
+  },
 ];
-
-import { Wave, Pebble, Coral, Conch } from "./Decorations";
 
 export default function PartnerStrip() {
   return (
@@ -32,19 +44,24 @@ export default function PartnerStrip() {
           Live inventory from trusted booking partners
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-5 sm:gap-x-8 gap-y-4">
+        <div className="flex flex-wrap items-end justify-center gap-x-5 sm:gap-x-8 gap-y-4">
           {PARTNERS.map((p) => (
             <div
               key={p.name}
-              className="flex flex-col items-center"
-              title={p.note}
+              className="flex flex-col items-center text-center"
+              title={p.parent ? `${p.name} — ${p.parent}` : p.note}
             >
               <span
-                className="text-base sm:text-lg md:text-xl font-bold tracking-tight"
+                className="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-none"
                 style={{ color: p.color }}
               >
                 {p.name}
               </span>
+              {p.parent && (
+                <span className="text-[9px] italic text-slate-500 mt-0.5">
+                  {p.parent}
+                </span>
+              )}
               <span className="text-[10px] uppercase tracking-wider text-slate-400 mt-0.5">
                 {p.note}
               </span>
@@ -66,6 +83,11 @@ export default function PartnerStrip() {
           <span className="inline-flex items-center gap-1.5">
             <span className="text-green-600">✓</span> No booking fees
           </span>
+        </div>
+
+        {/* Powered by line — subtle attribution below trust indicators */}
+        <div className="mt-4 text-center text-[10px] uppercase tracking-widest text-slate-400">
+          Reviews & experiences powered by <span className="font-semibold text-slate-500">Tripadvisor Group</span>
         </div>
       </div>
     </section>
