@@ -1,6 +1,7 @@
 import Hero from "@/components/Hero";
 import PartnerStrip from "@/components/PartnerStrip";
 import SearchForm from "@/components/SearchForm";
+import TravelEssentials from "@/components/TravelEssentials";
 import { Hibiscus, Starfish, PalmLeaf, Boat, StrawHat, Coral, Conch, Shell } from "@/components/Decorations";
 
 export default function HomePage() {
@@ -78,6 +79,11 @@ export default function HomePage() {
         <StrawHat className="hidden md:block absolute top-2 left-1/2 -translate-x-1/2 w-16 text-sea-300 opacity-55 pointer-events-none -rotate-6" />
         <Boat className="hidden sm:block absolute top-1 right-6 w-16 text-sea-400 opacity-55 pointer-events-none" />
       </div>
+
+      {/* Travel essentials — affiliate cross-sell */}
+      <section className="mt-10 mb-10">
+        <TravelEssentials />
+      </section>
 
       {/* Ambient palm leaf + coral drifting in the page corners */}
       <PalmLeaf className="hidden lg:block fixed -bottom-20 -right-20 w-72 text-sea-200 opacity-60 rotate-45 pointer-events-none -z-10" />
