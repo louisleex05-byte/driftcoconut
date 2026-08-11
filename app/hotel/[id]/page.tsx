@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PalmLeaf, Shell } from "@/components/Decorations";
+import TravelEssentials from "@/components/TravelEssentials";
 
 type Params = { id: string };
 
@@ -143,6 +144,14 @@ export default async function HotelDetailPage({
           </div>
         </aside>
       </div>
+
+      {/* Travel essentials — affiliate cross-sell (Klook, Welcome Pickups, Yesim, Kiwi) */}
+      <section className="pt-8 border-t border-sea-100">
+        <TravelEssentials
+          heading="Complete your stay"
+          subheading="Add these before you go — activities, transfers, connectivity, and flights."
+        />
+      </section>
     </div>
   );
 }
