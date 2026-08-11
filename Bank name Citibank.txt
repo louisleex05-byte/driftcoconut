@@ -1,0 +1,7 @@
+Bank name: Citibank
+Bank address: 111 Wall Street New York, NY 10043 USA
+Routing (ABA): 031100209
+SWIFT code: CITIUS33
+Account number: 70586140002555439
+Account type: CHECKING
+Beneficiary name: Niphon Srisawat

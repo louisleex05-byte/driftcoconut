@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import Logo from "@/components/Logo";
 import HeaderSearch from "@/components/HeaderSearch";
 import { Wave, Shell, Coral, Conch, Starfish } from "@/components/Decorations";
 import "./globals.css";
+
+// Travelpayouts Drive script — loaded via env var so it's easy to toggle.
+// Set NEXT_PUBLIC_TRAVELPAYOUTS_SRC in Vercel env vars to enable.
+const TP_DRIVE_SRC =
+  process.env.NEXT_PUBLIC_TRAVELPAYOUTS_SRC ||
+  "https://emrld.ltd/NTYxMTY4.js?t=561168";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://driftcoconut.com";
 
@@ -131,6 +138,16 @@ export default function RootLayout({
             © {new Date().getFullYear()} driftcoconut. Powered by affiliate partners. Prices and availability subject to change.
           </div>
         </footer>
+
+        {/* Travelpayouts Drive — third-party monetization script.
+            Loads after the page is interactive so it never blocks initial render.
+            Remove or comment out this <Script> tag anytime to disable Drive. */}
+        <Script
+          id="travelpayouts-drive"
+          src={TP_DRIVE_SRC}
+          strategy="afterInteractive"
+          data-cmp-ab="2"
+        />
       </body>
     </html>
   );
