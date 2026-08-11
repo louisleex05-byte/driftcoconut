@@ -71,28 +71,41 @@ export default function TravelEssentials({
 
       <div className={`grid gap-3 sm:gap-4 ${compact ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
         {ESSENTIALS.map((e) => (
-          <a
-            key={e.key}
-            href={AFFILIATE_LINKS[e.key]}
-            target="_blank"
-            rel="noopener sponsored"
-            className="group bg-white/80 backdrop-blur border border-sea-100 rounded-xl p-4 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col"
-          >
-            <div className={`w-11 h-11 rounded-full ${e.bg} flex items-center justify-center text-2xl mb-3 flex-shrink-0`}>
-              {e.emoji}
-            </div>
-            <h3 className={`font-display text-base font-semibold ${e.color} group-hover:text-sea-700 transition-colors`}>
-              {e.title}
-            </h3>
-            <p className="text-xs text-slate-600 mt-1 flex-grow">{e.subtitle}</p>
-            <div className="mt-3 text-xs font-medium text-sea-700 inline-flex items-center gap-1">
-              Book now
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
-                <path d="M5 12h14" />
-                <path d="M12 5l7 7-7 7" />
-              </svg>
-            </div>
-          </a>
+          <div key={e.key} className="flex flex-col">
+            <a
+              href={AFFILIATE_LINKS[e.key]}
+              target="_blank"
+              rel="noopener sponsored"
+              className="group bg-white/80 backdrop-blur border border-sea-100 rounded-xl p-4 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col flex-grow"
+            >
+              <div className={`w-11 h-11 rounded-full ${e.bg} flex items-center justify-center text-2xl mb-3 flex-shrink-0`}>
+                {e.emoji}
+              </div>
+              <h3 className={`font-display text-base font-semibold ${e.color} group-hover:text-sea-700 transition-colors`}>
+                {e.title}
+              </h3>
+              <p className="text-xs text-slate-600 mt-1 flex-grow">{e.subtitle}</p>
+              <div className="mt-3 text-xs font-medium text-sea-700 inline-flex items-center gap-1">
+                Book now
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
+                  <path d="M5 12h14" />
+                  <path d="M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </a>
+
+            {/* Secondary alternative — only shown under Yesim (eSIM has physical alternative) */}
+            {e.key === "yesim" && (
+              <a
+                href={AFFILIATE_LINKS.drimsim}
+                target="_blank"
+                rel="noopener sponsored"
+                className="mt-1.5 text-[11px] text-slate-500 hover:text-sea-600 text-center transition-colors"
+              >
+                or try Drimsim (physical SIM) →
+              </a>
+            )}
+          </div>
         ))}
       </div>
 
