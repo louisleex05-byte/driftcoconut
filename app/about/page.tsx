@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PalmLeaf, Shell, Hibiscus, Boat, StrawHat } from "@/components/Decorations";
+import TravelEssentials from "@/components/TravelEssentials";
 
 export const metadata: Metadata = {
   title: "About — driftcoconut",
@@ -51,6 +52,14 @@ export default function AboutPage() {
         by our partners and are subject to change. All bookings and payment are handled by the
         respective booking partner.
       </p>
+
+      {/* Travel essentials — cross-sell affiliate partners */}
+      <div className="not-prose mt-12 pt-8 border-t border-sea-100">
+        <TravelEssentials
+          heading="Plan your trip end-to-end"
+          subheading="Beyond hotels — the essentials we recommend from vetted travel partners."
+        />
+      </div>
     </div>
   );
 }
