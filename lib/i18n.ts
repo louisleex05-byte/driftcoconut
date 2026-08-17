@@ -119,7 +119,7 @@ export const dictionary = {
     // Deals section
     deals_eyebrow: "คัดสรรสำหรับนักเดินทาง",
     deals_title: "ล่องลอยไปที่ไหนต่อดี",
-    deals_tropical_title: "หลบร้อนสู่เขตร้อน",
+    deals_tropical_title: "หลบร้อนไปติดเกาะ",
     deals_tropical_desc: "บาหลี, ภูเก็ต, มัลดีฟส์",
     deals_city_title: "เที่ยวเมืองใหญ่",
     deals_city_desc: "โตเกียว, สิงคโปร์, ฮ่องกง",
