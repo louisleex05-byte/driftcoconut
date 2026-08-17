@@ -21,7 +21,7 @@ export default function SiteHeader() {
               driftcoconut
             </span>
             <span
-              className="font-display text-base sm:text-lg md:text-xl font-medium tracking-wide text-emerald-400 mt-0.5 truncate animate-drift"
+              className="font-display text-[13px] sm:text-sm md:text-base font-medium tracking-wide text-emerald-400 mt-0.5 truncate animate-drift"
               lang="th"
               aria-label="Drift Coconut in Thai"
             >
