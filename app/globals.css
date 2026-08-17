@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap");
+/* Mitr — rounded-terminal Thai display font, pairs well with the coconut/drift brand feel */
+@import url("https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -32,6 +34,11 @@ body {
 .animate-drift {
   animation: drift 5s ease-in-out infinite;
   will-change: transform, opacity;
+}
+
+/* Rounded Thai display face — used for the มะพร้าวลอยน้ำ brand subtitle */
+.font-thai-rounded {
+  font-family: "Mitr", "Fraunces", system-ui, sans-serif;
 }
 @media (prefers-reduced-motion: reduce) {
   .animate-drift { animation: none; }
