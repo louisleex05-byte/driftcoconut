@@ -81,23 +81,23 @@ function EssentialCard({ e }: { e: Essential }) {
       href={AFFILIATE_LINKS[e.key]}
       target="_blank"
       rel="noopener sponsored"
-      className="group bg-white/80 backdrop-blur border border-sea-100 rounded-xl p-4 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col relative"
+      className="group bg-white/80 backdrop-blur border border-sea-100 rounded-lg p-2.5 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col relative"
     >
       {e.hot && (
-        <div className="absolute top-2 right-2 text-[9px] uppercase tracking-wider text-rose-700 font-semibold bg-rose-50 px-2 py-0.5 rounded-full">
+        <div className="absolute top-1 right-1 text-[8px] uppercase tracking-wider text-rose-700 font-semibold bg-rose-50 px-1.5 py-[1px] rounded-full">
           Hot
         </div>
       )}
-      <div className={`w-11 h-11 rounded-full ${e.bg} flex items-center justify-center text-2xl mb-3 flex-shrink-0`}>
+      <div className={`w-8 h-8 rounded-full ${e.bg} flex items-center justify-center text-base mb-1.5 flex-shrink-0`}>
         {e.emoji}
       </div>
-      <h3 className={`font-display text-base font-semibold ${e.color} group-hover:text-sea-700 transition-colors`}>
+      <h3 className={`font-display text-[13px] leading-tight font-semibold ${e.color} group-hover:text-sea-700 transition-colors`}>
         {e.title}
       </h3>
-      <p className="text-xs text-slate-600 mt-1">{e.subtitle}</p>
-      <div className="mt-3 text-xs font-medium text-sea-700 inline-flex items-center gap-1">
+      <p className="text-[11px] leading-snug text-slate-600 mt-0.5">{e.subtitle}</p>
+      <div className="mt-1.5 text-[11px] font-medium text-sea-700 inline-flex items-center gap-1">
         Book now
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
           <path d="M5 12h14" />
           <path d="M12 5l7 7-7 7" />
         </svg>
@@ -126,21 +126,21 @@ function AlternativeCard({
       href={href}
       target="_blank"
       rel="noopener sponsored"
-      className="group bg-white/80 backdrop-blur border border-sea-100 rounded-xl p-4 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col relative"
+      className="group bg-white/80 backdrop-blur border border-sea-100 rounded-lg p-2.5 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col relative"
     >
-      <div className="absolute top-2 right-2 text-[9px] uppercase tracking-wider text-sea-600 font-semibold bg-sea-50 px-2 py-0.5 rounded-full">
-        Alternative
+      <div className="absolute top-1 right-1 text-[8px] uppercase tracking-wider text-sea-600 font-semibold bg-sea-50 px-1.5 py-[1px] rounded-full">
+        Alt
       </div>
-      <div className={`w-11 h-11 rounded-full ${bg} flex items-center justify-center text-2xl mb-3 flex-shrink-0`}>
+      <div className={`w-8 h-8 rounded-full ${bg} flex items-center justify-center text-base mb-1.5 flex-shrink-0`}>
         {emoji}
       </div>
-      <h3 className={`font-display text-base font-semibold ${titleColor} group-hover:text-sea-700 transition-colors`}>
+      <h3 className={`font-display text-[13px] leading-tight font-semibold ${titleColor} group-hover:text-sea-700 transition-colors`}>
         {title}
       </h3>
-      <p className="text-xs text-slate-600 mt-1">{subtitle}</p>
-      <div className="mt-3 text-xs font-medium text-sea-700 inline-flex items-center gap-1">
+      <p className="text-[11px] leading-snug text-slate-600 mt-0.5">{subtitle}</p>
+      <div className="mt-1.5 text-[11px] font-medium text-sea-700 inline-flex items-center gap-1">
         Book now
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
           <path d="M5 12h14" />
           <path d="M12 5l7 7-7 7" />
         </svg>
@@ -161,23 +161,23 @@ export default function TravelEssentials({
   return (
     <section aria-label="Travel essentials" className="relative">
       {!compact && (
-        <div className="text-center mb-6">
-          <div className="text-xs uppercase tracking-widest text-sea-600 font-semibold">
+        <div className="text-center mb-4">
+          <div className="text-[10px] uppercase tracking-widest text-sea-600 font-semibold">
             Travel essentials
           </div>
-          <h2 className="font-display text-2xl md:text-3xl font-semibold text-sea-800 mt-1">
+          <h2 className="font-display text-xl md:text-2xl font-semibold text-sea-800 mt-0.5">
             {heading}
           </h2>
-          <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">
+          <p className="text-xs text-slate-600 mt-1 max-w-xl mx-auto">
             {subheading}
           </p>
         </div>
       )}
 
       {/* Row 1: core essentials — each column can stack an "Alternative" card underneath */}
-      <div className={`grid gap-3 sm:gap-4 items-start ${compact ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
+      <div className={`grid gap-2 sm:gap-2.5 items-start ${compact ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"}`}>
         {ESSENTIALS_ROW1.map((e) => (
-          <div key={e.key} className="flex flex-col gap-3">
+          <div key={e.key} className="flex flex-col gap-2">
             <EssentialCard e={e} />
 
             {/* Tiqets stacked under Klook — attraction tickets alternative */}
@@ -218,13 +218,13 @@ export default function TravelEssentials({
       </div>
 
       {/* Row 2: expansion partners (3 cards — Airalo moved into Yesim stack) */}
-      <div className={`mt-3 sm:mt-4 grid gap-3 sm:gap-4 items-start ${compact ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+      <div className={`mt-2 sm:mt-2.5 grid gap-2 sm:gap-2.5 items-start ${compact ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"}`}>
         {ESSENTIALS_ROW2.map((e) => (
           <EssentialCard key={e.key} e={e} />
         ))}
       </div>
 
-      <p className="text-[10px] text-slate-400 mt-4 text-center italic">
+      <p className="text-[9px] text-slate-400 mt-3 text-center italic">
         Affiliate disclosure: driftcoconut may earn a small commission when you book through these partners, at no extra cost to you.
       </p>
     </section>
