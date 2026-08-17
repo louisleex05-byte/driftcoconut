@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
 import { PalmLeaf, Shell, Boat, StrawHat } from "./Decorations";
 
-const ROTATE_MS = 7000;
+const ROTATE_MS = 3000;
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
