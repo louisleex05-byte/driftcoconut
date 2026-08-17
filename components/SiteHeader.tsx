@@ -17,11 +17,11 @@ export default function SiteHeader() {
         >
           <Logo className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0 transition-transform group-hover:-rotate-6" />
           <span className="flex flex-col items-center min-w-0 leading-none">
-            <span className="font-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 truncate mt-3">
+            <span className="font-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 truncate mt-5">
               driftcoconut
             </span>
             <span
-              className="font-thai-rounded text-[13px] sm:text-sm md:text-base font-medium tracking-wide text-emerald-400 mt-0.5 truncate animate-drift"
+              className="font-thai-rounded text-[13px] sm:text-sm md:text-base font-medium tracking-wide text-emerald-400 -mt-0.5 truncate animate-drift -translate-x-1"
               lang="th"
               aria-label="Drift Coconut in Thai"
             >
