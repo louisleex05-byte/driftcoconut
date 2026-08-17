@@ -151,7 +151,8 @@ export const HERO_PHOTOS: HeroPhoto[] = [
     alt: "Hot air balloon over Bagan pagodas at sunrise, Myanmar",
     caption: "Bagan balloons, Myanmar",
     credit: "Photo: Peggy_Marco / Pixabay",
-    position: "center 55%",
+    // Balloon is top-right of source; shift up + right so it stays fully visible on wide crops
+    position: "75% 25%",
   },
   {
     src: "/hero/thailand-phu-chi-fa.jpg",

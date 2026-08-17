@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
-import { PalmLeaf, Shell, Boat, StrawHat } from "./Decorations";
 
 const ROTATE_MS = 3000;
 
@@ -21,14 +20,6 @@ export default function Hero() {
 
   return (
     <section className="relative -mt-6 sm:-mt-8 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
-      {/* Decorative palm leaf — top-right corner overlay */}
-      <PalmLeaf className="absolute top-3 right-4 w-24 md:w-36 lg:w-44 text-white/50 rotate-[35deg] z-10 pointer-events-none" />
-      {/* Straw hat — top-left */}
-      <StrawHat className="hidden sm:block absolute top-5 left-4 w-20 md:w-28 text-white/55 -rotate-12 z-10 pointer-events-none" />
-      {/* Sailboat — floating on the "horizon" area, right side */}
-      <Boat className="hidden md:block absolute top-1/3 right-8 lg:right-16 w-24 lg:w-32 text-white/60 z-10 pointer-events-none" />
-      {/* Shell — bottom-left, half-hidden */}
-      <Shell className="absolute -bottom-3 -left-2 w-20 md:w-28 text-white/50 -rotate-12 z-10 pointer-events-none" />
       {/* Panoramic image container — 3:1 aspect ratio on desktop, gracefully falls back on mobile */}
       <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[380px]">
         {HERO_PHOTOS.map((photo, i) => (
