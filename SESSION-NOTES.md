@@ -1,7 +1,7 @@
 # driftcoconut — Full Session Notes
 
 **Session date:** August 3, 2026
-**Owner:** Niphon Srisawat (Louis Leex)
+**Owner:** Niphon Srisawat (Louis Leex / louisleex05@gmail.com)
 **Live site:** https://driftcoconut.com
 **GitHub repo:** https://github.com/louisleex05-byte/travel-site
 **Vercel project:** driftcoconut
@@ -10,235 +10,160 @@
 
 ## 1. Project overview
 
-A Next.js 15 travel site that discovers and compares hotels across Asia-Pacific destinations, monetized through affiliate partnerships with major booking networks. Built end-to-end in one working session — from research to live deployment with custom domain, HTTPS, and multi-affiliate applications in progress.
+A Next.js 15 travel site that discovers and compares hotels across Asia-Pacific destinations, monetized through multiple affiliate partnerships. Built end-to-end in one working session — from research to live custom domain with 5 already-earning affiliate integrations, and 20+ additional applications in various stages.
 
 **Positioning:** independent hotel discovery for English-speaking leisure travelers (25–55) planning tropical getaways, city breaks, and cultural trips across Asia-Pacific.
 
 **Tech stack:**
 - Next.js 15 (App Router, React 19, Server Components)
 - TypeScript, Tailwind CSS with custom `sea` palette + Fraunces display serif
-- Vercel hosting (Hobby plan)
-- Cloudflare DNS (free plan)
+- Vercel hosting (Hobby plan) with auto-deploy on push
+- Cloudflare DNS (free plan) — nameservers: alan.ns.cloudflare.com + dina.ns.cloudflare.com
 - Z.com domain registrar
 
 ---
 
-## 2. Affiliate program research (Round 1)
+## 2. All affiliate programs — full status matrix
 
-Compared major travel affiliate programs:
+### ✅ APPROVED (5) — tracked links live on site
 
-| Program | Commission | API | Cookie | Best for |
+| Platform | Program | Reward | Cookie | Tracked link |
 |---|---|---|---|---|
-| **Agoda** | 4–7% tiered | Long Tail Search API (REST) | 1 day | Asia-Pacific hotels |
-| **Booking.com** | ~4% (up to 40% of theirs) | Demand API (approval-gated) | Session | Global inventory |
-| **Expedia (via Rapid API)** | 15–25% Expedia Collect | EPS Rapid API | 30 days | Bundling hotels+flights+cars |
-| **Tripadvisor** | 50% of gross | No affiliate API | 14 days | Reviews-focused sites |
-| **Skyscanner** | Up to 20% (or 50% of their commission) | Flights API | Varies | Flight comparison |
-| **KAYAK** | Up to 50% | API + White Label | Varies | Meta-search |
+| Travelpayouts | **Klook** | 8% hotels, 10% tours | 7–30 days | klook.tpk.mx/nsmgv9sX |
+| Travelpayouts | **Yesim** (eSIM) | 18% | 90 days | yesim.tpk.mx/3oNaHk4h |
+| Travelpayouts | **Welcome Pickups** | 8–9% | 45 days | tpk.mx/1lwxsIoN |
+| Travelpayouts | **Kiwi.com** | 3% + €1.5 | 30 days | kiwi.tpk.mx/tQAy1nbS |
+| Travelpayouts | **Drimsim** (SIM) | €8 fixed | 90 days | drimsim.tpk.mx/bVdli8RO |
 
-Key takeaway: Tripadvisor moved OFF CJ Affiliate — now only Viator (their subsidiary) is available on affiliate networks. Booking.com traditional program was reduced in 2024, now runs through Awin or the direct Partner Hub.
+### ⏳ PENDING APPLICATIONS
 
----
+| Platform | Program | Notes |
+|---|---|---|
+| Agoda (direct) | driftcoconut.com | Site ID 1970417 — ticket now with Affiliate Partnerships Team |
+| CJ Affiliate | Booking.com (7 regions) | Pending — will process once CJ activated |
+| Awin | Lebua Hotels (Global) | Pending review |
+| Awin | Chatrium Hotels (Global) | Pending review |
 
-## 3. Site development timeline
+### ❌ DECLINED / BLOCKED
 
-### Phase 1 — Scaffold
-- Created Next.js 15 project with TypeScript + Tailwind
-- Built lib/agoda.ts API client with mock mode (`AGODA_MOCK=true`)
-- Added mock hotels dataset (9 realistic Bali/Bangkok hotels)
-- Created search form, hotel card, hotel detail pages
-- Added About, Privacy, Terms pages (required for affiliate approval)
-- Expanded city list to 47 destinations grouped by region
+| Platform | Program | Reason | Retry |
+|---|---|---|---|
+| Awin | Viator US | "Dead URL, page not found" | Retry in 3–4 days |
+| Awin | Viator AU | "Advertiser doesn't work with this publisher type" | Try Viator UK/DE instead |
+| Travelpayouts | Booking.com | Traffic requirement (3+ months) | Reapply Nov 2026 |
+| Travelpayouts | 19 other premium programs | Same traffic reason | Reapply Nov 2026 |
 
-### Phase 2 — Rebrand from TravelSite → driftcoconut
-- New palette: seawater blue (custom `sea` ramp 50–900)
-- New wordmark: Fraunces display serif in `sea-700`
-- Coconut palm logo (SVG) — palm fronds + shell + water ripples
-- Softer background: linear gradient from `#F0F9FB` to `#F8FAFC`
-- Fonts scaled +20% via `html { font-size: 120% }`
+### 🔴 BLOCKERS TO RESOLVE
 
-### Phase 3 — Hero + rotation
-- 6 rotating panoramic hero photos (Bali sunset, Maldives overwater, infinity pool, hammock, dhoni boat, palm beach)
-- 3:1 aspect ratio on desktop → gracefully falls back to 21:9, 16:9, 4:3 on smaller viewports
-- Off-center crop positions via `object-position` to prevent subject/text clash
-- 7-second fade cross-transition
-- Clickable dot indicators
-- Photo credits (Pixabay attribution)
-
-### Phase 4 — PartnerStrip trust bar
-- Text-styled logotypes in brand colors: agoda, Booking.com, Expedia, Hotels.com, Viator (by Tripadvisor Group)
-- Trust indicators: Best price guarantee · Free cancellation · Secure checkout · No booking fees
-- "Powered by Tripadvisor Group" attribution line
-
-### Phase 5 — Tropical decorations
-- 10+ reusable SVG components: PalmLeaf, Shell, Pebble, Wave, Hibiscus, Starfish, Boat, StrawHat, Coral, Conch
-- Dispersed across all pages at 40–60% opacity
-- Fixed viewport-corner accents that drift as you scroll
-- Hidden on mobile to reduce clutter (`hidden md:block`)
-
-### Phase 6 — Mobile responsive fixes
-- Header wordmark shrunk to `text-xl` on mobile
-- Nav gap reduced (12 px mobile vs 24 px desktop)
-- "Search" nav hidden on mobile, magnify glass icon shown instead
-- Logo scaled: 48/56/64 px across breakpoints
-- Header search field with magnify glass, smart routing to cities
-
-### Phase 7 — Layout restructure
-- Hero + PartnerStrip visually attached (no gap between)
-- Search form moved to its own section with "Where to?" · "Search hotels" heading, id="search-form" for anchor scrolling
-- Deals section (`#deals`) tightened up to sit closer to search
-- Cards use emoji icons (🏝️ 🏙️ ⛰️) with subtle SVG accents in corners
+| Blocker | Impact | Fix |
+|---|---|---|
+| **CJ Superuser login** | Payment info locked, can't activate CJ | Log in with `louisleex@hotmail.com` (Superuser), not gmail (Operator) |
+| **Payoneer KYC pending** | No US routing/account numbers yet | Wait 1–3 business days; check email for doc requests |
+| **Partnerize login** | Can't apply to Expedia/Hotels.com/Vrbo | Try `louisleex` all lowercase or reset password |
+| **Agoda old placeholder** | Site 1970237 (approvalsite819358665.co) taints account | Just submitted ticket to Affiliate Partnerships Team to remove |
 
 ---
 
-## 4. Deployment & DNS journey
+## 3. Recommended NEXT applications on Travelpayouts
 
-### Vercel deployment
-- Repo pushed to GitHub via `gh` CLI
-- Vercel auto-deploy on every `git push` to `main`
-- Free subdomain: `driftcoconut.vercel.app` (always works as fallback)
-- Custom domain: `driftcoconut.com`
+Top 6 to apply for (all fit driftcoconut's Asia-Pacific focus):
 
-### Custom domain setup — the sequence
-1. Registered `driftcoconut.com` at **Z.com** registrar
-2. In Cloudflare: added domain → got 2 nameservers: `alan.ns.cloudflare.com` + `dina.ns.cloudflare.com`
-3. At Z.com: switched from Default nameservers to Custom → pasted Cloudflare's 2 nameservers
-   - Blocker: Z.com requires 2FA to be enabled first — set up Two-Step Verification
-   - Blocker: initially entered same nameserver twice — corrected to two different ones
-4. In Cloudflare: added DNS records
-   - A record: `@` → `216.198.79.1` (DNS only, grey cloud)
-   - CNAME: `www` → `9e6a1127d9d5036b.vercel-dns-017.com` (DNS only, grey cloud)
-5. In Vercel: added both `driftcoconut.com` and `www.driftcoconut.com` to project
-6. Waited ~2 hours for full propagation
-7. All 3 domains flipped to "Valid Configuration" green:
-   - ✅ driftcoconut.com
-   - ✅ www.driftcoconut.com (308 redirect to canonical)
-   - ✅ driftcoconut.vercel.app (fallback)
-
-### Critical lesson
-- Do NOT use Cloudflare Proxy (orange cloud) for Vercel — breaks HTTPS provisioning. Always keep DNS-only (grey cloud).
+1. **GetYourGuide** — 8% tours (global, complements Klook's Asia focus)
+2. **Trip.com** — 1–5.5% Asian OTA (hotels + flights + trains)
+3. **AirHelp** — 15–16.6% flight compensation leads
+4. **Airalo** — 12% eSIM (Yesim backup)
+5. **DiscoverCars** — 23–54% + **365-day cookie** (car rentals)
+6. **Hostelworld** — 40% rev share (budget accommodations)
 
 ---
 
-## 5. Affiliate applications status
+## 4. Site structure — full page-by-page breakdown
 
-### Agoda (direct)
-- **Site ID:** 1970237
-- **Sites listed:** driftcoconut.com + old placeholder (`niphon.srisawat.approvalsite819358665.co`)
-- **Status:** Pending Approval
-- **Blocker:** Can't add new site through UI — form hangs. Emailed `partnersupport@agoda.com` requesting placeholder removal + new site addition.
-- **Verification method:** Manual Verification (clicked Proceed)
-- **Bank info:** Filled with Krungsri Bank details
+### Home page (`app/page.tsx`)
 
-### CJ Affiliate (Commission Junction)
-- **Username:** LouisLeeX (with capitals)
-- **Two users on account:**
-  - Louis Leex — `louisleex@hotmail.com` — **Superuser** (Techguy)
-  - Louis Lee — `louisleex05@gmail.com` — **Operator** (CEO) ← currently logged in
-- **Onboarding checklist:** 7/8 completed
-  - ✅ Validate Email
-  - ✅ Enter user information
-  - ✅ Complete Network Profile (description written, 798 chars)
-  - ✅ Enter company details
-  - ✅ Submit tax forms — W-8BEN submitted 3-Aug-2026 for Thailand
-  - ✅ Add Promotional Property — Website type, `https://driftcoconut.com`
-  - ⚠️ **Payment Information — LOCKED** (requires Superuser login to edit)
-- **Blockers:**
-  1. Wrong role — need to log in as Superuser (hotmail account) not Operator (gmail account)
-  2. Payoneer account still pending verification (needed for US routing/account numbers)
-- **Applied programs (all "Pending" — will process once account activated):**
-  - Booking.com Italy
-  - Booking.com LATAM
-  - Booking.com MEA
-  - Booking.com Nordics
-  - Booking.com North America (needs onboarding complete before it processes)
-  - Booking.com Spain & Portugal
-  - Booking.com UK
+New ordering (browse-first, action-second) shipped this session:
 
-### Awin
-- **Publisher ID:** 3018153
-- **Primary region:** USA (Thailand not available as primary)
-- **Applied programs (all Pending):**
-  - Viator - A Tripadvisor Company (US)
-  - Lebua Hotels (Global) — Thai brand, great fit
-  - Chatrium Hotels (Global) — Thai/Asia brand
-- **Deposit:** $5 refundable (returned as first commission earned)
-- **W-8BEN:** Submitted
+```
+1. HERO (rotating 6-photo panorama)
+2. PARTNER STRIP (attached — Agoda, Booking, Expedia, Hotels.com, Viator/Tripadvisor Group)
+3. WHERE TO DRIFT NEXT (Tropical / City / Mountain cards) ← MOVED UP
+4. SEARCH HOTELS (refined typography, smaller labels) ← MOVED DOWN
+5. TRAVEL ESSENTIALS (Klook / Welcome Pickups / Yesim+Drimsim / Kiwi)
+6. Ambient palm + coral decorations (fixed to viewport corners)
+```
 
-### Partnerize (for Expedia / Hotels.com / Vrbo)
-- **Username:** `louisleex` (all lowercase!)
-- **Status:** Cannot log in — likely case mismatch on username or password issue
-- **Next:** Log in via "Forgotten login details" flow to reset password
+### Header (`app/layout.tsx`)
 
-### Payoneer
-- **Status:** USD receiving account pending KYC verification
-- **Timeline:** Up to 3 business days for approval
-- **Blockers:** Waiting on Payoneer's identity/address/document review
-- **Once approved:** Get US routing (ABA) + account number + bank name → paste into CJ Payment Information → CJ activates
+- Coconut logo (48/56/64px across breakpoints) — dominant over wordmark
+- "driftcoconut" wordmark in Fraunces serif, sea-700, text-lg → text-2xl responsive
+- HeaderSearch component: magnify glass + input with smart routing to matched cities
+- Mobile: magnify icon replaces text search field
+- Nav: Deals / About (Search hidden on mobile — replaced by icon)
+
+### Hotel detail page (`app/hotel/[id]/page.tsx`)
+
+- 5-photo gallery grid
+- Star rating + review score badge
+- Description + amenities + available rooms
+- Sticky "Book on Agoda" sidebar (uses affiliate landing URL)
+- **NEW:** TravelEssentials section at bottom ("Complete your stay")
+
+### About page (`app/about/page.tsx`)
+
+- Full content with corner decorations
+- **NEW:** TravelEssentials section at bottom ("Plan your trip end-to-end")
+
+### Search results (`app/search/page.tsx`)
+
+- Server-rendered grid
+- Uses mockHotels while AGODA_MOCK=true
+
+### Legal pages (`app/privacy/page.tsx`, `app/terms/page.tsx`)
+
+Complete GDPR/FTC-compliant text. All email addresses updated to `hello@driftcoconut.com`.
 
 ---
 
-## 6. Key architecture decisions
-
-### Server-side API proxy
-- Agoda API key never touches the browser
-- `app/search/page.tsx` is a Server Component — calls `searchAgoda()` directly on the server
-- Response cached 15 min via `next: { revalidate: 900 }`
-- Mock mode fallback: `AGODA_MOCK=true` serves realistic sample hotels before Agoda API approval
-
-### Environment variables (all set in Vercel)
-- `NEXT_PUBLIC_SITE_URL=https://driftcoconut.com`
-- `AGODA_MOCK=true` (flip to false once Agoda approves)
-- `AGODA_SITE_ID=` (fill when approved)
-- `AGODA_API_KEY=` (fill when approved)
-- Placeholders for `BOOKING_AFFILIATE_ID`, `EXPEDIA_API_KEY`, `TRIPADVISOR_CJ_ID`
-
-### Design system
-- **Palette:** custom `sea` ramp (10 stops from `#F0F9FB` to `#0F3541`)
-- **Typography:** Fraunces (display) + system sans (body)
-- **Radius:** 12px cards, 24px hero bottom corners
-- **Shadow:** minimal, functional only
-- **Focus rings:** sea-blue (accessibility)
-
----
-
-## 7. File structure
+## 5. File structure (current state)
 
 ```
 Travel Site/
 ├── app/
-│   ├── layout.tsx              # Header, footer, metadata, HeaderSearch
-│   ├── page.tsx                # Home: Hero + PartnerStrip + Search + Deals
-│   ├── globals.css             # Font imports, root font-size scaling
-│   ├── icon.svg                # Favicon
+│   ├── layout.tsx              # Header (logo, wordmark, HeaderSearch, nav) + footer + Travelpayouts Drive script
+│   ├── page.tsx                # Home: Hero → Partners → Deals → Search → TravelEssentials
+│   ├── globals.css             # Fraunces font import + root font-size scaling +20%
+│   ├── icon.svg                # Favicon (coconut palm)
 │   ├── apple-icon.svg          # iOS home screen icon
-│   ├── about/page.tsx          # About us
+│   ├── about/page.tsx          # About + TravelEssentials
 │   ├── privacy/page.tsx        # Privacy policy
 │   ├── terms/page.tsx          # Terms of use
-│   ├── search/page.tsx         # Search results (server component)
-│   ├── hotel/[id]/page.tsx     # Hotel detail page
-│   └── api/agoda/search/route.ts   # JSON proxy for Agoda API
+│   ├── search/page.tsx         # Server-rendered results grid + corner accents
+│   ├── hotel/[id]/page.tsx     # Photo gallery + booking + TravelEssentials
+│   └── api/agoda/search/route.ts   # JSON API proxy
 ├── components/
-│   ├── Hero.tsx                # Rotating panoramic hero
-│   ├── SearchForm.tsx          # Destination + dates + guests
-│   ├── HeaderSearch.tsx        # Compact search bar in header
+│   ├── Hero.tsx                # Rotating panoramic hero (6 photos, 7-sec fade)
+│   ├── SearchForm.tsx          # Compact form (uppercase labels, sm text)
+│   ├── HeaderSearch.tsx        # Magnify-glass input with smart routing
 │   ├── HotelCard.tsx           # Grid tile with photo + affiliate link
-│   ├── PartnerStrip.tsx        # Trust bar with partner brands
+│   ├── PartnerStrip.tsx        # Trust bar: agoda, Booking.com, Expedia, Hotels.com, Viator (by Tripadvisor Group)
+│   ├── TravelEssentials.tsx    # 4-card affiliate cross-sell + Drimsim stacked under Yesim
 │   ├── Logo.tsx                # Coconut palm SVG
-│   └── Decorations.tsx         # 10+ tropical accent SVGs
+│   └── Decorations.tsx         # 10+ tropical SVGs: PalmLeaf, Shell, Pebble, Wave, Hibiscus, Starfish, Boat, StrawHat, Coral, Conch
 ├── lib/
-│   ├── agoda.ts                # Typed API client (with mock mode)
-│   ├── cities.ts               # 47 curated destinations by region
-│   ├── heroPhotos.ts           # Rotating hero config
-│   └── mockHotels.ts           # Sample hotels + detail data
+│   ├── agoda.ts                # Typed API client (with AGODA_MOCK fallback)
+│   ├── cities.ts               # 47 cities grouped by region
+│   ├── heroPhotos.ts           # 6-photo rotating hero config
+│   ├── mockHotels.ts           # Sample hotels + detail data
+│   └── affiliateLinks.ts       # Centralized Travelpayouts tracked URLs (5 partners)
 ├── public/
-│   └── hero/                   # 6 panoramic photos
+│   └── hero/                   # 7 panoramic photos (6 in rotation + 1 spare)
 │       ├── bali-sanur.jpg
 │       ├── maldives-overwater.jpg
 │       ├── maldives-pool.jpg
 │       ├── maldives-hammock.jpg
 │       ├── maldives-dhoni.jpg
-│       └── maldives-palm-beach.jpg
+│       ├── maldives-palm-beach.jpg
+│       └── maldives-beach.jpg (spare)
 ├── DEPLOY.md                   # Cloudflare + Vercel deployment guide
 ├── README.md                   # Project overview
 ├── SESSION-NOTES.md            # This file
@@ -252,7 +177,21 @@ Travel Site/
 
 ---
 
-## 8. Commands reference
+## 6. Environment variables (set in Vercel dashboard)
+
+| Name | Current value | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `https://driftcoconut.com` | Used for OG tags, metadata |
+| `AGODA_MOCK` | `true` | Serves sample hotels until Agoda approves |
+| `AGODA_SITE_ID` | *(blank)* | Fill once Agoda approves (their CID) |
+| `AGODA_API_KEY` | *(blank)* | Fill once Agoda approves |
+| `NEXT_PUBLIC_AGODA_VERIFICATION` | *(blank)* | Fill if Agoda provides meta tag verification |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | *(blank)* | Fill after Google Search Console setup |
+| `NEXT_PUBLIC_TRAVELPAYOUTS_SRC` | *(optional)* | If empty, falls back to `https://emrld.ltd/NTYxMTY4.js?t=561168` |
+
+---
+
+## 7. Commands reference
 
 ### Local development
 ```bash
@@ -276,86 +215,140 @@ del ".git\HEAD.lock" 2>nul
 del ".git\index.lock" 2>nul
 ```
 
-### Manual deploy
+### Manual Vercel deploy
 ```bash
 vercel --prod
 ```
 
+### Cloning to laptop (continue session)
+```bash
+git clone https://github.com/louisleex05-byte/travel-site.git
+cd travel-site
+npm install
+cp .env.example .env.local
+# → then paste real values from Vercel Environment Variables
+npm run dev
+```
+
 ---
 
-## 9. Current blockers & next actions
+## 8. Design system
 
-### 🚨 Priority 1 — Fix CJ Superuser login
-- Log out of CJ (Operator: `louisleex05@gmail.com`)
-- Log back in with **`louisleex@hotmail.com`** (Superuser)
-- If password forgotten → "Forgot Password" → check hotmail inbox → reset
-- Once in as Superuser, complete Payment Information (once Payoneer approves)
+### Seawater palette (custom Tailwind `sea` ramp)
 
-### 🚨 Priority 2 — Wait on Payoneer (1–3 business days)
-- Check Gmail daily for Payoneer verification requests
-- Submit any missing docs immediately (ID, address, selfie)
-- When approved: log in → Receive → USD receiving account → copy routing + account numbers
+| Token | Hex | Use |
+|---|---|---|
+| `sea-50` | `#F0F9FB` | Softest tint (page bg gradient) |
+| `sea-100` | `#DAF0F5` | Card borders, dividers |
+| `sea-200/300` | `#B8E1EB` / `#85CBDB` | Input borders, ripples |
+| `sea-400/500` | `#4FAFC5` / `#2A93AB` | Icons, focus rings |
+| `sea-600/700` | `#1E7A91` / `#1A6377` | Buttons, links, prices |
+| `sea-800/900` | `#194F5F` / `#0F3541` | Headings |
 
-### Priority 3 — Follow up with Agoda
-- Send update email to `partnersupport@agoda.com`
-- Subject: "Status update request — Site ID 1970237"
-- Confirm driftcoconut.com is fully live, ask for prioritized review
+### Typography
+- **Wordmark & headings:** Fraunces (display serif, Google Fonts)
+- **Body:** system sans-serif
+- **Root font-size:** 115% → 118% → 120% (mobile → tablet → desktop) = ~20% larger than default
+- **Search form labels:** `text-[10px] uppercase tracking-wider text-slate-500` (small caps style)
+
+### Decorations (in `components/Decorations.tsx`)
+10 SVG components using `currentColor` so Tailwind `text-*` tints them:
+- **PalmLeaf, Shell, Pebble, Wave, Hibiscus, Starfish, Boat, StrawHat, Coral, Conch**
+- Placed at opacity 40–70% across all pages
+- Fixed viewport-corner accents drift as user scrolls
+- Hidden on mobile (`hidden md:block`) to reduce clutter
+
+---
+
+## 9. What changed in Session Part 2 (post-domain-setup)
+
+Everything after custom domain went live:
+
+1. **Header search bar** — magnify glass icon + input with smart city-name matching → direct route to `/search` results, or scroll to search form
+2. **Reorder home** — Hero → Partners → Deals ("Where to drift next") → Search → TravelEssentials
+3. **Search form typography refined** — uppercase micro-caps labels (`text-[10px]`), smaller inputs, tighter padding
+4. **Logo scaling** — 48/56/64 px across breakpoints (dominant over wordmark)
+5. **PartnerStrip restructure** — Tripadvisor → **Viator (By Tripadvisor Group)** with "Alternative" pill; parent brand credits pattern
+6. **Travelpayouts integration** — 5 approved programs, tracked links live on 3 pages
+7. **TravelEssentials component** — 4-card grid + Drimsim stacked as full card under Yesim (with "Alternative" badge)
+8. **Travelpayouts Drive script** — added via `next/script` to unlock TP dashboard access
+9. **Affiliate disclosure** — FTC-compliant italic text below every affiliate section
+
+---
+
+## 10. Priority action list (RESUME HERE ON LAPTOP)
+
+### 🚨 Priority 1 — Wait for Agoda Affiliate Partnerships response
+- Ticket submitted via `partners.agoda.com` support form → routed to correct team
+- Expected reply: 3–5 business days
+- Their response will do one of: approve, ask for more info, decline
+
+### 🚨 Priority 2 — Fix CJ Superuser login (blocking $$$)
+- Log out of gmail (Operator) account
+- Log in with `louisleex@hotmail.com` (Superuser)
+- Reset password if needed via "Forgot Password"
+- Complete Payment Information with Payoneer USD details
+- Click ACTIVATE ACCOUNT → 7 Booking.com applications start processing
+
+### 🚨 Priority 3 — Wait for Payoneer full approval
+- Check Gmail daily for verification doc requests
+- Once approved → get US routing + account numbers → use in CJ + Travelpayouts
 
 ### Priority 4 — Fix Partnerize login
-- Try username: `louisleex` (all lowercase)
-- If fails: use "Forgotten login details" to reset
+- Username: `louisleex` (all lowercase)
+- If fails: "Forgotten login details" reset flow
+- Then apply to Expedia + Hotels.com + Vrbo
 
-### Priority 5 — Apply to more affiliates
-On Awin (once approved): Klook, Etihad, Emirates, Qatar Airways, Marriott, Hilton, IHG, Accor, GetYourGuide, Skyscanner, Trip.com
+### Priority 5 — Apply to remaining Travelpayouts programs
+- GetYourGuide, Trip.com, AirHelp, Airalo, DiscoverCars, Hostelworld
+- ~2 min each, all likely to auto-approve given you already have 5 approved
 
-On CJ (once activated): Trip.com, Marriott, Klook, Hilton, Rentalcars.com
+### Priority 6 — Content + traffic building
+- Write 3–5 destination guides (Bali, Bangkok, Tokyo, Maldives)
+- Set up Google Analytics 4 + Search Console
+- Set up hello@driftcoconut.com via Cloudflare Email Routing (free, 5 min)
+- Instagram/Pinterest @driftcoconut posting weekly
+- Reddit contributions in r/travel, r/solotravel
 
-### Priority 6 — Build content
-Write 3–5 destination guides on driftcoconut. Real content = faster affiliate approvals and better SEO.
-
----
-
-## 10. What to do when each affiliate approves
-
-### Agoda approved:
-1. Get Site ID (CID) + API Key from Agoda dashboard → Tools → API
-2. In Vercel Environment Variables:
-   - `AGODA_MOCK=false`
-   - `AGODA_SITE_ID=<your CID>`
-   - `AGODA_API_KEY=<your key>`
-3. Redeploy (`vercel --prod` or push any commit)
-4. Site now serves live hotel data with your affiliate tracking
-
-### CJ / Tripadvisor / Viator approved:
-1. Download official brand logos from partner dashboard
-2. Update `components/PartnerStrip.tsx` — swap text logotype for official image
-3. Update `app/hotel/[id]/page.tsx` — add "See on Tripadvisor" outbound link with tracking
-
-### Booking.com approved:
-1. Use their Deep Link Builder to generate tracked URLs
-2. Add as a second CTA on hotel detail pages
-3. Or offer as "Book on Booking.com" alternative to Agoda
-
-### Expedia (via Partnerize) approved:
-1. Download brand assets for Expedia + Hotels.com + Vrbo (one signup covers all 3)
-2. Add "Book on Hotels.com" tracked link on detail page
-3. Use Rapid API in future to serve Expedia inventory directly
+### Priority 7 — More hero photos
+- Add Tokyo, Chiang Mai, Sapa, etc. from Pixabay/Unsplash/Pexels
+- Save to `public/hero/` folder
+- Add entries to `lib/heroPhotos.ts`
 
 ---
 
-## 11. Key learnings
+## 11. Support contacts
+
+| Platform | Support channel | Notes |
+|---|---|---|
+| **Agoda Affiliate** | Dashboard → Submit Ticket | Just submitted — WAIT for reply |
+| Agoda general | `partnersupport@agoda.com` | Wrong team; routes to Customer Experience Group |
+| CJ Affiliate | `publishersupport@cj.com` | For Superuser role transfer if hotmail login lost |
+| Awin | Support ticket via Awin dashboard | For rejections + questions |
+| Partnerize | `support@partnerize.com` | For login reset |
+| Payoneer | In-app chat / `support@payoneer.com` | For KYC status |
+| Vercel | Community forum + docs | Rare need — everything works |
+| Cloudflare | Community forum + docs | Rare need — everything works |
+| Travelpayouts | Dashboard help center | For any program-specific questions |
+
+---
+
+## 12. Key learnings from this session
 
 - **Domain propagation takes hours.** Even with correct nameservers, DNS updates worldwide slowly. Be patient.
 - **Cloudflare Proxy breaks Vercel HTTPS.** Always use DNS-only (grey cloud) for Vercel origins.
-- **Affiliate approvals take 1–4 weeks** for premium travel brands. 24-hour approvals are rare and only for smaller brands.
-- **CJ has role hierarchy.** Operator ≠ Superuser. Payment info edits require Superuser role.
-- **Payoneer is the payment infrastructure for Thai publishers.** Native Thai bank details don't validate on US networks. Payoneer's US-format routing/account works everywhere.
-- **Text logos are safer than official images** until each affiliate approves you. Then swap for their official co-branded assets.
+- **Affiliate approvals take 1–4 weeks** for premium travel brands. 24-hour approvals are rare.
+- **CJ has role hierarchy.** Operator ≠ Superuser. Payment info edits require Superuser.
+- **Payoneer is the payment infrastructure for Thai publishers.** Native Thai bank SWIFT details don't validate on US networks. Payoneer's US routing/account works everywhere.
+- **Text logos are safer than official images** until each affiliate approves you. Text-styled brand names in brand colors = zero trademark risk.
 - **Photo licenses matter.** Pixabay + Unsplash are safe for free commercial use. Agoda API photos can only be used alongside Agoda booking widgets.
+- **Traffic is the #1 requirement** for premium OTA affiliate programs (Booking, Expedia, Tripadvisor main). Content sites without 3+ months of traffic get auto-declined.
+- **Support routing errors are common.** General support inboxes route to wrong departments. Use in-dashboard tickets to hit the right team directly.
+- **Browse-first UX beats search-first** for discovery brands. Moving "Where to drift next" above "Search hotels" aligns with the coconut/drift aesthetic.
 
 ---
 
-## 12. Reference URLs
+## 13. Reference URLs
 
 - **Live site:** https://driftcoconut.com
 - **Vercel dashboard:** https://vercel.com/sometum-deedee-s-projects/driftcoconut
@@ -363,35 +356,58 @@ Write 3–5 destination guides on driftcoconut. Real content = faster affiliate 
 - **Cloudflare dashboard:** https://dash.cloudflare.com → driftcoconut.com
 - **Agoda Partners:** https://partners.agoda.com
 - **CJ Affiliate:** https://members.cj.com
-- **Awin:** https://ui.awin.com
-- **Partnerize:** https://console.partnerize.com
+- **Awin:** https://ui.awin.com (Publisher ID 3018153)
+- **Partnerize:** https://console.partnerize.com (Username: `louisleex`)
+- **Travelpayouts:** https://app.travelpayouts.com
 - **Payoneer:** https://myaccount.payoneer.com
 
----
-
-## 13. Contact for support (when things break)
-
-- **Agoda:** `partnersupport@agoda.com`
-- **CJ Affiliate:** `publishersupport@cj.com`
-- **Awin:** support ticket via Awin dashboard
-- **Partnerize:** `support@partnerize.com`
-- **Payoneer:** in-app chat or `support@payoneer.com`
-- **Vercel:** community forum + docs
-- **Cloudflare:** community forum + docs
+### Search Console + Analytics (to be set up)
+- **Google Search Console:** https://search.google.com/search-console
+- **Google Analytics:** https://analytics.google.com
 
 ---
 
-## 14. Final notes
+## 14. Final notes for continuing on laptop
 
-You built a professional, brand-consistent travel platform in one working session:
-- Live on custom `.com` domain with HTTPS
-- Mobile-responsive with 6-photo rotating hero
-- Tropical Hawaiian/Maldivian brand identity
-- Legal pages required for affiliate approval
-- Multiple affiliate applications in-flight
-- Payment infrastructure set up (Payoneer)
-- Complete tax paperwork submitted (W-8BEN for Thailand)
+**To pick up this session on your laptop:**
 
-Real work now shifts from technical setup to **content, marketing, and traffic**. The foundation is solid. When affiliate approvals arrive over the next 1–4 weeks, everything will just plug in.
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/louisleex05-byte/travel-site.git
+   cd travel-site
+   npm install
+   ```
 
-🥥 Good luck.
+2. Copy env vars from Vercel dashboard → paste into `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with values from Vercel Settings → Environment Variables
+   ```
+
+3. Run locally:
+   ```bash
+   npm run dev
+   # → http://localhost:3000
+   ```
+
+4. Any changes → same push flow:
+   ```bash
+   git add -A
+   git commit -m "your change"
+   git push
+   ```
+
+5. Vercel auto-deploys in ~30 seconds.
+
+**What to work on next (in priority order):**
+1. Fix CJ Superuser login (login as hotmail account) — biggest immediate revenue unlock
+2. Wait for Agoda Affiliate Partnerships reply (3–5 days) — biggest strategic win
+3. Apply to 6 more Travelpayouts programs (GetYourGuide, Trip.com, AirHelp, Airalo, DiscoverCars, Hostelworld)
+4. Set up Google Analytics + Search Console for SEO tracking
+5. Set up hello@driftcoconut.com via Cloudflare Email Routing
+6. Write your first destination guide (Bali or Bangkok)
+7. Add more hero photos (Tokyo, Chiang Mai, Sapa) from Pixabay
+
+**Currently earning-capable:** 5 Travelpayouts programs (Klook, Welcome Pickups, Yesim, Kiwi, Drimsim). If someone visits driftcoconut.com right now and books any of those services via your TravelEssentials cards, you earn commission immediately.
+
+🥥 Good luck on the laptop. Session context is fully preserved here.
