@@ -148,8 +148,8 @@ export default async function HotelDetailPage({
       {/* Travel essentials — affiliate cross-sell (Klook, Welcome Pickups, Yesim, Kiwi) */}
       <section className="pt-8 border-t border-sea-100">
         <TravelEssentials
-          heading="Complete your stay"
-          subheading="Add these before you go — activities, transfers, connectivity, and flights."
+          headingKey="essentials_hotel_heading"
+          subheadingKey="essentials_hotel_sub"
         />
       </section>
     </div>

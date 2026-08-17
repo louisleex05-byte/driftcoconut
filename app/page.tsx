@@ -1,85 +1,79 @@
+"use client";
+
 import Hero from "@/components/Hero";
 import PartnerStrip from "@/components/PartnerStrip";
 import SearchForm from "@/components/SearchForm";
 import TravelEssentials from "@/components/TravelEssentials";
 import { Hibiscus, Starfish, PalmLeaf, Boat, StrawHat, Coral, Conch, Shell } from "@/components/Decorations";
+import { useT } from "@/contexts/LanguageProvider";
 
 export default function HomePage() {
+  const t = useT();
   return (
     <div className="relative">
-      {/* Hero + PartnerStrip visually attached — no gap between them */}
       <div className="mb-10">
         <Hero />
         <PartnerStrip />
       </div>
 
-      {/* Where to drift next — inspiration FIRST (browse before you search) */}
+      {/* Where to drift next */}
       <section id="deals" className="relative pt-2 pb-6 mb-6">
         <Hibiscus className="absolute -top-6 -right-2 w-20 md:w-28 text-sea-300 opacity-70 rotate-12 pointer-events-none" />
         <Starfish className="hidden sm:block absolute -bottom-4 -left-4 w-20 md:w-24 text-sea-400 opacity-70 -rotate-12 pointer-events-none" />
 
         <div className="text-center mb-6 relative">
           <div className="text-xs uppercase tracking-widest text-sea-600 font-semibold">
-            Curated for wanderers
+            {t("deals_eyebrow")}
           </div>
           <h2 className="font-display text-2xl md:text-3xl font-semibold text-sea-800 mt-1">
-            Where to drift next
+            {t("deals_title")}
           </h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 relative z-10">
           {[
-            { title: "Tropical escapes", desc: "Bali, Phuket, Maldives", emoji: "🏝️" },
-            { title: "City breaks", desc: "Tokyo, Singapore, HK", emoji: "🏙️" },
-            { title: "Mountain retreats", desc: "Chiang Mai, Kyoto, Sapa", emoji: "⛰️" },
+            { titleKey: "deals_tropical_title", descKey: "deals_tropical_desc", emoji: "🏝️", accent: "shell" },
+            { titleKey: "deals_city_title",     descKey: "deals_city_desc",     emoji: "🏙️", accent: "conch" },
+            { titleKey: "deals_mountain_title", descKey: "deals_mountain_desc", emoji: "⛰️", accent: "starfish" },
           ].map((c) => (
             <div
-              key={c.title}
+              key={c.titleKey}
               className="relative bg-white/80 backdrop-blur rounded-xl border border-sea-100 p-6 hover:border-sea-300 hover:shadow-sm transition-all"
             >
               <div className="text-3xl">{c.emoji}</div>
-              <h3 className="font-display text-lg font-semibold mt-2 text-sea-800">{c.title}</h3>
-              <p className="text-sm text-slate-600 mt-1">{c.desc}</p>
-              {c.title === "Tropical escapes" && (
-                <Shell className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />
-              )}
-              {c.title === "City breaks" && (
-                <Conch className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />
-              )}
-              {c.title === "Mountain retreats" && (
-                <Starfish className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />
-              )}
+              <h3 className="font-display text-lg font-semibold mt-2 text-sea-800">{t(c.titleKey as never)}</h3>
+              <p className="text-sm text-slate-600 mt-1">{t(c.descKey as never)}</p>
+              {c.accent === "shell" && <Shell className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
+              {c.accent === "conch" && <Conch className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
+              {c.accent === "starfish" && <Starfish className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Tight decorative dividers between deals and search */}
       <div className="relative h-3 flex items-center justify-center">
         <Boat className="hidden md:block absolute left-1/4 w-12 text-sea-400 opacity-45 pointer-events-none" />
         <StrawHat className="hidden md:block absolute right-1/4 w-10 text-sea-400 opacity-45 pointer-events-none rotate-6" />
         <Conch className="hidden lg:block absolute left-2/3 w-8 text-sea-500 opacity-45 pointer-events-none -rotate-12" />
       </div>
 
-      {/* Main search form — placed after inspiration, when user is ready to act */}
+      {/* Main search form */}
       <section id="search-form" className="mb-10 scroll-mt-24 pt-2">
         <div className="text-center mb-4">
           <div className="text-xs uppercase tracking-widest text-sea-600 font-semibold">
-            Ready to book?
+            {t("search_eyebrow")}
           </div>
           <h2 className="font-display text-2xl md:text-3xl font-semibold text-sea-800 mt-1">
-            Search hotels
+            {t("search_title")}
           </h2>
         </div>
         <SearchForm />
       </section>
 
-      {/* Travel essentials — affiliate cross-sell */}
       <section className="mt-10 mb-10">
         <TravelEssentials />
       </section>
 
-      {/* Ambient palm leaf + coral drifting in the page corners */}
       <PalmLeaf className="hidden lg:block fixed -bottom-20 -right-20 w-72 text-sea-200 opacity-60 rotate-45 pointer-events-none -z-10" />
       <Coral className="hidden lg:block fixed top-1/3 -left-10 w-40 text-sea-200 opacity-45 -rotate-6 pointer-events-none -z-10" />
     </div>

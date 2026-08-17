@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CITIES } from "@/lib/cities";
+import { useT } from "@/contexts/LanguageProvider";
 
 function tomorrow(offset = 0) {
   const d = new Date();
@@ -11,6 +12,7 @@ function tomorrow(offset = 0) {
 }
 
 export default function SearchForm() {
+  const t = useT();
   const router = useRouter();
   const [cityId, setCityId] = useState<number>(CITIES[0].id);
   const [checkIn, setCheckIn] = useState(tomorrow(0));
@@ -43,7 +45,7 @@ export default function SearchForm() {
       className="bg-white rounded-xl shadow-sm border border-sea-100 p-4 grid grid-cols-1 md:grid-cols-5 gap-3"
     >
       <label className="md:col-span-2">
-        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">Destination</div>
+        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">{t("search_destination")}</div>
         <select
           className="w-full text-sm border border-sea-200 rounded-lg px-2.5 py-1.5 focus:border-sea-500 focus:outline-none transition-colors"
           value={cityId}
@@ -59,7 +61,7 @@ export default function SearchForm() {
         </select>
       </label>
       <label>
-        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">Check-in</div>
+        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">{t("search_check_in")}</div>
         <input
           type="date"
           className="w-full text-sm border border-sea-200 rounded-lg px-2.5 py-1.5 focus:border-sea-500 focus:outline-none transition-colors"
@@ -68,7 +70,7 @@ export default function SearchForm() {
         />
       </label>
       <label>
-        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">Check-out</div>
+        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">{t("search_check_out")}</div>
         <input
           type="date"
           className="w-full text-sm border border-sea-200 rounded-lg px-2.5 py-1.5 focus:border-sea-500 focus:outline-none transition-colors"
@@ -77,7 +79,7 @@ export default function SearchForm() {
         />
       </label>
       <label>
-        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">Guests</div>
+        <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">{t("search_guests")}</div>
         <input
           type="number"
           min={1}
@@ -92,7 +94,7 @@ export default function SearchForm() {
           type="submit"
           className="w-full md:w-auto bg-sea-600 hover:bg-sea-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
         >
-          Search hotels
+          {t("search_submit")}
         </button>
       </div>
     </form>

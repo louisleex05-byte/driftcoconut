@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CITIES } from "@/lib/cities";
+import { useT } from "@/contexts/LanguageProvider";
 
 function tomorrow(offset = 0) {
   const d = new Date();
@@ -11,6 +12,7 @@ function tomorrow(offset = 0) {
 }
 
 export default function HeaderSearch() {
+  const t = useT();
   const router = useRouter();
   const [q, setQ] = useState("");
 
@@ -66,9 +68,9 @@ export default function HeaderSearch() {
           name="q"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Where to? Try Bali or Tokyo..."
+          placeholder={t("header_search_placeholder")}
           className="w-full pl-9 pr-3 py-2 rounded-full border border-sea-200 bg-white/80 text-sm placeholder:text-slate-400 focus:outline-none focus:border-sea-500 focus:bg-white transition-colors"
-          aria-label="Search destinations"
+          aria-label={t("header_search_aria")}
         />
       </div>
     </form>

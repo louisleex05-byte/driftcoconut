@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
+import { useT } from "@/contexts/LanguageProvider";
 
 const ROTATE_MS = 3000;
 
 export default function Hero() {
+  const t = useT();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -51,10 +53,10 @@ export default function Hero() {
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-14 sm:pb-10 md:pb-14 px-4">
           <div className="w-full max-w-3xl text-center text-white">
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight drop-shadow-lg">
-              Find your next stay
+              {t("hero_title")}
             </h1>
             <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-lg drop-shadow-md opacity-95 px-2">
-              Compare thousands of hotels worldwide and book the perfect room.
+              {t("hero_subtitle")}
             </p>
           </div>
         </div>
