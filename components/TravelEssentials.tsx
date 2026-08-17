@@ -58,14 +58,6 @@ const ESSENTIALS_ROW2: Essential[] = [
     hot: true,
   },
   {
-    key: "airalo",
-    title: "Global eSIM",
-    subtitle: "200+ countries, install before you land",
-    emoji: "🌐",
-    color: "text-indigo-700",
-    bg: "bg-indigo-50",
-  },
-  {
     key: "ekta",
     title: "Travel insurance",
     subtitle: "Medical, baggage, trip cancellation cover",
@@ -200,23 +192,33 @@ export default function TravelEssentials({
               />
             )}
 
-            {/* Drimsim stacked under Yesim — physical SIM alternative */}
+            {/* Drimsim + Airalo stacked under Yesim — connectivity alternatives */}
             {e.key === "yesim" && (
-              <AlternativeCard
-                href={AFFILIATE_LINKS.drimsim}
-                emoji="📱"
-                bg="bg-sky-50"
-                title="Drimsim physical SIM"
-                subtitle="Prefer a physical SIM card? Works in 190+ countries"
-                titleColor="text-sky-700"
-              />
+              <>
+                <AlternativeCard
+                  href={AFFILIATE_LINKS.drimsim}
+                  emoji="📱"
+                  bg="bg-sky-50"
+                  title="Drimsim physical SIM"
+                  subtitle="Prefer a physical SIM card? Works in 190+ countries"
+                  titleColor="text-sky-700"
+                />
+                <AlternativeCard
+                  href={AFFILIATE_LINKS.airalo}
+                  emoji="🌐"
+                  bg="bg-indigo-50"
+                  title="Airalo global eSIM"
+                  subtitle="200+ countries, install before you land"
+                  titleColor="text-indigo-700"
+                />
+              </>
             )}
           </div>
         ))}
       </div>
 
-      {/* Row 2: expansion partners */}
-      <div className={`mt-3 sm:mt-4 grid gap-3 sm:gap-4 items-start ${compact ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
+      {/* Row 2: expansion partners (3 cards — Airalo moved into Yesim stack) */}
+      <div className={`mt-3 sm:mt-4 grid gap-3 sm:gap-4 items-start ${compact ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
         {ESSENTIALS_ROW2.map((e) => (
           <EssentialCard key={e.key} e={e} />
         ))}
