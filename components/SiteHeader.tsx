@@ -21,11 +21,11 @@ export default function SiteHeader() {
               driftcoconut
             </span>
             <span
-              className="font-display text-[10px] sm:text-[11px] font-medium tracking-wide text-emerald-600 mt-0.5 truncate animate-drift"
+              className="font-display text-base sm:text-lg md:text-xl font-medium tracking-wide text-emerald-400 mt-0.5 truncate animate-drift"
               lang="th"
               aria-label="Drift Coconut in Thai"
             >
-              มะพร้าวลอยน้ำ <span className="text-emerald-500/70">(Drift Coconut)</span>
+              มะพร้าวลอยน้ำ
             </span>
           </span>
         </Link>
