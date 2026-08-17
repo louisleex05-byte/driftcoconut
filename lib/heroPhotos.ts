@@ -11,6 +11,16 @@ export type HeroPhoto = {
 };
 
 export const HERO_PHOTOS: HeroPhoto[] = [
+  // ─── Featured first slide ────────────────────────────────────────
+  {
+    src: "/hero/myanmar-bagan-balloon.jpg",
+    alt: "Hot air balloon over Bagan pagodas at sunrise, Myanmar",
+    caption: "Bagan balloons, Myanmar",
+    credit: "Photo: Peggy_Marco / Pixabay",
+    // Balloon is top-right of source; shift up + right so it stays fully visible on wide crops
+    position: "75% 25%",
+  },
+
   // ─── Original set: tropical / Maldives / Bali ────────────────────
   {
     src: "/hero/bali-sanur.jpg",
@@ -146,14 +156,6 @@ export const HERO_PHOTOS: HeroPhoto[] = [
   },
 
   // ─── Cultural / mountain / SE Asia ───────────────────────────────
-  {
-    src: "/hero/myanmar-bagan-balloon.jpg",
-    alt: "Hot air balloon over Bagan pagodas at sunrise, Myanmar",
-    caption: "Bagan balloons, Myanmar",
-    credit: "Photo: Peggy_Marco / Pixabay",
-    // Balloon is top-right of source; shift up + right so it stays fully visible on wide crops
-    position: "75% 25%",
-  },
   {
     src: "/hero/thailand-phu-chi-fa.jpg",
     alt: "Two travelers on Phu Chi Fa cliff at sunrise, northern Thailand",
