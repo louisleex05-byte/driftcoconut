@@ -15,8 +15,8 @@ export default function SiteHeader() {
           href="/"
           className="flex items-center gap-1.5 sm:gap-3 group min-w-0 flex-shrink"
         >
-          <Logo className="w-9 h-9 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0 transition-transform group-hover:-rotate-6" />
-          <span className="font-display text-base sm:text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 leading-none truncate min-w-0">
+          <Logo className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex-shrink-0 transition-transform group-hover:-rotate-6" />
+          <span className="font-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-sea-700 leading-none truncate min-w-0">
             driftcoconut
           </span>
         </Link>
