@@ -4,6 +4,31 @@
 const AGODA_ENDPOINT =
   "https://affiliateapi7643.agoda.com/affiliateservice/lt_v1";
 
+/**
+ * Get a working "Book on Agoda" URL for a hotel.
+ * - When we're using mock data (landingURL contains `cid=DEMO`), we fall back to
+ *   Agoda's real search page for the hotel name — this guarantees the button
+ *   never 404s while our real Agoda API is still pending approval.
+ * - Once the real Agoda API is connected, hotel.landingURL becomes a genuine
+ *   affiliate deep-link (with the real cid= tracking your site ID). No code
+ *   change needed — this helper transparently forwards it.
+ *
+ * The AGODA_SITE_ID env var is appended as `cid=` to the search fallback so
+ * that once your affiliate account is approved, clicks attribute retroactively.
+ */
+export function getAgodaBookingUrl(hotel: {
+  hotelName: string;
+  landingURL: string;
+}): string {
+  const isMock = hotel.landingURL.includes("cid=DEMO");
+  if (!isMock) return hotel.landingURL;
+
+  const query = encodeURIComponent(hotel.hotelName);
+  const cid = process.env.NEXT_PUBLIC_AGODA_SITE_ID || process.env.AGODA_SITE_ID;
+  const cidParam = cid ? `&cid=${cid}` : "";
+  return `https://www.agoda.com/search?q=${query}${cidParam}`;
+}
+
 export type AgodaSearchParams = {
   cityId?: number;         // Agoda city id (e.g., Bangkok = 9395)
   hotelIds?: number[];     // Or search specific hotels

@@ -1,4 +1,5 @@
 import { MOCK_HOTELS, getHotelDetail } from "@/lib/mockHotels";
+import { getAgodaBookingUrl } from "@/lib/agoda";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -132,7 +133,7 @@ export default async function HotelDetailPage({
               <span className="text-sm text-slate-500">/ night</span>
             </div>
             <a
-              href={hotel.landingURL}
+              href={getAgodaBookingUrl(hotel)}
               target="_blank"
               rel="noopener sponsored"
               className="mt-4 block w-full bg-sea-600 hover:bg-sea-700 text-white text-center font-semibold py-3 rounded-lg"
