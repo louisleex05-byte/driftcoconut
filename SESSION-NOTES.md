@@ -39,15 +39,15 @@ A Next.js 15 travel site that discovers and compares hotels across Asia-Pacific 
 
 | Platform | Program | Notes |
 |---|---|---|
-| Agoda (direct) | driftcoconut.com | Site ID 1970417 — ticket now with Affiliate Partnerships Team |
-| CJ Affiliate | Booking.com (7 regions) | Pending — will process once CJ activated |
-| Awin | Lebua Hotels (Global) | Pending review |
-| Awin | Chatrium Hotels (Global) | Pending review |
+| CJ Affiliate | Booking.com regional (6 more) + Trip.com, Accor CN, IHG AMEA, Kayak, Momondo, Vrbo | 7 pending — CJ now activated |
+| Awin | Lebua Hotels (Global) | Pending review — Awin currently on pause |
+| Awin | Chatrium Hotels (Global) | Pending review — Awin currently on pause |
 
 ### ❌ DECLINED / BLOCKED
 
 | Platform | Program | Reason | Retry |
 |---|---|---|---|
+| **Agoda (direct)** | **driftcoconut.com** | **REJECTED 8/20/2026 — boilerplate reasons (likely "site under construction" / "thin content"). Reconsideration ticket submitted 8/28.** | **Wait 3–7 days for support reply; if no reversal, reapply after 90-day cooldown (~ late Nov 2026) with destination guides + traffic** |
 | Awin | Viator US | "Dead URL, page not found" | Retry in 3–4 days |
 | Awin | Viator AU | "Advertiser doesn't work with this publisher type" | Try Viator UK/DE instead |
 | Travelpayouts | Booking.com | Traffic requirement (3+ months) | Reapply Nov 2026 |
@@ -60,7 +60,7 @@ A Next.js 15 travel site that discovers and compares hotels across Asia-Pacific 
 | **CJ Superuser login** | Payment info locked, can't activate CJ | Log in with `louisleex@hotmail.com` (Superuser), not gmail (Operator) |
 | **Payoneer KYC pending** | No US routing/account numbers yet | Wait 1–3 business days; check email for doc requests |
 | **Partnerize login** | Can't apply to Expedia/Hotels.com/Vrbo | Try `louisleex` all lowercase or reset password |
-| **Agoda old placeholder** | Site 1970237 (approvalsite819358665.co) taints account | Just submitted ticket to Affiliate Partnerships Team to remove |
+| **Agoda application rejected** | Direct affiliate blocked until reapproval — no Agoda inventory or commissions | (a) Wait for reconsideration ticket reply (3–7 days); (b) If denied, build 5–8 destination guides + earn some organic traffic, reapply after 90-day cooldown |
 
 ---
 
@@ -278,8 +278,12 @@ Everything after custom domain went live:
 
 ## 10. Priority action list (RESUME HERE ON LAPTOP)
 
-### 🚨 Priority 1 — Wait for Agoda Affiliate Partnerships response
-- Ticket submitted via `partners.agoda.com` support form → routed to correct team
+### 🚨 Priority 1 — Agoda: REJECTED, appeal in progress
+- **Application was REJECTED 8/20/2026** with boilerplate reasons (site under construction / thin content)
+- Reconsideration ticket submitted 8/28/2026 via `partners.agoda.com` support form → routed to Affiliate Partnerships Team
+- Expected reply: 3–7 business days
+- If no reversal: plan to reapply after 90-day cooldown (late Nov 2026) with strengthened site (destination guides + organic traffic)
+- Site UI already cleaned up: "Book on Agoda" button REPLACED with Booking.com CTA; Agoda removed from partner strip, footer, and About page
 - Expected reply: 3–5 business days
 - Their response will do one of: approve, ask for more info, decline
 
