@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PalmLeaf, Shell } from "@/components/Decorations";
 import TravelEssentials from "@/components/TravelEssentials";
+import BookingCard from "@/components/BookingCard";
 
 type Params = { id: string };
 
@@ -144,6 +145,12 @@ export default async function HotelDetailPage({
           </div>
         </aside>
       </div>
+
+      {/* Booking.com CJ card — alternative booking channel for this destination.
+          Uses the hotel name so Booking search surfaces this hotel + nearby options. */}
+      <section className="pt-8 border-t border-sea-100 flex justify-center">
+        <BookingCard destination={hotel.hotelName} />
+      </section>
 
       {/* Travel essentials — affiliate cross-sell (Klook, Welcome Pickups, Yesim, Kiwi) */}
       <section className="pt-8 border-t border-sea-100">

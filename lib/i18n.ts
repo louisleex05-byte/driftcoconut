@@ -100,6 +100,16 @@ export const dictionary = {
     footer_link_terms: "Terms",
     footer_copyright: "Powered by affiliate partners. Prices and availability subject to change.",
 
+    // Booking.com CJ card
+    booking_card_eyebrow: "Affiliate partner",
+    booking_card_title: "Find your stay on Booking.com",
+    booking_card_body: "2.3M properties · free cancellation on most stays · price match guarantee.",
+    booking_card_cta: "Search hotels →",
+
+    // Site-wide FTC disclosure (footer)
+    footer_ftc_disclosure:
+      "driftcoconut participates in affiliate programs including Agoda, Booking.com, Expedia, and Tripadvisor. We may earn a commission when you book through our links, at no cost to you.",
+
     // Language toggle
     lang_toggle_aria: "Switch language",
   },
@@ -195,6 +205,16 @@ export const dictionary = {
     footer_link_privacy: "ความเป็นส่วนตัว",
     footer_link_terms: "เงื่อนไข",
     footer_copyright: "ขับเคลื่อนโดยพาร์ทเนอร์ Affiliate ราคาและห้องว่างอาจเปลี่ยนแปลงได้",
+
+    // Booking.com CJ card
+    booking_card_eyebrow: "พาร์ทเนอร์ Affiliate",
+    booking_card_title: "ค้นหาที่พักบน Booking.com",
+    booking_card_body: "โรงแรม 2.3 ล้านแห่งทั่วโลก · ยกเลิกฟรีเกือบทุกที่พัก · การันตีราคาดีที่สุด",
+    booking_card_cta: "ค้นหาโรงแรม →",
+
+    // Site-wide FTC disclosure (footer)
+    footer_ftc_disclosure:
+      "driftcoconut เข้าร่วมโปรแกรม Affiliate รวมถึง Agoda, Booking.com, Expedia และ Tripadvisor เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
 
     // Language toggle
     lang_toggle_aria: "เปลี่ยนภาษา",
