@@ -1,5 +1,5 @@
 import { MOCK_HOTELS, getHotelDetail } from "@/lib/mockHotels";
-import { getAgodaBookingUrl } from "@/lib/agoda";
+import { bookingCJSearch } from "@/lib/booking";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -133,12 +133,13 @@ export default async function HotelDetailPage({
               <span className="text-sm text-slate-500">/ night</span>
             </div>
             <a
-              href={getAgodaBookingUrl(hotel)}
+              href={bookingCJSearch(hotel.hotelName)}
               target="_blank"
-              rel="noopener sponsored"
-              className="mt-4 block w-full bg-sea-600 hover:bg-sea-700 text-white text-center font-semibold py-3 rounded-lg"
+              rel="sponsored nofollow noopener"
+              className="mt-4 block w-full text-white text-center font-semibold py-3 rounded-lg transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#003580" }}
             >
-              Book on Agoda
+              Book on Booking.com
             </a>
             <p className="text-xs text-slate-500 mt-3 text-center">
               Secure booking · Free cancellation on most rooms

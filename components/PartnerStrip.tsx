@@ -12,7 +12,6 @@ type Partner = {
 };
 
 const PARTNERS: Partner[] = [
-  { name: "agoda", color: "#F41B4A", note: "Asia-Pacific specialist" },
   { name: "Booking.com", color: "#003580", note: "Global inventory" },
   { name: "Expedia", color: "#FFC72C", note: "Bundle & save" },
   { name: "Hotels.com", color: "#D32F2F", note: "Rewards program" },

@@ -42,10 +42,10 @@ export default function SiteFooter() {
         <div>
           <div className="font-semibold text-slate-900 mb-2">{t("footer_col_partners")}</div>
           <ul className="space-y-1.5 text-slate-500 text-xs">
-            <li>Agoda</li>
-            <li>Expedia · Hotels.com</li>
             <li>Booking.com</li>
-            <li>Tripadvisor</li>
+            <li>Expedia · Hotels.com</li>
+            <li>Viator · Tripadvisor Group</li>
+            <li>Klook · Aviasales</li>
           </ul>
         </div>
       </div>

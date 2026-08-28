@@ -84,7 +84,7 @@ export const dictionary = {
       "We pull live availability and pricing from major hotel booking networks, then present it in a simple, unified search experience. When you find a stay you like, we send you directly to our partner's secure booking page to complete your reservation. We never charge you more than the partner's listed rate — our income comes from a small referral fee paid by the partner, at no cost to you.",
     about_partners_h2: "Our partners",
     about_partners_body:
-      "We work with reputable global hotel networks including Agoda, Expedia Group (Hotels.com, Expedia, Vrbo), Booking.com, and Tripadvisor. Every listing you see is verified inventory from one of these networks.",
+      "We work with reputable global hotel networks including Booking.com, Expedia Group (Hotels.com, Expedia, Vrbo), and Tripadvisor Group (Viator). Every listing you see is verified inventory from one of these networks.",
     about_contact_h2: "Contact",
     about_contact_body_prefix: "Questions, feedback, or partnership inquiries? Email ",
     about_disclaimer:
@@ -108,7 +108,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut participates in affiliate programs including Agoda, Booking.com, Expedia, and Tripadvisor. We may earn a commission when you book through our links, at no cost to you.",
+      "driftcoconut participates in affiliate programs including Booking.com, Expedia, Tripadvisor Group (Viator), Klook, and other travel partners. We may earn a commission when you book through our links, at no cost to you.",
 
     // Language toggle
     lang_toggle_aria: "Switch language",
@@ -190,7 +190,7 @@ export const dictionary = {
       "เราดึงข้อมูลห้องว่างและราคาแบบเรียลไทม์จากเครือข่ายจองโรงแรมชั้นนำ แล้วนำเสนอในหน้าค้นหาที่ใช้งานง่ายเป็นหนึ่งเดียว เมื่อคุณพบที่พักที่ถูกใจ เราจะพาคุณไปจองบนหน้าเว็บของพาร์ทเนอร์โดยตรง เราไม่คิดเงินเพิ่มจากราคาที่พาร์ทเนอร์แสดง — รายได้ของเรามาจากค่าแนะนำเล็กน้อยที่พาร์ทเนอร์จ่ายให้ โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
     about_partners_h2: "พาร์ทเนอร์ของเรา",
     about_partners_body:
-      "เราทำงานร่วมกับเครือข่ายโรงแรมระดับโลกที่น่าเชื่อถือ รวมถึง Agoda, Expedia Group (Hotels.com, Expedia, Vrbo), Booking.com และ Tripadvisor รายการโรงแรมทุกรายการที่คุณเห็นได้รับการยืนยันจากเครือข่ายเหล่านี้",
+      "เราทำงานร่วมกับเครือข่ายโรงแรมระดับโลกที่น่าเชื่อถือ รวมถึง Booking.com, Expedia Group (Hotels.com, Expedia, Vrbo) และ Tripadvisor Group (Viator) รายการโรงแรมทุกรายการที่คุณเห็นได้รับการยืนยันจากเครือข่ายเหล่านี้",
     about_contact_h2: "ติดต่อเรา",
     about_contact_body_prefix: "มีคำถาม ข้อเสนอแนะ หรือสนใจร่วมเป็นพาร์ทเนอร์? อีเมล ",
     about_disclaimer:
@@ -214,7 +214,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut เข้าร่วมโปรแกรม Affiliate รวมถึง Agoda, Booking.com, Expedia และ Tripadvisor เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
+      "driftcoconut เข้าร่วมโปรแกรม Affiliate รวมถึง Booking.com, Expedia, Tripadvisor Group (Viator), Klook และพาร์ทเนอร์การเดินทางรายอื่น เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
 
     // Language toggle
     lang_toggle_aria: "เปลี่ยนภาษา",
