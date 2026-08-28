@@ -4,6 +4,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Wave, Shell, Coral, Conch, Starfish } from "@/components/Decorations";
 import { useT } from "@/contexts/LanguageProvider";
+import BookingImpressionPixel from "@/components/BookingImpressionPixel";
 
 export default function SiteFooter() {
   const t = useT();
@@ -48,9 +49,15 @@ export default function SiteFooter() {
           </ul>
         </div>
       </div>
-      <div className="max-w-screen-2xl mx-auto px-4 mt-8 pt-6 border-t border-sea-100 text-xs text-slate-400 text-center">
-        © {year} driftcoconut. {t("footer_copyright")}
+      <div className="max-w-screen-2xl mx-auto px-4 mt-8 pt-6 border-t border-sea-100 text-xs text-slate-400 text-center space-y-2">
+        <p className="max-w-3xl mx-auto text-[11px] leading-relaxed">
+          {t("footer_ftc_disclosure")}
+        </p>
+        <p>© {year} driftcoconut. {t("footer_copyright")}</p>
       </div>
+
+      {/* CJ impression pixel — required for Booking.com EPC reconciliation. */}
+      <BookingImpressionPixel />
     </footer>
   );
 }
