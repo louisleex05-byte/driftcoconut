@@ -11,13 +11,30 @@ function tomorrow(offset = 0) {
   return d.toISOString().slice(0, 10);
 }
 
+/** Return the ISO date string exactly one day after the given YYYY-MM-DD. */
+function nextDay(isoDate: string): string {
+  const d = new Date(isoDate + "T00:00:00");
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
 export default function SearchForm() {
   const t = useT();
   const router = useRouter();
   const [cityId, setCityId] = useState<number>(CITIES[0].id);
   const [checkIn, setCheckIn] = useState(tomorrow(0));
-  const [checkOut, setCheckOut] = useState(tomorrow(2));
+  const [checkOut, setCheckOut] = useState(tomorrow(1));
   const [adults, setAdults] = useState(2);
+
+  /**
+   * When check-in changes, snap check-out to exactly one day later.
+   * This keeps the two dates in sync for a standard 1-night stay by default.
+   * Users can still manually change check-out afterwards for longer stays.
+   */
+  function handleCheckInChange(newCheckIn: string) {
+    setCheckIn(newCheckIn);
+    setCheckOut(nextDay(newCheckIn));
+  }
 
   // Group cities by region for the dropdown
   const grouped = useMemo(() => {
@@ -66,13 +83,14 @@ export default function SearchForm() {
           type="date"
           className="w-full text-sm border border-sea-200 rounded-lg px-2.5 py-1.5 focus:border-sea-500 focus:outline-none transition-colors"
           value={checkIn}
-          onChange={(e) => setCheckIn(e.target.value)}
+          onChange={(e) => handleCheckInChange(e.target.value)}
         />
       </label>
       <label>
         <div className="text-[10px] uppercase tracking-wider font-medium text-slate-500 mb-1">{t("search_check_out")}</div>
         <input
           type="date"
+          min={nextDay(checkIn)}
           className="w-full text-sm border border-sea-200 rounded-lg px-2.5 py-1.5 focus:border-sea-500 focus:outline-none transition-colors"
           value={checkOut}
           onChange={(e) => setCheckOut(e.target.value)}
