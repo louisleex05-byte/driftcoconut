@@ -5,17 +5,27 @@ import { useMemo, useState } from "react";
 import { CITIES } from "@/lib/cities";
 import { useT } from "@/contexts/LanguageProvider";
 
+/** Format a Date as YYYY-MM-DD using LOCAL time (not UTC). */
+function fmtLocal(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** Return today + (1 + offset) days as YYYY-MM-DD in local time. */
 function tomorrow(offset = 0) {
   const d = new Date();
   d.setDate(d.getDate() + 1 + offset);
-  return d.toISOString().slice(0, 10);
+  return fmtLocal(d);
 }
 
-/** Return the ISO date string exactly one day after the given YYYY-MM-DD. */
+/** Return the date string exactly one day after the given YYYY-MM-DD. Timezone-safe. */
 function nextDay(isoDate: string): string {
-  const d = new Date(isoDate + "T00:00:00");
+  // Parse at noon local to avoid any DST / UTC edge cases around midnight.
+  const d = new Date(isoDate + "T12:00:00");
   d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
+  return fmtLocal(d);
 }
 
 export default function SearchForm() {
