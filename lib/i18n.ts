@@ -106,6 +106,12 @@ export const dictionary = {
     booking_card_body: "2.3M properties · free cancellation on most stays · price match guarantee.",
     booking_card_cta: "Search hotels →",
 
+    // Mock-mode notice on search results
+    search_mock_notice_title: "You're viewing sample listings",
+    search_mock_notice_body: "Our live hotel inventory is coming soon. For real available rooms in this city, use Booking.com below — we'll credit your booking to us.",
+    search_booking_card_title_prefix: "Real hotels in ",
+    search_booking_card_body: "See live availability & prices from Booking.com's 2.3M+ properties.",
+
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
       "driftcoconut participates in affiliate programs including Booking.com, Expedia, Tripadvisor Group (Viator), Klook, and other travel partners. We may earn a commission when you book through our links, at no cost to you.",
@@ -211,6 +217,12 @@ export const dictionary = {
     booking_card_title: "ค้นหาที่พักบน Booking.com",
     booking_card_body: "โรงแรม 2.3 ล้านแห่งทั่วโลก · ยกเลิกฟรีเกือบทุกที่พัก · การันตีราคาดีที่สุด",
     booking_card_cta: "ค้นหาโรงแรม →",
+
+    // Mock-mode notice on search results
+    search_mock_notice_title: "คุณกำลังดูรายการตัวอย่าง",
+    search_mock_notice_body: "ระบบค้นหาโรงแรมสดของเราเร็วๆ นี้ สำหรับห้องพักจริงในเมืองนี้ ใช้ Booking.com ด้านล่างได้เลย — เราจะได้ค่าคอมมิชชั่นจากการจองของคุณ",
+    search_booking_card_title_prefix: "โรงแรมจริงใน ",
+    search_booking_card_body: "ดูห้องว่างและราคาจริงจากโรงแรม 2.3 ล้านแห่งบน Booking.com",
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
