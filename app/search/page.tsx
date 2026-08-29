@@ -1,7 +1,10 @@
 import { searchAgoda } from "@/lib/agoda";
 import HotelCard from "@/components/HotelCard";
 import Link from "next/link";
-import { PalmLeaf, Wave, Conch } from "@/components/Decorations";
+import { PalmLeaf, Conch } from "@/components/Decorations";
+import { CITIES } from "@/lib/cities";
+import SearchBookingCard from "@/components/SearchBookingCard";
+import SearchMockNotice from "@/components/SearchMockNotice";
 
 type SearchParams = {
   cityId?: string;
@@ -26,12 +29,17 @@ export default async function SearchPage({
     );
   }
 
+  const cityIdNum = Number(sp.cityId);
+  const cityMatch = CITIES.find((c) => c.id === cityIdNum);
+  const cityName = cityMatch?.name ?? "your destination";
+  const isMock = process.env.AGODA_MOCK === "true";
+
   let hotels: Awaited<ReturnType<typeof searchAgoda>> = [];
   let errorMsg: string | null = null;
 
   try {
     hotels = await searchAgoda({
-      cityId: Number(sp.cityId),
+      cityId: cityIdNum,
       checkIn: sp.checkIn,
       checkOut: sp.checkOut,
       adults: Number(sp.adults ?? 2),
@@ -51,9 +59,15 @@ export default async function SearchPage({
           ← New search
         </Link>
         <h1 className="text-2xl font-bold mt-2">
-          {hotels.length} hotels · {sp.checkIn} → {sp.checkOut}
+          {hotels.length} hotels · {cityName} · {sp.checkIn} → {sp.checkOut}
         </h1>
       </div>
+
+      {/* Booking.com CJ — city-aware "real inventory" CTA (top of results) */}
+      <SearchBookingCard cityName={cityName} />
+
+      {/* Mock-mode notice — only shown when we're serving sample listings */}
+      {isMock && <SearchMockNotice />}
 
       {errorMsg ? (
         <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
