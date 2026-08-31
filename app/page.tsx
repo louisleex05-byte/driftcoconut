@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import PartnerStrip from "@/components/PartnerStrip";
 import SearchForm from "@/components/SearchForm";
 import TravelEssentials from "@/components/TravelEssentials";
+import GuideTipsBadge from "@/components/GuideTipsBadge";
 import { Hibiscus, Starfish, PalmLeaf, Boat, StrawHat, Coral, Conch, Shell } from "@/components/Decorations";
 import { useT } from "@/contexts/LanguageProvider";
 import { bookingCJSearch } from "@/lib/booking";
@@ -43,44 +44,50 @@ export default function HomePage() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 relative z-10">
-          {(
-            [
-              { cat: "tropical" as Category, titleKey: "deals_tropical_title", emoji: "🏝️", accent: "shell",    fallback: "Bali, Phuket, Maldives" },
-              { cat: "city"     as Category, titleKey: "deals_city_title",     emoji: "🏙️", accent: "conch",    fallback: "Tokyo, Singapore, HK" },
-              { cat: "mountain" as Category, titleKey: "deals_mountain_title", emoji: "⛰️", accent: "starfish", fallback: "Chiang Mai, Kyoto, Sapa" },
-            ]
-          ).map((c) => {
-            const pick = drift?.[c.cat];
-            const dest = pick?.primary ?? c.fallback.split(",")[0].trim();
-            const descLine = pick
-              ? [pick.primary, ...pick.others].join(", ")
-              : c.fallback;
-            return (
-              <a
-                key={c.titleKey}
-                href={bookingCJSearch(dest)}
-                onClick={reshuffle}
-                target="_blank"
-                rel="sponsored nofollow noopener"
-                className="group relative bg-white/80 backdrop-blur rounded-xl border border-sea-100 p-6 hover:border-sea-300 hover:shadow-md transition-all cursor-pointer block"
-              >
-                <div className="text-3xl">{c.emoji}</div>
-                <h3 className="font-display text-lg font-semibold mt-2 text-sea-800 group-hover:text-sea-700 transition-colors">{t(c.titleKey as never)}</h3>
-                <p className="text-sm text-slate-600 mt-1 transition-opacity duration-300">{descLine}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-sea-700 opacity-80 group-hover:opacity-100 transition-opacity">
-                  {t("essentials_book_now")} {pick && <span className="text-sea-500">· {pick.primary}</span>}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
-                    <path d="M5 12h14" />
-                    <path d="M12 5l7 7-7 7" />
-                  </svg>
-                </span>
-                {c.accent === "shell" && <Shell className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
-                {c.accent === "conch" && <Conch className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
-                {c.accent === "starfish" && <Starfish className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
-              </a>
-            );
-          })}
+        {/* Grid: 3 destination cards on left, Guide Tips badge on right (lg+); stacks on smaller screens */}
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start relative z-10">
+          <div className="grid md:grid-cols-3 gap-4">
+            {(
+              [
+                { cat: "tropical" as Category, titleKey: "deals_tropical_title", emoji: "🏝️", accent: "shell",    fallback: "Bali, Phuket, Maldives" },
+                { cat: "city"     as Category, titleKey: "deals_city_title",     emoji: "🏙️", accent: "conch",    fallback: "Tokyo, Singapore, HK" },
+                { cat: "mountain" as Category, titleKey: "deals_mountain_title", emoji: "⛰️", accent: "starfish", fallback: "Chiang Mai, Kyoto, Sapa" },
+              ]
+            ).map((c) => {
+              const pick = drift?.[c.cat];
+              const dest = pick?.primary ?? c.fallback.split(",")[0].trim();
+              const descLine = pick
+                ? [pick.primary, ...pick.others].join(", ")
+                : c.fallback;
+              return (
+                <a
+                  key={c.titleKey}
+                  href={bookingCJSearch(dest)}
+                  onClick={reshuffle}
+                  target="_blank"
+                  rel="sponsored nofollow noopener"
+                  className="group relative bg-white/80 backdrop-blur rounded-xl border border-sea-100 p-6 hover:border-sea-300 hover:shadow-md transition-all cursor-pointer block"
+                >
+                  <div className="text-3xl">{c.emoji}</div>
+                  <h3 className="font-display text-lg font-semibold mt-2 text-sea-800 group-hover:text-sea-700 transition-colors">{t(c.titleKey as never)}</h3>
+                  <p className="text-sm text-slate-600 mt-1 transition-opacity duration-300">{descLine}</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-sea-700 opacity-80 group-hover:opacity-100 transition-opacity">
+                    {t("essentials_book_now")} {pick && <span className="text-sea-500">· {pick.primary}</span>}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">
+                      <path d="M5 12h14" />
+                      <path d="M12 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                  {c.accent === "shell" && <Shell className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
+                  {c.accent === "conch" && <Conch className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
+                  {c.accent === "starfish" && <Starfish className="absolute bottom-3 right-3 w-10 text-sea-200 opacity-60 pointer-events-none" />}
+                </a>
+              );
+            })}
+          </div>
+
+          {/* Guide Tips badge — right rail on lg+, stacks below on smaller screens */}
+          <GuideTipsBadge featuredSlug="bangkok" />
         </div>
       </section>
 

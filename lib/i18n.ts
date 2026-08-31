@@ -106,6 +106,14 @@ export const dictionary = {
     booking_card_body: "2.3M properties · free cancellation on most stays · price match guarantee.",
     booking_card_cta: "Search hotels →",
 
+    // Guide tips badge (homepage callout)
+    guide_tips_pill: "Guide tips",
+    guide_tips_eyebrow: "Just published",
+    guide_tips_featured_title: "The driftcoconut guide to Bangkok",
+    guide_tips_featured_teaser: "A local's picks: where to stay, when to go, and what to skip — from a Bangkok-based writer.",
+    guide_tips_read_cta: "Read the guide",
+    guide_tips_see_all: "See all guides",
+
     // Mock-mode notice on search results
     search_mock_notice_title: "You're viewing sample listings",
     search_mock_notice_body: "Our live hotel inventory is coming soon. For real available rooms in this city, use Booking.com below — we'll credit your booking to us.",
@@ -217,6 +225,14 @@ export const dictionary = {
     booking_card_title: "ค้นหาที่พักบน Booking.com",
     booking_card_body: "โรงแรม 2.3 ล้านแห่งทั่วโลก · ยกเลิกฟรีเกือบทุกที่พัก · การันตีราคาดีที่สุด",
     booking_card_cta: "ค้นหาโรงแรม →",
+
+    // Guide tips badge (homepage callout)
+    guide_tips_pill: "คู่มือเที่ยว",
+    guide_tips_eyebrow: "เพิ่งเผยแพร่",
+    guide_tips_featured_title: "คู่มือกรุงเทพฯ โดย driftcoconut",
+    guide_tips_featured_teaser: "คำแนะนำจากคนในพื้นที่: พักที่ไหน ไปช่วงไหน อะไรควรข้าม — จากนักเขียนชาวกรุงเทพฯ",
+    guide_tips_read_cta: "อ่านคู่มือ",
+    guide_tips_see_all: "ดูคู่มือทั้งหมด",
 
     // Mock-mode notice on search results
     search_mock_notice_title: "คุณกำลังดูรายการตัวอย่าง",
