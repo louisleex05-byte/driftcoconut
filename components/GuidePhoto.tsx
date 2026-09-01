@@ -31,6 +31,18 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     doiSuthep:   { file: "doi-suthep.jpg",   alt: "Wat Phra That Doi Suthep temple with mountain view" },
     khaoSoi:     { file: "khao-soi.jpg",     alt: "Bowl of Northern Thai khao soi curry noodles in Chiang Mai" },
   },
+  bali: {
+    hero:         { file: "hero.jpg",          alt: "Tegallalang rice terraces in the Ubud hills of Bali at sunrise" },
+    whenToGo:     { file: "when-to-go.jpg",    alt: "Balinese Nyepi Ogoh-Ogoh parade before the Day of Silence" },
+    ubud:         { file: "ubud.jpg",          alt: "Ubud rice terraces and jungle village in Bali" },
+    canggu:       { file: "canggu.jpg",        alt: "Surfer at Batu Bolong beach in Canggu, Bali" },
+    seminyak:     { file: "seminyak.jpg",      alt: "Seminyak beach club at sunset with cocktails on the sand" },
+    uluwatu:      { file: "uluwatu.jpg",       alt: "Uluwatu Temple perched on a cliff over the Indian Ocean at sunset" },
+    sanur:        { file: "sanur.jpg",         alt: "Sanur beach at dawn with traditional Balinese jukung fishing boats" },
+    nusaPenida:   { file: "nusa-penida.jpg",   alt: "Kelingking Beach T-Rex cliff view on Nusa Penida" },
+    cookingClass: { file: "cooking-class.jpg", alt: "Balinese cooking class with fresh market ingredients" },
+    warung:       { file: "warung.jpg",        alt: "Traditional Balinese warung serving nasi campur and babi guling" },
+  },
 };
 
 export default function GuidePhoto({
