@@ -39,12 +39,6 @@ export async function generateMetadata({
   };
 }
 
-// Components made available inside MDX.
-const mdxComponents = {
-  AffiliateLink,
-  GuidePhoto,
-};
-
 export default async function GuidePage({
   params,
 }: {
@@ -52,6 +46,15 @@ export default async function GuidePage({
 }) {
   const { slug } = await params;
   const guide = await getGuide(slug);
+  // Bind guideSlug so MDX authors can write `<GuidePhoto slot="oldCity" />`
+  // and the correct per-guide photo dict is used automatically.
+  const BoundGuidePhoto = (props: { slot: string }) => (
+    <GuidePhoto slot={props.slot} guideSlug={slug} />
+  );
+  const mdxComponents = {
+    AffiliateLink,
+    GuidePhoto: BoundGuidePhoto,
+  };
   if (!guide) notFound();
 
   return (
