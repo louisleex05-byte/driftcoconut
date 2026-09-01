@@ -208,6 +208,18 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="cookingClass"; file="cooking-class.jpg"; alt="Balinese cooking class with fresh market ingredients" },
         [pscustomobject]@{ slot="warung";       file="warung.jpg";        alt="Traditional Balinese warung serving nasi campur and babi guling" }
     )
+    "pattaya" = @(
+        [pscustomobject]@{ slot="hero";        file="hero.jpg";         alt="Wongamat Beach at sunset with the Pattaya coastline in the background" },
+        [pscustomobject]@{ slot="whenToGo";    file="when-to-go.jpg";   alt="Songkran and Wan Lai water festival celebration in Pattaya" },
+        [pscustomobject]@{ slot="wongamat";    file="wongamat.jpg";     alt="Wongamat Beach at sunset with palms and family-friendly seafront in North Pattaya" },
+        [pscustomobject]@{ slot="jomtien";     file="jomtien.jpg";      alt="Jomtien Beach with tree shade and calm sand south of Pattaya" },
+        [pscustomobject]@{ slot="pratamnak";   file="pratamnak.jpg";    alt="Pratamnak Hill viewpoint over Pattaya Bay with Big Buddha Wat Phra Yai" },
+        [pscustomobject]@{ slot="central";     file="central.jpg";      alt="Central Pattaya beach and skyline near Central Festival mall" },
+        [pscustomobject]@{ slot="sanctuary";   file="sanctuary.jpg";    alt="Sanctuary of Truth all-teak temple by the sea in Pattaya" },
+        [pscustomobject]@{ slot="kohLarn";     file="koh-larn.jpg";     alt="Coral Island Koh Larn white sand beach and turquoise water day trip from Pattaya" },
+        [pscustomobject]@{ slot="nongNooch";   file="nong-nooch.jpg";   alt="Nong Nooch Tropical Botanical Garden with topiary and orchid houses" },
+        [pscustomobject]@{ slot="fishMarket";  file="fish-market.jpg";  alt="Naklua Fish Market grilled seafood and local Thai stalls at dawn" }
+    )
     "generic" = @(
         [pscustomobject]@{ slot="hero";          file="hero.jpg";          alt="Hero image - main destination shot" },
         [pscustomobject]@{ slot="whenToGo";      file="when-to-go.jpg";    alt="Seasonal image (festival, weather)" },
@@ -523,8 +535,24 @@ $txtHeaderSlug.Text = $global:CurrentSlug
 $txtHeaderSlug.Location = New-Object System.Drawing.Point(55, 10)
 $txtHeaderSlug.Size = New-Object System.Drawing.Size(150, 22)
 $txtHeaderSlug.Add_TextChanged({
-    $global:CurrentSlug = $txtHeaderSlug.Text.Trim()
+    # Force lowercase + kebab-case (Linux/Vercel filesystems are case-sensitive; slugs
+    # must match the URL exactly). Prevents the Bali.mdx / Pattaya.mdx case-mismatch bug.
+    $raw = $txtHeaderSlug.Text.Trim().ToLower() -replace '\s+', '-'
+    if ($raw -ne $txtHeaderSlug.Text) {
+        # Preserve cursor position while rewriting the field
+        $pos = $txtHeaderSlug.SelectionStart
+        $txtHeaderSlug.Text = $raw
+        $txtHeaderSlug.SelectionStart = [Math]::Min($pos, $raw.Length)
+    }
+    $global:CurrentSlug = $raw
     if ($global:CurrentSlug) { $global:Meta.slug = $global:CurrentSlug }
+
+    # Auto-switch photo preset when slug matches a known preset key
+    if ($global:cmbPreset -and $global:PhotoSlotPresets.Contains($raw)) {
+        if ($global:cmbPreset.SelectedItem -ne $raw) {
+            $global:cmbPreset.SelectedItem = $raw
+        }
+    }
 }.GetNewClosure())
 $header.Controls.Add($txtHeaderSlug)
 
