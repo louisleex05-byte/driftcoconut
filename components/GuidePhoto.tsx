@@ -43,6 +43,18 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     cookingClass: { file: "cooking-class.jpg", alt: "Balinese cooking class with fresh market ingredients" },
     warung:       { file: "warung.jpg",        alt: "Traditional Balinese warung serving nasi campur and babi guling" },
   },
+  pattaya: {
+    hero:       { file: "hero.jpg",        alt: "Wongamat Beach at sunset with the Pattaya coastline in the background" },
+    whenToGo:   { file: "when-to-go.jpg",  alt: "Songkran and Wan Lai water festival celebration in Pattaya" },
+    wongamat:   { file: "wongamat.jpg",    alt: "Wongamat Beach at sunset with palms and family-friendly seafront in North Pattaya" },
+    jomtien:    { file: "jomtien.jpg",     alt: "Jomtien Beach with tree shade and calm sand south of Pattaya" },
+    pratamnak:  { file: "pratamnak.jpg",   alt: "Pratamnak Hill viewpoint over Pattaya Bay with Big Buddha Wat Phra Yai" },
+    central:    { file: "central.jpg",     alt: "Central Pattaya beach and skyline near Central Festival mall" },
+    sanctuary:  { file: "sanctuary.jpg",   alt: "Sanctuary of Truth all-teak temple by the sea in Pattaya" },
+    kohLarn:    { file: "koh-larn.jpg",    alt: "Coral Island Koh Larn white sand beach and turquoise water day trip from Pattaya" },
+    nongNooch:  { file: "nong-nooch.jpg",  alt: "Nong Nooch Tropical Botanical Garden with topiary and orchid houses" },
+    fishMarket: { file: "fish-market.jpg", alt: "Naklua Fish Market grilled seafood and local Thai stalls at dawn" },
+  },
 };
 
 export default function GuidePhoto({
