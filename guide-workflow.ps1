@@ -171,6 +171,215 @@ function Save-ConfigJson {
     }
 }
 
+# ============================================================================
+# FIX-PASS HELPERS - run automatically on Assemble + Copy Photos
+# ============================================================================
+# Eliminates the need for a separate manual fix pass by baking in:
+#   * Compress-Jpeg      - resize + JPEG compress in-place to under a size cap
+#   * Fix-Mojibake       - repair UTF-8 double-encoding artifacts in pasted drafts
+#   * ToTitleCase        - capitalize slug for display (phuket -> Phuket)
+#   * Insert-GuidePhotoTags - smart section-based <GuidePhoto slot="..." /> inserter
+
+function Compress-Jpeg {
+    param(
+        [Parameter(Mandatory)] [string] $Path,
+        [int] $MaxDim = 1600,
+        [int] $MaxKB = 450
+    )
+    if (-not (Test-Path $Path)) { return $null }
+
+    $img = [System.Drawing.Image]::FromFile((Resolve-Path $Path).Path)
+    try {
+        # Compute new dimensions - cap longest edge at MaxDim
+        $w = $img.Width; $h = $img.Height
+        if ($w -gt $MaxDim -or $h -gt $MaxDim) {
+            if ($w -ge $h) {
+                $newW = $MaxDim
+                $newH = [int]([Math]::Round($h * $MaxDim / $w))
+            } else {
+                $newH = $MaxDim
+                $newW = [int]([Math]::Round($w * $MaxDim / $h))
+            }
+        } else {
+            $newW = $w; $newH = $h
+        }
+
+        # Resize into new bitmap
+        $resized = New-Object System.Drawing.Bitmap $newW, $newH
+        $g = [System.Drawing.Graphics]::FromImage($resized)
+        $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+        $g.SmoothingMode     = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+        $g.PixelOffsetMode   = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
+        $g.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
+        $g.DrawImage($img, 0, 0, $newW, $newH)
+        $g.Dispose()
+
+        # Save with progressive quality steps until under MaxKB
+        $jpegCodec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
+        $encoderParams = New-Object System.Drawing.Imaging.EncoderParameters 1
+        $qualityParam = [System.Drawing.Imaging.Encoder]::Quality
+
+        $finalQ = 0
+        $finalKB = 0
+        foreach ($q in 85, 82, 79, 76, 73, 70, 67, 64) {
+            $encoderParams.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter($qualityParam, [long]$q)
+            $img.Dispose()  # release source file lock before save
+            $resized.Save($Path, $jpegCodec, $encoderParams)
+            $finalKB = [int]([Math]::Round((Get-Item $Path).Length / 1024))
+            $finalQ = $q
+            if ($finalKB -le $MaxKB) { break }
+            # If not under cap, need to reload img reference for next iteration (already saved though)
+            $img = [System.Drawing.Image]::FromFile((Resolve-Path $Path).Path)
+        }
+
+        $resized.Dispose()
+        return @{ Width = $newW; Height = $newH; SizeKB = $finalKB; Quality = $finalQ }
+    } finally {
+        if ($img) { try { $img.Dispose() } catch {} }
+    }
+}
+
+function Fix-Mojibake {
+    param([string] $Text)
+    if (-not $Text) { return $Text }
+    # UTF-8 bytes-that-were-misread-as-Latin-1-and-re-encoded produce specific 2-3 byte sequences.
+    # We build the target bytes explicitly via [char] codepoints to avoid PS source-encoding issues.
+    $replacements = @(
+        @{ from = [char]0xE2 + [char]0x80 + [char]0x99; to = "'" },   # curly apostrophe
+        @{ from = [char]0xE2 + [char]0x80 + [char]0x9C; to = '"' },   # left double quote
+        @{ from = [char]0xE2 + [char]0x80 + [char]0x9D; to = '"' },   # right double quote
+        @{ from = [char]0xE2 + [char]0x80 + [char]0x93; to = '-' },   # en dash
+        @{ from = [char]0xE2 + [char]0x80 + [char]0x94; to = '-' },   # em dash
+        @{ from = [char]0xE2 + [char]0x80 + [char]0xA6; to = '...' }, # ellipsis
+        @{ from = [char]0xE0 + [char]0xB8 + [char]0xBF; to = 'B' },   # baht sign ASCII fallback
+        @{ from = [char]0xC2 + [char]0xB0;              to = 'deg' }, # degree sign ASCII fallback
+        @{ from = [char]0xC3 + [char]0xA9;              to = 'e' },   # e-acute
+        @{ from = [char]0xC3 + [char]0xA8;              to = 'e' },   # e-grave
+        @{ from = [char]0xC2;                            to = '' }    # stray non-breaking space marker
+    )
+    foreach ($r in $replacements) {
+        $Text = $Text.Replace($r.from, $r.to)
+    }
+    return $Text
+}
+
+function ConvertTo-TitleCase {
+    param([string] $Text)
+    if (-not $Text) { return $Text }
+    # Capitalize each space-separated word (leave commas + existing caps alone)
+    return ([System.Globalization.CultureInfo]::InvariantCulture.TextInfo).ToTitleCase($Text.ToLower())
+}
+
+function Insert-GuidePhotoTags {
+    param(
+        [string] $Body,
+        [string] $Slug
+    )
+    if (-not $global:PhotoSlotPresets.Contains($Slug)) { return @{ Body = $Body; Inserted = 0 } }
+    $slots = $global:PhotoSlotPresets[$Slug]
+    $inserted = 0
+
+    # Rule 1: whenToGo goes at end of ## When to go section (before next ##)
+    if (($slots | Where-Object { $_.slot -eq 'whenToGo' }) -and ($Body -notmatch 'slot="whenToGo"')) {
+        $Body = [regex]::Replace(
+            $Body,
+            '(?s)(## When to go\r?\n.*?)(\r?\n## )',
+            {
+                param($m)
+                $inserted++
+                "$($m.Groups[1].Value)`n`n<GuidePhoto slot=`"whenToGo`" />`n$($m.Groups[2].Value)"
+            }
+        )
+    }
+
+    # Rule 2: For each non-hero slot, try to match a "### Header" containing the slot keyword
+    # Insert BEFORE the next "-> <AffiliateLink" line, or before next ### / ## if no arrow.
+    # Uses fuzzy header matching (case-insensitive contains).
+    $keywordMap = @{
+        'wongamat'     = @('Wongamat', 'Wong Amat', 'Naklua', 'North Pattaya')
+        'jomtien'      = @('Jomtien')
+        'pratamnak'    = @('Pratamnak', 'Pratumnak')
+        'central'      = @('Central Pattaya')
+        'sanctuary'    = @('Sanctuary of Truth')
+        'kohLarn'      = @('Koh Larn', 'Coral Island')
+        'nongNooch'    = @('Nong Nooch')
+        'fishMarket'   = @('Naklua Fish Market', 'fish market')
+        'oldCity'      = @('Old City', 'Rattanakosin')
+        'nimman'       = @('Nimman', 'Nimmanhaemin')
+        'riverside'    = @('Riverside', 'Ping River', 'Bang Rak', 'Charoenrat', 'Wat Ket')
+        'nightBazaar'  = @('Night Bazaar', 'Chang Khlan')
+        'santitham'    = @('Santitham', 'Chang Puak')
+        'doiSuthep'    = @('Doi Suthep')
+        'khaoSoi'      = @('khao soi', 'Khao Soi')
+        'ubud'         = @('Ubud')
+        'canggu'       = @('Canggu')
+        'seminyak'     = @('Seminyak', 'Petitenget')
+        'uluwatu'      = @('Uluwatu')
+        'sanur'        = @('Sanur')
+        'nusaPenida'   = @('Nusa Penida', 'Kelingking')
+        'cookingClass' = @('cooking class')
+        'warung'       = @('warung')
+        'sukhumvit'    = @('Sukhumvit', 'Asok', 'Phrom Phong')
+        'silom'        = @('Silom', 'Sathorn')
+        'oldTown'      = @('Old Town', 'Rattanakosin', 'Banglamphu')
+        'activity'     = @('activity')
+        'localTips'    = @('local tips')
+        'kata'         = @('Kata', 'Karon')
+        'bangTao'      = @('Bang Tao', 'Laguna', 'Kamala', 'Cherngtalay')
+        'patong'       = @('Patong')
+        'bigBuddha'    = @('Big Buddha', 'Wat Phra Yai')
+        'phiPhi'       = @('Phi Phi')
+        'khanomJeen'   = @('khanom jeen')
+    }
+
+    foreach ($slot in $slots) {
+        if ($slot.slot -eq 'hero' -or $slot.slot -eq 'whenToGo') { continue }
+        if ($Body -match "slot=`"$($slot.slot)`"") { continue }  # already there
+        $keywords = $keywordMap[$slot.slot]
+        if (-not $keywords) { continue }
+
+        # First try: section header + inject before -> AffiliateLink
+        $matched = $false
+        foreach ($kw in $keywords) {
+            $escKw = [regex]::Escape($kw)
+            $pattern = "(?i)(### [^\n]*$escKw[^\n]*\r?\n(?:.*?\r?\n)*?)(-> <AffiliateLink)"
+            if ($Body -match $pattern) {
+                $Body = [regex]::Replace(
+                    $Body, $pattern,
+                    {
+                        param($m)
+                        $script:localHit = $true
+                        "$($m.Groups[1].Value)`n<GuidePhoto slot=`"$($slot.slot)`" />`n`n$($m.Groups[2].Value)"
+                    },
+                    [System.Text.RegularExpressions.RegexOptions]::Singleline
+                )
+                if ($script:localHit) { $inserted++; $matched = $true; $script:localHit = $false; break }
+            }
+        }
+        if ($matched) { continue }
+
+        # Second try: first inline mention of keyword - insert on new line after that paragraph
+        foreach ($kw in $keywords) {
+            $escKw = [regex]::Escape($kw)
+            $pattern = "(?i)($escKw[^\n]*\r?\n)"
+            if ($Body -match $pattern) {
+                $Body = [regex]::Replace(
+                    $Body, $pattern,
+                    {
+                        param($m)
+                        $script:localHit = $true
+                        "$($m.Groups[1].Value)`n<GuidePhoto slot=`"$($slot.slot)`" />`n"
+                    },
+                    [System.Text.RegularExpressions.RegexOptions]::None, 1
+                )
+                if ($script:localHit) { $inserted++; $script:localHit = $false; break }
+            }
+        }
+    }
+
+    return @{ Body = $Body; Inserted = $inserted }
+}
+
 # Default current-guide state (overridable in UI)
 $global:CurrentSlug = "chiang-mai"
 
@@ -219,6 +428,17 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="phiPhi";      file="phi-phi.jpg";      alt="Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
         [pscustomobject]@{ slot="khanomJeen";  file="khanom-jeen.jpg";  alt="Southern Thai khanom jeen curry rice noodles with fresh vegetables" }
     )
+    "samui" = @(
+        [pscustomobject]@{ slot="hero";         file="hero.jpg";          alt="Bophut Fisherman's Village lantern-lit walking street in Koh Samui at dusk" },
+        [pscustomobject]@{ slot="whenToGo";     file="when-to-go.jpg";    alt="Ang Thong Marine Park emerald lagoon and limestone islands off Koh Samui" },
+        [pscustomobject]@{ slot="bophut";       file="bophut.jpg";        alt="Bophut Fisherman's Village boutique dinner strip on the north coast of Koh Samui" },
+        [pscustomobject]@{ slot="choengMon";    file="choeng-mon.jpg";    alt="Choeng Mon crescent beach with calm swimming water on Koh Samui's east tip" },
+        [pscustomobject]@{ slot="chaweng";      file="chaweng.jpg";       alt="Chaweng Beach main tourist strip and long sand strip on Koh Samui" },
+        [pscustomobject]@{ slot="lamai";        file="lamai.jpg";         alt="Lamai Beach and Hin Ta Hin Yai grandfather grandmother rock formations Koh Samui" },
+        [pscustomobject]@{ slot="bigBuddha";    file="big-buddha.jpg";    alt="Big Buddha Wat Phra Yai gold statue on Ko Fan islet Koh Samui" },
+        [pscustomobject]@{ slot="angThong";     file="ang-thong.jpg";     alt="Ang Thong National Marine Park limestone archipelago day trip from Koh Samui" },
+        [pscustomobject]@{ slot="nathonMarket"; file="nathon-market.jpg"; alt="Nathon fresh market grilled fish and Thai food stalls at dawn Koh Samui" }
+    )
     "pattaya" = @(
         [pscustomobject]@{ slot="hero";        file="hero.jpg";         alt="Wongamat Beach at sunset with the Pattaya coastline in the background" },
         [pscustomobject]@{ slot="whenToGo";    file="when-to-go.jpg";   alt="Songkran and Wan Lai water festival celebration in Pattaya" },
@@ -242,6 +462,98 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="localTips";     file="local-tips.jpg";    alt="Local tips / food shot" }
     )
 }
+
+# ===================================================================
+# PREVENTION MECHANISM: Auto-import presets from components/GuidePhoto.tsx
+# ===================================================================
+# GuidePhoto.tsx is the runtime source of truth - Vercel needs it to render
+# the guide's photos. If it defines slots for a guide, those slots MUST exist
+# in this app or the workflow silently falls back to "generic" (the bug we
+# hit repeatedly). This function parses GuidePhoto.tsx at launch and merges
+# each guide's slot definitions into $global:PhotoSlotPresets, overwriting
+# hardcoded values. Result: as long as a guide is added to GuidePhoto.tsx,
+# it appears in the slot preset dropdown with the correct slot names.
+# Hardcoded presets above serve as a safety net if the parse fails.
+function Import-PresetsFromGuidePhoto {
+    param([string]$RepoRoot)
+    $tsxPath = Join-Path $RepoRoot "components\GuidePhoto.tsx"
+    if (-not (Test-Path $tsxPath)) { return 0 }
+    try {
+        $content = [System.IO.File]::ReadAllText($tsxPath)
+        # Locate the GUIDES const block, walk braces to find its close
+        $startIdx = $content.IndexOf('const GUIDES')
+        if ($startIdx -lt 0) { return 0 }
+        $openIdx = $content.IndexOf('{', $startIdx)
+        if ($openIdx -lt 0) { return 0 }
+        $depth = 1; $i = $openIdx + 1
+        while ($i -lt $content.Length -and $depth -gt 0) {
+            $c = $content[$i]
+            if ($c -eq '{') { $depth++ }
+            elseif ($c -eq '}') { $depth-- }
+            $i++
+        }
+        if ($depth -ne 0) { return 0 }
+        $body = $content.Substring($openIdx + 1, $i - $openIdx - 2)
+
+        # Walk top-level guide blocks: `"slug": { ... }` or `slug: { ... }`
+        $imported = 0
+        $j = 0
+        while ($j -lt $body.Length) {
+            # Skip whitespace, commas, and comment lines
+            while ($j -lt $body.Length) {
+                $ch = $body[$j]
+                if ($ch -eq ' ' -or $ch -eq "`n" -or $ch -eq "`r" -or $ch -eq "`t" -or $ch -eq ',') { $j++; continue }
+                # Skip // comment to end of line
+                if ($ch -eq '/' -and ($j + 1) -lt $body.Length -and $body[$j + 1] -eq '/') {
+                    while ($j -lt $body.Length -and $body[$j] -ne "`n") { $j++ }
+                    continue
+                }
+                break
+            }
+            if ($j -ge $body.Length) { break }
+            $rest = $body.Substring($j)
+            if ($rest -match '^"?([\w-]+)"?\s*:\s*\{') {
+                $slug = $matches[1]
+                $keyLen = $matches[0].Length
+                $blockOpen = $j + $keyLen
+                # Find matching close brace for this guide's slot map
+                $d = 1; $k = $blockOpen
+                while ($k -lt $body.Length -and $d -gt 0) {
+                    $c = $body[$k]
+                    if ($c -eq '{') { $d++ }
+                    elseif ($c -eq '}') { $d-- }
+                    $k++
+                }
+                if ($d -ne 0) { break }
+                $slotBody = $body.Substring($blockOpen, $k - $blockOpen - 1)
+                # Extract each slot: `slot: { file: "...", alt: "..." }`
+                $slotMatches = [regex]::Matches($slotBody, '(\w+)\s*:\s*\{\s*file:\s*"([^"]+)"\s*,\s*alt:\s*"([^"]+)"\s*\}')
+                if ($slotMatches.Count -gt 0) {
+                    $slots = @()
+                    foreach ($sm in $slotMatches) {
+                        $slots += [pscustomobject]@{
+                            slot = $sm.Groups[1].Value
+                            file = $sm.Groups[2].Value
+                            alt  = $sm.Groups[3].Value
+                        }
+                    }
+                    $global:PhotoSlotPresets[$slug] = $slots
+                    $imported++
+                }
+                $j = $k
+            } else {
+                $j++
+            }
+        }
+        return $imported
+    } catch {
+        return 0
+    }
+}
+
+# Run the auto-importer so any guide defined in GuidePhoto.tsx wins over
+# stale hardcoded presets above. Silent on failure - hardcoded is the fallback.
+$global:AutoImportedPresetCount = Import-PresetsFromGuidePhoto -RepoRoot $PSScriptRoot
 
 # Active preset - defaults to current slug if there's a match, else "generic"
 $global:PhotoSlots = if ($global:PhotoSlotPresets.Contains($global:CurrentSlug)) {
@@ -1239,11 +1551,14 @@ $global:lblPublishStatus.Font = New-Object System.Drawing.Font("Consolas", 8.5)
 $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::DimGray
 $global:panelPublish.Controls.Add($global:lblPublishStatus)
 
-# --- Copy Photos handler ---
+# --- Copy Photos handler (with auto-compression baked in) ---
 $btnCopyPhotos.Add_Click({
     $destDir = Get-CurrentPhotosDir
     $lines = @()
-    $lines += "Copying to: $destDir"
+    $lines += "Copying + compressing to: $destDir"
+    $lines += ""
+    $totalOrigKB = 0
+    $totalOutKB  = 0
     foreach ($slot in $global:PhotoSlots) {
         $src = $global:PhotoRows[$slot.slot].Text.Trim().Trim('"')
         if (-not $src) { continue }
@@ -1254,12 +1569,23 @@ $btnCopyPhotos.Add_Click({
         $dst = Join-Path $destDir $slot.file
         try {
             Copy-Item -Path $src -Destination $dst -Force
-            $sizeKb = [math]::Round((Get-Item $dst).Length / 1024)
-            $lines += "  OK: $($slot.slot) -> $($slot.file) (${sizeKb}KB)"
+            $origKB = [int]([Math]::Round((Get-Item $dst).Length / 1024))
+            $totalOrigKB += $origKB
+            # In-place compress
+            $r = Compress-Jpeg -Path $dst -MaxDim 1600 -MaxKB 450
+            if ($r) {
+                $totalOutKB += $r.SizeKB
+                $lines += ("  OK  {0,-16} -> {1,-22} {2,4}KB -> {3,4}KB  {4}x{5}  q{6}" -f `
+                    $slot.slot, $slot.file, $origKB, $r.SizeKB, $r.Width, $r.Height, $r.Quality)
+            } else {
+                $lines += "  COPY-ONLY: $($slot.slot) (compression skipped)"
+            }
         } catch {
-            $lines += "  FAIL: $($slot.slot): $_"
+            $lines += "  FAIL: $($slot.slot): $($_.Exception.Message)"
         }
     }
+    $lines += ""
+    $lines += "TOTAL: $totalOrigKB KB -> $totalOutKB KB  (saved $($totalOrigKB - $totalOutKB) KB)"
     $global:lblPublishStatus.Text = ($lines -join "`n")
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
@@ -1276,6 +1602,27 @@ $btnAssembleMDX.Add_Click({
         return
     }
     $body = Get-Content $srcPath -Raw
+
+    # --- FIX PASS baked in ---
+    # 1) Repair mojibake (UTF-8 misinterpreted as Latin-1) if present in the pasted draft
+    $body = Fix-Mojibake -Text $body
+
+    # 2) Auto-insert <GuidePhoto> tags at neighborhood + activity sections
+    $insertResult = Insert-GuidePhotoTags -Body $body -Slug $global:CurrentSlug
+    $body = $insertResult.Body
+    $guidePhotoInserted = $insertResult.Inserted
+
+    # 3) Capitalize the Destination + Title if user typed them lowercase
+    $rawDest = $global:txtMetaDestination.Text.Trim()
+    if ($rawDest -and $rawDest.Length -gt 0 -and $rawDest[0] -cmatch '[a-z]') {
+        $global:txtMetaDestination.Text = ConvertTo-TitleCase $rawDest
+    }
+    $rawTitle = $global:txtMetaTitle.Text.Trim()
+    if ($rawTitle -and $rawTitle.Length -gt 0 -and $rawTitle[0] -cmatch '[a-z]') {
+        # Capitalize just the first word (city name), leave the rest as-is
+        $words = $rawTitle -split ' ', 2
+        $global:txtMetaTitle.Text = (ConvertTo-TitleCase $words[0]) + $(if ($words.Length -gt 1) { ' ' + $words[1] } else { '' })
+    }
 
     # Regex-wrap common affiliate anchor phrases with <AffiliateLink> JSX (only if not already wrapped)
     $wrapCount = 0
@@ -1313,8 +1660,9 @@ heroAlt: "$($global:txtMetaHeroAlt.Text)"
     $finalMdx = $frontmatter + $body
 
     $outPath = Join-Path $dir "final.mdx"
-    Set-Content -Path $outPath -Value $finalMdx -Encoding UTF8
-    $global:lblPublishStatus.Text = "Assembled: $outPath`nWrapped $wrapCount affiliate anchor(s). Review, then Publish."
+    # UTF-8 no-BOM (Next.js prefers this)
+    [System.IO.File]::WriteAllText($outPath, $finalMdx, (New-Object System.Text.UTF8Encoding($false)))
+    $global:lblPublishStatus.Text = "Assembled: $outPath`nAffiliate anchors wrapped: $wrapCount  |  GuidePhoto tags inserted: $guidePhotoInserted  |  Mojibake fixed  |  Title/Destination capitalized. Review, then Publish."
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
 
