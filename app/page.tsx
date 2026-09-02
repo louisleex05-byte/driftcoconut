@@ -27,7 +27,13 @@ export default function HomePage() {
     <div className="relative">
       <div className="mb-10">
         <Hero />
-        <PartnerStrip />
+        {/* PartnerStrip on the left, GuideTipsBadge on the right (lg+); stacks on smaller screens */}
+        <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
+          <PartnerStrip />
+          <div className="lg:pt-2">
+            <GuideTipsBadge featuredSlug="bangkok" />
+          </div>
+        </div>
       </div>
 
       {/* Where to drift next */}
@@ -44,8 +50,8 @@ export default function HomePage() {
           </h2>
         </div>
 
-        {/* Grid: 3 destination cards on left, Guide Tips badge on right (lg+); stacks on smaller screens */}
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start relative z-10">
+        {/* 3 destination cards, full width (Guide Tips badge moved up next to PartnerStrip) */}
+        <div className="relative z-10">
           <div className="grid md:grid-cols-3 gap-4">
             {(
               [
@@ -85,9 +91,6 @@ export default function HomePage() {
               );
             })}
           </div>
-
-          {/* Guide Tips badge — right rail on lg+, stacks below on smaller screens */}
-          <GuideTipsBadge featuredSlug="bangkok" />
         </div>
       </section>
 
