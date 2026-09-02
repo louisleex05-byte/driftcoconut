@@ -54,6 +54,17 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     phiPhi:     { file: "phi-phi.jpg",     alt: "Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
     khanomJeen: { file: "khanom-jeen.jpg", alt: "Southern Thai khanom jeen curry rice noodles with fresh vegetables" },
   },
+  samui: {
+    hero:         { file: "hero.jpg",          alt: "Bophut Fisherman's Village lantern-lit walking street in Koh Samui at dusk" },
+    whenToGo:     { file: "when-to-go.jpg",    alt: "Ang Thong Marine Park emerald lagoon and limestone islands off Koh Samui" },
+    bophut:       { file: "bophut.jpg",        alt: "Bophut Fisherman's Village boutique dinner strip on the north coast of Koh Samui" },
+    choengMon:    { file: "choeng-mon.jpg",    alt: "Choeng Mon crescent beach with calm swimming water on Koh Samui's east tip" },
+    chaweng:      { file: "chaweng.jpg",       alt: "Chaweng Beach main tourist strip and long sand strip on Koh Samui" },
+    lamai:        { file: "lamai.jpg",         alt: "Lamai Beach and Hin Ta Hin Yai grandfather grandmother rock formations Koh Samui" },
+    bigBuddha:    { file: "big-buddha.jpg",    alt: "Big Buddha Wat Phra Yai gold statue on Ko Fan islet Koh Samui" },
+    angThong:     { file: "ang-thong.jpg",     alt: "Ang Thong National Marine Park limestone archipelago day trip from Koh Samui" },
+    nathonMarket: { file: "nathon-market.jpg", alt: "Nathon fresh market grilled fish and Thai food stalls at dawn Koh Samui" },
+  },
   pattaya: {
     hero:       { file: "hero.jpg",        alt: "Wongamat Beach at sunset with the Pattaya coastline in the background" },
     whenToGo:   { file: "when-to-go.jpg",  alt: "Songkran and Wan Lai water festival celebration in Pattaya" },
