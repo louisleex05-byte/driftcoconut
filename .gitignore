@@ -7,3 +7,15 @@ out
 *.log
 
 .vercel
+
+next-env.d.ts
+tsconfig.tsbuildinfo
+guides-drafts/
+Driftcoconut/
+*.pdf
+session.md
+Bangkok_skeleton.md
+DESTINATION-GUIDE-FRAMEWORK.md
+
+# guide-workflow app — local config with API key (never commit)
+guide-workflow-config.json
