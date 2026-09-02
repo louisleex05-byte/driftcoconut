@@ -208,6 +208,17 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="cookingClass"; file="cooking-class.jpg"; alt="Balinese cooking class with fresh market ingredients" },
         [pscustomobject]@{ slot="warung";       file="warung.jpg";        alt="Traditional Balinese warung serving nasi campur and babi guling" }
     )
+    "phuket" = @(
+        [pscustomobject]@{ slot="hero";        file="hero.jpg";         alt="Promthep Cape sunset viewpoint at the southern tip of Phuket" },
+        [pscustomobject]@{ slot="whenToGo";    file="when-to-go.jpg";   alt="Andaman coast red flag beach warning during monsoon season in Phuket" },
+        [pscustomobject]@{ slot="kata";        file="kata.jpg";         alt="Kata Beach family-friendly Andaman coast in Phuket at sunset" },
+        [pscustomobject]@{ slot="bangTao";     file="bang-tao.jpg";     alt="Bang Tao and Kamala luxury resort beach in northern Phuket" },
+        [pscustomobject]@{ slot="oldTown";     file="old-town.jpg";     alt="Sino-Portuguese saffron shophouses on Thalang Road in Phuket Old Town" },
+        [pscustomobject]@{ slot="patong";      file="patong.jpg";       alt="Patong Beach in daytime with longtail boats and busy sand strip" },
+        [pscustomobject]@{ slot="bigBuddha";   file="big-buddha.jpg";   alt="Big Buddha Wat Phra Yai marble statue overlooking Phuket bay" },
+        [pscustomobject]@{ slot="phiPhi";      file="phi-phi.jpg";      alt="Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
+        [pscustomobject]@{ slot="khanomJeen";  file="khanom-jeen.jpg";  alt="Southern Thai khanom jeen curry rice noodles with fresh vegetables" }
+    )
     "pattaya" = @(
         [pscustomobject]@{ slot="hero";        file="hero.jpg";         alt="Wongamat Beach at sunset with the Pattaya coastline in the background" },
         [pscustomobject]@{ slot="whenToGo";    file="when-to-go.jpg";   alt="Songkran and Wan Lai water festival celebration in Pattaya" },
