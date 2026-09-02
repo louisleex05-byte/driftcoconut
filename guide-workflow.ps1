@@ -376,41 +376,60 @@ function Insert-GuidePhotoTags {
         }
         if (-not $keywords -or $keywords.Count -eq 0) { continue }
 
-        # First try: section header + inject before -> AffiliateLink
+        # First try: section header + inject before -> AffiliateLink.
+        # CRITICAL SAFETY: use LINE-SCOPED pattern (no Singleline .*? nesting - that
+        # was the previous freeze cause: catastrophic backtracking on any body where
+        # the header appeared without a matching AffiliateLink below). This pattern
+        # walks line-by-line and blocks on ##/### boundaries.
+        # Plus a 2-second regex timeout as a hard safety net.
         $matched = $false
+        $timeoutSpan = [TimeSpan]::FromSeconds(2)
         foreach ($kw in $keywords) {
             $escKw = [regex]::Escape($kw)
-            $pattern = "(?i)(### [^\n]*$escKw[^\n]*\r?\n(?:.*?\r?\n)*?)(-> <AffiliateLink)"
-            if ($Body -match $pattern) {
-                $Body = [regex]::Replace(
-                    $Body, $pattern,
-                    {
-                        param($m)
-                        $script:localHit = $true
-                        "$($m.Groups[1].Value)`n<GuidePhoto slot=`"$($slot.slot)`" />`n`n$($m.Groups[2].Value)"
-                    },
-                    [System.Text.RegularExpressions.RegexOptions]::Singleline
-                )
-                if ($script:localHit) { $inserted++; $matched = $true; $script:localHit = $false; break }
+            $pattern = "(?i)(### [^\r\n]*$escKw[^\r\n]*(?:\r?\n(?!### )(?!## )[^\r\n]*)*)(\r?\n-> <AffiliateLink)"
+            try {
+                $rx = [regex]::new($pattern, [System.Text.RegularExpressions.RegexOptions]::None, $timeoutSpan)
+                if ($rx.IsMatch($Body)) {
+                    $Body = $rx.Replace(
+                        $Body,
+                        {
+                            param($m)
+                            $script:localHit = $true
+                            "$($m.Groups[1].Value)`n`n<GuidePhoto slot=`"$($slot.slot)`" />$($m.Groups[2].Value)"
+                        },
+                        1
+                    )
+                    if ($script:localHit) { $inserted++; $matched = $true; $script:localHit = $false; break }
+                }
+            } catch [System.Text.RegularExpressions.RegexMatchTimeoutException] {
+                # skip this keyword if pattern times out - never freeze the UI
+                continue
             }
         }
         if ($matched) { continue }
 
-        # Second try: first inline mention of keyword - insert on new line after that paragraph
+        # Second try: first inline mention of keyword - insert on new line after that paragraph.
+        # Pattern is line-scoped (uses [^\r\n]) so it's inherently safe.
+        # Timeout still applied as belt-and-suspenders.
         foreach ($kw in $keywords) {
             $escKw = [regex]::Escape($kw)
-            $pattern = "(?i)($escKw[^\n]*\r?\n)"
-            if ($Body -match $pattern) {
-                $Body = [regex]::Replace(
-                    $Body, $pattern,
-                    {
-                        param($m)
-                        $script:localHit = $true
-                        "$($m.Groups[1].Value)`n<GuidePhoto slot=`"$($slot.slot)`" />`n"
-                    },
-                    [System.Text.RegularExpressions.RegexOptions]::None, 1
-                )
-                if ($script:localHit) { $inserted++; $script:localHit = $false; break }
+            $pattern = "(?i)([^\r\n]*$escKw[^\r\n]*\r?\n)"
+            try {
+                $rx = [regex]::new($pattern, [System.Text.RegularExpressions.RegexOptions]::None, $timeoutSpan)
+                if ($rx.IsMatch($Body)) {
+                    $Body = $rx.Replace(
+                        $Body,
+                        {
+                            param($m)
+                            $script:localHit = $true
+                            "$($m.Groups[1].Value)`n<GuidePhoto slot=`"$($slot.slot)`" />`n"
+                        },
+                        1
+                    )
+                    if ($script:localHit) { $inserted++; $script:localHit = $false; break }
+                }
+            } catch [System.Text.RegularExpressions.RegexMatchTimeoutException] {
+                continue
             }
         }
     }
