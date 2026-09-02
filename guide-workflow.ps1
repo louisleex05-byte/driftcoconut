@@ -330,13 +330,51 @@ function Insert-GuidePhotoTags {
         'bigBuddha'    = @('Big Buddha', 'Wat Phra Yai')
         'phiPhi'       = @('Phi Phi')
         'khanomJeen'   = @('khanom jeen')
+        # --- Samui slots ---
+        'bophut'       = @('Bophut', "Fisherman's Village", 'Fisherman Village')
+        'choengMon'    = @('Choeng Mon', 'Chaweng Noi')
+        'chaweng'      = @('Chaweng')
+        'lamai'        = @('Lamai', 'Hin Ta', 'Hin Yai', 'Grandmother rock', 'Grandfather rock')
+        'angThong'     = @('Ang Thong')
+        'nathonMarket' = @('Nathon', 'Nathon Fresh Market', 'Nathon Pier')
+    }
+
+    # PREVENTION: derive keyword candidates for slots not in the hardcoded map.
+    # Splits camelCase / hyphenated / snake_case slot names into human words, and
+    # pulls the leading proper-noun phrase from the alt text as an extra candidate.
+    # Result: a new guide slot works out of the box as long as the MDX body
+    # mentions the slot name (e.g. slot="bophut" -> body says "Bophut" -> hit).
+    function Get-AutoKeywords {
+        param([string]$SlotName, [string]$AltText)
+        $out = @()
+        # Split camelCase: bophutBeach -> Bophut Beach
+        $spaced = [regex]::Replace($SlotName, '([a-z])([A-Z])', '$1 $2')
+        # Replace hyphens and underscores with spaces
+        $spaced = $spaced -replace '[-_]', ' '
+        # Title-case the first letter of each word
+        $words = ($spaced -split '\s+' | Where-Object { $_ }) | ForEach-Object {
+            $_.Substring(0,1).ToUpper() + $_.Substring(1)
+        }
+        if ($words.Count -gt 0) { $out += ($words -join ' ') }
+        # Also pull the leading proper-noun phrase from the alt text (first 2-4 capitalized words)
+        if ($AltText) {
+            $m = [regex]::Match($AltText, '^((?:[A-Z][a-z''0-9]+ ){1,3}[A-Z][a-z''0-9]+)')
+            if ($m.Success -and $out -notcontains $m.Groups[1].Value) {
+                $out += $m.Groups[1].Value
+            }
+        }
+        return $out
     }
 
     foreach ($slot in $slots) {
         if ($slot.slot -eq 'hero' -or $slot.slot -eq 'whenToGo') { continue }
         if ($Body -match "slot=`"$($slot.slot)`"") { continue }  # already there
         $keywords = $keywordMap[$slot.slot]
-        if (-not $keywords) { continue }
+        if (-not $keywords) {
+            # Auto-derived fallback so new guides don't silently fail
+            $keywords = Get-AutoKeywords -SlotName $slot.slot -AltText $slot.alt
+        }
+        if (-not $keywords -or $keywords.Count -eq 0) { continue }
 
         # First try: section header + inject before -> AffiliateLink
         $matched = $false
@@ -1557,11 +1595,40 @@ $btnCopyPhotos.Add_Click({
     $lines = @()
     $lines += "Copying + compressing to: $destDir"
     $lines += ""
+
+    # PREVENTION: detect duplicate source paths BEFORE copying.
+    # Catches the "I picked the same file twice" mistake that leads to
+    # visually-identical photos in different slots.
+    $seen = @{}
+    $dupes = @()
+    foreach ($slot in $global:PhotoSlots) {
+        $srcRaw = $global:PhotoRows[$slot.slot].Text.Trim().Trim('"')
+        if (-not $srcRaw) { continue }
+        $key = $srcRaw.ToLower()
+        if ($seen.ContainsKey($key)) {
+            $dupes += "  DUPE: '$($slot.slot)' and '$($seen[$key])' both point to $(Split-Path $srcRaw -Leaf)"
+        } else {
+            $seen[$key] = $slot.slot
+        }
+    }
+    if ($dupes.Count -gt 0) {
+        $lines += "!!! DUPLICATE SOURCE FILES DETECTED !!!"
+        $lines += $dupes
+        $lines += ""
+        $lines += "Pick different photos for the duplicated slots, then re-click Copy Photos."
+        $global:lblPublishStatus.Text = ($lines -join "`n")
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(180, 60, 60)
+        return  # abort copy so user fixes it
+    }
+
     $totalOrigKB = 0
     $totalOutKB  = 0
     foreach ($slot in $global:PhotoSlots) {
         $src = $global:PhotoRows[$slot.slot].Text.Trim().Trim('"')
-        if (-not $src) { continue }
+        if (-not $src) {
+            $lines += "  EMPTY: $($slot.slot) (no source picked)"
+            continue
+        }
         if (-not (Test-Path $src)) {
             $lines += "  MISSING: $($slot.slot) -> $src"
             continue
