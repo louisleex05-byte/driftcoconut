@@ -54,6 +54,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     phiPhi:     { file: "phi-phi.jpg",     alt: "Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
     khanomJeen: { file: "khanom-jeen.jpg", alt: "Southern Thai khanom jeen curry rice noodles with fresh vegetables" },
   },
+  pai: {
+    hero:          { file: "hero.jpg",           alt: "Pai valley at sunrise with mist over rice paddies and mountain backdrop in northern Thailand" },
+    whenToGo:      { file: "when-to-go.jpg",     alt: "Ban Rak Thai Yunnanese Chinese tea village lake at dawn in cool season" },
+    pai:           { file: "pai.jpg",            alt: "Pai Walking Street night market with hipster cafes and travelers in Mae Hong Son" },
+    maeHongSon:    { file: "mae-hong-son.jpg",   alt: "Wat Chong Klang and Wat Chong Kham twin Burmese temples reflected in Chong Kham Lake" },
+    banRakThai:    { file: "ban-rak-thai.jpg",   alt: "Ban Rak Thai Yunnanese Chinese tea plantation village on Myanmar border" },
+    yunLai:        { file: "yun-lai.jpg",        alt: "Yun Lai viewpoint at dawn overlooking misty Pai valley in Mae Hong Son" },
+    watChongKlang: { file: "wat-chong-klang.jpg", alt: "Wat Chong Klang Burmese-style temple on Chong Kham Lake in Mae Hong Son town" },
+    localFood:     { file: "local-food.jpg",     alt: "Yunnanese steamed pork buns and hot tea breakfast at Ban Rak Thai" },
+  },
   samui: {
     hero:         { file: "hero.jpg",          alt: "Bophut Fisherman's Village lantern-lit walking street in Koh Samui at dusk" },
     whenToGo:     { file: "when-to-go.jpg",    alt: "Ang Thong Marine Park emerald lagoon and limestone islands off Koh Samui" },
