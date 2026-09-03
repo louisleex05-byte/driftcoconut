@@ -485,6 +485,16 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="phiPhi";      file="phi-phi.jpg";      alt="Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
         [pscustomobject]@{ slot="khanomJeen";  file="khanom-jeen.jpg";  alt="Southern Thai khanom jeen curry rice noodles with fresh vegetables" }
     )
+    "pai" = @(
+        [pscustomobject]@{ slot="hero";          file="hero.jpg";           alt="Pai valley at sunrise with mist over rice paddies and mountain backdrop in northern Thailand" },
+        [pscustomobject]@{ slot="whenToGo";      file="when-to-go.jpg";     alt="Ban Rak Thai Yunnanese Chinese tea village lake at dawn in cool season" },
+        [pscustomobject]@{ slot="pai";           file="pai.jpg";            alt="Pai Walking Street night market with hipster cafes and travelers in Mae Hong Son" },
+        [pscustomobject]@{ slot="maeHongSon";    file="mae-hong-son.jpg";   alt="Wat Chong Klang and Wat Chong Kham twin Burmese temples reflected in Chong Kham Lake" },
+        [pscustomobject]@{ slot="banRakThai";    file="ban-rak-thai.jpg";   alt="Ban Rak Thai Yunnanese Chinese tea plantation village on Myanmar border" },
+        [pscustomobject]@{ slot="yunLai";        file="yun-lai.jpg";        alt="Yun Lai viewpoint at dawn overlooking misty Pai valley in Mae Hong Son" },
+        [pscustomobject]@{ slot="watChongKlang"; file="wat-chong-klang.jpg"; alt="Wat Chong Klang Burmese-style temple on Chong Kham Lake in Mae Hong Son town" },
+        [pscustomobject]@{ slot="localFood";     file="local-food.jpg";     alt="Yunnanese steamed pork buns and hot tea breakfast at Ban Rak Thai" }
+    )
     "samui" = @(
         [pscustomobject]@{ slot="hero";         file="hero.jpg";          alt="Bophut Fisherman's Village lantern-lit walking street in Koh Samui at dusk" },
         [pscustomobject]@{ slot="whenToGo";     file="when-to-go.jpg";    alt="Ang Thong Marine Park emerald lagoon and limestone islands off Koh Samui" },
@@ -927,10 +937,14 @@ $txtHeaderSlug.Add_TextChanged({
     $global:CurrentSlug = $raw
     if ($global:CurrentSlug) { $global:Meta.slug = $global:CurrentSlug }
 
-    # Auto-switch photo preset when slug matches a known preset key
-    if ($global:cmbPreset -and $global:PhotoSlotPresets.Contains($raw)) {
-        if ($global:cmbPreset.SelectedItem -ne $raw) {
-            $global:cmbPreset.SelectedItem = $raw
+    # Auto-switch photo preset when slug matches a known preset key.
+    # CRITICAL: fall back to "generic" when the slug is unknown - otherwise the
+    # dropdown silently sticks to the previous preset and the user thinks they're
+    # configuring the current guide when they're actually seeing the old one's slots.
+    if ($global:cmbPreset -and $raw) {
+        $target = if ($global:PhotoSlotPresets.Contains($raw)) { $raw } else { "generic" }
+        if ($global:cmbPreset.SelectedItem -ne $target) {
+            $global:cmbPreset.SelectedItem = $target
         }
     }
 }.GetNewClosure())
