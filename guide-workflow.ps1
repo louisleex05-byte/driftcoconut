@@ -1447,7 +1447,7 @@ $global:panelPublish.Controls.Add($btnAutoFill)
 # edit / adding a new guide entry - no need to close and reopen the app.
 $btnRefresh = New-Object System.Windows.Forms.Button
 $btnRefresh.Text = "Refresh"
-$btnRefresh.Location = New-Object System.Drawing.Point(940, 6); $btnRefresh.Size = New-Object System.Drawing.Size(80, 24)
+$btnRefresh.Location = New-Object System.Drawing.Point(626, 6); $btnRefresh.Size = New-Object System.Drawing.Size(75, 24)
 $btnRefresh.FlatStyle = "Flat"
 $btnRefresh.BackColor = [System.Drawing.Color]::FromArgb(90, 155, 175)
 $btnRefresh.ForeColor = [System.Drawing.Color]::White
@@ -1479,7 +1479,7 @@ $global:panelPublish.Controls.Add($btnRefresh)
 
 $lblAutoFillHint = New-Object System.Windows.Forms.Label
 $lblAutoFillHint.Text = "(auto-runs on Tab 3 switch if fields are empty)"
-$lblAutoFillHint.Location = New-Object System.Drawing.Point(628, 10); $lblAutoFillHint.Size = New-Object System.Drawing.Size(310, 18)
+$lblAutoFillHint.Location = New-Object System.Drawing.Point(708, 10); $lblAutoFillHint.Size = New-Object System.Drawing.Size(230, 18)
 $lblAutoFillHint.ForeColor = [System.Drawing.Color]::DimGray
 $global:panelPublish.Controls.Add($lblAutoFillHint)
 
