@@ -1651,9 +1651,19 @@ $btnPublishMDX.ForeColor = [System.Drawing.Color]::White
 $btnPublishMDX.FlatStyle = "Flat"
 $global:panelPublish.Controls.Add($btnPublishMDX)
 
+# Progress bar - shown during multi-stage Publish flow, hidden otherwise
+$global:progressPublish = New-Object System.Windows.Forms.ProgressBar
+$global:progressPublish.Location = New-Object System.Drawing.Point(10, ($actionY + 40))
+$global:progressPublish.Size = New-Object System.Drawing.Size(920, 18)
+$global:progressPublish.Minimum = 0
+$global:progressPublish.Maximum = 100
+$global:progressPublish.Value = 0
+$global:progressPublish.Visible = $false
+$global:panelPublish.Controls.Add($global:progressPublish)
+
 $global:lblPublishStatus = New-Object System.Windows.Forms.Label
-$global:lblPublishStatus.Location = New-Object System.Drawing.Point(10, ($actionY + 40))
-$global:lblPublishStatus.Size = New-Object System.Drawing.Size(920, 100)
+$global:lblPublishStatus.Location = New-Object System.Drawing.Point(10, ($actionY + 65))
+$global:lblPublishStatus.Size = New-Object System.Drawing.Size(920, 120)
 $global:lblPublishStatus.Font = New-Object System.Drawing.Font("Consolas", 8.5)
 $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::DimGray
 $global:panelPublish.Controls.Add($global:lblPublishStatus)
@@ -1804,15 +1814,101 @@ heroAlt: "$($global:txtMetaHeroAlt.Text)"
 
 # --- Publish handler ---
 $btnPublishMDX.Add_Click({
+    # FULL PUBLISH PIPELINE with progress bar:
+    #   [1/5] Copy final.mdx -> content/guides/<slug>.mdx
+    #   [2/5] Stage whitelisted files (never `git add -A` - avoids leaking secrets)
+    #   [3/5] git commit
+    #   [4/5] git push
+    #   [5/5] Print live URL
+    # Errors at any stage halt the pipeline and turn status red.
+    $slug = $global:CurrentSlug
+    $lines = @()
+    $global:progressPublish.Value = 0
+    $global:progressPublish.Visible = $true
+    $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+    $global:lblPublishStatus.Text = "Starting publish pipeline for $slug..."
+    [System.Windows.Forms.Application]::DoEvents()
+
+    # --- Stage 1: copy MDX ---
     $srcMdx = Join-Path (Get-CurrentDraftDir) "final.mdx"
     if (-not (Test-Path $srcMdx)) {
-        $global:lblPublishStatus.Text = "No final.mdx yet. Run Assemble first."
+        $global:lblPublishStatus.Text = "[FAIL] No final.mdx yet. Run Assemble first."
         $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
         return
     }
-    $dstMdx = Join-Path $global:PublishedRoot "$global:CurrentSlug.mdx"
-    Copy-Item -Path $srcMdx -Destination $dstMdx -Force
-    $global:lblPublishStatus.Text = "Published: $dstMdx`nCommit + push to deploy on Vercel."
+    $dstMdx = Join-Path $global:PublishedRoot "$slug.mdx"
+    try {
+        Copy-Item -Path $srcMdx -Destination $dstMdx -Force
+    } catch {
+        $global:lblPublishStatus.Text = "[1/5 FAIL] Copy MDX: $($_.Exception.Message)"
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
+    $global:progressPublish.Value = 20
+    $lines += "[1/5] MDX copied -> $dstMdx"
+    $global:lblPublishStatus.Text = ($lines -join "`n")
+    [System.Windows.Forms.Application]::DoEvents()
+
+    # --- Stage 2: git add whitelisted files only (never -A) ---
+    Push-Location $global:ProjectRoot
+    try {
+        $addPaths = @(
+            "content/guides/$slug.mdx",
+            "public/guides/$slug",
+            "components/GuidePhoto.tsx"
+        )
+        $addOut = & git add -- $addPaths 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $global:lblPublishStatus.Text = ($lines + "[2/5 FAIL] git add: $addOut" -join "`n")
+            $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+            $global:progressPublish.Visible = $false
+            return
+        }
+        $global:progressPublish.Value = 40
+        $lines += "[2/5] Staged: $($addPaths -join ', ')"
+        $global:lblPublishStatus.Text = ($lines -join "`n")
+        [System.Windows.Forms.Application]::DoEvents()
+
+        # --- Stage 3: commit ---
+        # git commit exits 1 if nothing to commit - treat that as OK not failure
+        $commitMsg = "Publish $slug guide"
+        $commitOut = & git commit -m $commitMsg 2>&1
+        $commitCode = $LASTEXITCODE
+        if ($commitCode -ne 0 -and ($commitOut -notmatch 'nothing to commit')) {
+            $global:lblPublishStatus.Text = ($lines + "[3/5 FAIL] git commit: $commitOut" -join "`n")
+            $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+            $global:progressPublish.Visible = $false
+            return
+        }
+        $global:progressPublish.Value = 60
+        $lines += "[3/5] Committed: `"$commitMsg`""
+        $global:lblPublishStatus.Text = ($lines -join "`n")
+        [System.Windows.Forms.Application]::DoEvents()
+
+        # --- Stage 4: push ---
+        $pushOut = & git push 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $global:lblPublishStatus.Text = ($lines + "[4/5 FAIL] git push: $pushOut" -join "`n")
+            $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+            $global:progressPublish.Visible = $false
+            return
+        }
+        $global:progressPublish.Value = 80
+        $lines += "[4/5] Pushed to origin/main. Vercel build starting..."
+        $global:lblPublishStatus.Text = ($lines -join "`n")
+        [System.Windows.Forms.Application]::DoEvents()
+    } finally {
+        Pop-Location
+    }
+
+    # --- Stage 5: done ---
+    $global:progressPublish.Value = 100
+    $liveUrl = "https://driftcoconut.com/guides/$slug"
+    $lines += "[5/5] DONE. Vercel deploys in ~90 sec."
+    $lines += "      Live URL: $liveUrl"
+    $global:lblPublishStatus.Text = ($lines -join "`n")
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
 
