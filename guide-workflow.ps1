@@ -330,6 +330,12 @@ function Insert-GuidePhotoTags {
         'bigBuddha'    = @('Big Buddha', 'Wat Phra Yai')
         'phiPhi'       = @('Phi Phi')
         'khanomJeen'   = @('khanom jeen')
+        # --- Pai / Mae Hong Son Loop slots ---
+        'maeHongSon'   = @('Mae Hong Son', 'Chong Kham', 'HGN')
+        'banRakThai'   = @('Ban Rak Thai', 'Yunnanese', 'tea-country', 'Chinese village')
+        'yunLai'       = @('Yun Lai', 'Doi Kong Mu', 'viewpoint', 'first light', 'mist')
+        'watChongKlang' = @('Wat Chong Klang', 'Wat Chong Kham', 'Chong Kham Lake', 'Jong Kham')
+        'localFood'    = @('Yunnanese', 'khao soi', 'pork', 'noodle', 'breakfast', 'tea and a simple meal')
         # --- Samui slots ---
         'bophut'       = @('Bophut', "Fisherman's Village", 'Fisherman Village')
         'choengMon'    = @('Choeng Mon', 'Chaweng Noi')
