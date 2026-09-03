@@ -1441,6 +1441,42 @@ $btnAutoFill.ForeColor = [System.Drawing.Color]::White
 $btnAutoFill.Add_Click({ AutoFill-Metadata -Force }.GetNewClosure())
 $global:panelPublish.Controls.Add($btnAutoFill)
 
+# Refresh button - re-reads GuidePhoto.tsx (in case a new guide was just added there
+# or the current guide's slots changed), rebuilds the preset dropdown, reloads the
+# current slug's slot rows, and re-runs auto-fill. Handy after a git pull / external
+# edit / adding a new guide entry - no need to close and reopen the app.
+$btnRefresh = New-Object System.Windows.Forms.Button
+$btnRefresh.Text = "Refresh"
+$btnRefresh.Location = New-Object System.Drawing.Point(940, 6); $btnRefresh.Size = New-Object System.Drawing.Size(80, 24)
+$btnRefresh.FlatStyle = "Flat"
+$btnRefresh.BackColor = [System.Drawing.Color]::FromArgb(90, 155, 175)
+$btnRefresh.ForeColor = [System.Drawing.Color]::White
+$btnRefresh.Add_Click({
+    # 1. Re-import presets from GuidePhoto.tsx (picks up any new guides added there)
+    $importedCount = Import-PresetsFromGuidePhoto -RepoRoot $PSScriptRoot
+
+    # 2. Rebuild dropdown items in case new presets appeared
+    $currentPick = $global:cmbPreset.SelectedItem
+    $global:cmbPreset.Items.Clear()
+    foreach ($k in $global:PhotoSlotPresets.Keys) { [void]$global:cmbPreset.Items.Add($k) }
+
+    # 3. Pick the current slug's preset (or generic if unknown), reload slot rows
+    $slug = $global:CurrentSlug
+    $target = if ($global:PhotoSlotPresets.Contains($slug)) { $slug }
+              elseif ($currentPick -and $global:PhotoSlotPresets.Contains($currentPick)) { $currentPick }
+              else { "generic" }
+    $global:cmbPreset.SelectedItem = $target
+    $global:PhotoSlots = $global:PhotoSlotPresets[$target]
+    Sync-PhotoSlotRows
+
+    # 4. Re-run auto-fill so metadata + alt texts pick up the fresh preset
+    AutoFill-Metadata -Force
+
+    $global:lblPublishStatus.Text = "Refreshed. Presets loaded from GuidePhoto.tsx: $importedCount. Active: $target ($($global:PhotoSlots.Count) slots)."
+    $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+}.GetNewClosure())
+$global:panelPublish.Controls.Add($btnRefresh)
+
 $lblAutoFillHint = New-Object System.Windows.Forms.Label
 $lblAutoFillHint.Text = "(auto-runs on Tab 3 switch if fields are empty)"
 $lblAutoFillHint.Location = New-Object System.Drawing.Point(628, 10); $lblAutoFillHint.Size = New-Object System.Drawing.Size(310, 18)
