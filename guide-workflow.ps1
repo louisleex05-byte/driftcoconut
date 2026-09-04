@@ -1832,6 +1832,18 @@ $btnPublishMDX.Add_Click({
     $global:progressPublish.Value = 0
     $global:progressPublish.Visible = $true
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+
+    # SAFETY GUARD: abort if Guide slug does not match the loaded slot preset.
+    # Prevents the disaster where user types slug X but preset/photos/metadata
+    # are from guide Y, causing Publish to write Y content into X.mdx.
+    $presetPicked = $global:cmbPreset.SelectedItem
+    if ($presetPicked -and $slug -ne $presetPicked -and $presetPicked -ne 'generic') {
+        $global:lblPublishStatus.Text = "[ABORT] Guide slug '$slug' does not match loaded preset '$presetPicked'. Type '$presetPicked' in the Guide field so slug + preset + photos + metadata all point at the same destination. Publish would have overwritten $slug.mdx with $presetPicked content."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
+
     $global:lblPublishStatus.Text = "Starting publish pipeline for $slug..."
     [System.Windows.Forms.Application]::DoEvents()
 
