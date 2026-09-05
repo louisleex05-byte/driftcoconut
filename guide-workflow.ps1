@@ -637,6 +637,33 @@ function Append-GuideToTsx {
     if (-not (Test-Path $tsxPath)) { return @{ ok = $false; error = "GuidePhoto.tsx not found" } }
     try {
         $content = [System.IO.File]::ReadAllText($tsxPath)
+
+        # DEDUPE: remove any existing `<slug>: { ... },` block(s) for this slug
+        # BEFORE appending. Prevents the disaster where a user clicks + New Preset
+        # multiple times and stacks duplicate keys (TypeScript compile error).
+        $slugKeyBoth = @($Slug, "`"$Slug`"")
+        foreach ($key in $slugKeyBoth) {
+            $searchPat = "  $key`: {"
+            while ($true) {
+                $idx = $content.IndexOf($searchPat)
+                if ($idx -lt 0) { break }
+                # Walk from open brace to matching close brace
+                $openIdx2 = $content.IndexOf('{', $idx)
+                if ($openIdx2 -lt 0) { break }
+                $d2 = 1; $j = $openIdx2 + 1
+                while ($j -lt $content.Length -and $d2 -gt 0) {
+                    if ($content[$j] -eq '{') { $d2++ }
+                    elseif ($content[$j] -eq '}') { $d2-- }
+                    $j++
+                }
+                if ($d2 -ne 0) { break }
+                # Also swallow trailing comma + newline
+                while ($j -lt $content.Length -and $content[$j] -in @(',',"`r","`n"," ","`t")) { $j++ }
+                $content = $content.Substring(0, $idx) + $content.Substring($j)
+            }
+        }
+
+        # Now find the const GUIDES block and its closing brace
         $startIdx = $content.IndexOf('const GUIDES')
         if ($startIdx -lt 0) { return @{ ok = $false; error = "const GUIDES not found" } }
         $openIdx = $content.IndexOf('{', $startIdx)
