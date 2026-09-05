@@ -115,6 +115,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     neighborhood1: { file: "neighborhood1.jpg", alt: "Chiang Rai Clock Tower and Night Bazaar streets at dusk" },
     neighborhood2: { file: "neighborhood2.jpg", alt: "Kok River waterfront with a quiet riverside resort and tropical greenery" },
     activity:      { file: "activity.jpg",      alt: "Wat Rong Khun White Temple exterior and white naga lion guardian sculptures at Chiang Rai's mirrored temple complex" },
+    doiTung:       { file: "doi-tung.jpg",       alt: "Mae Fah Luang Garden landscaped flower beds with mountain views at Doi Tung Royal Villa in Chiang Rai highlands" },
     localFood:     { file: "local-food.jpg",    alt: "Khao soi northern Thai curry noodles with pickled mustard greens and crispy noodles" },
   },
 };
