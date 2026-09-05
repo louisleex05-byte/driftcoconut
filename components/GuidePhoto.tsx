@@ -111,7 +111,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
   },
   chiangrai: {
     hero:          { file: "hero.jpg",          alt: "Misty sunrise over Chiang Rai's mountain ridges with soft northern Thai light" },
-    whenToGo:      { file: "when-to-go.jpg",    alt: "Wat Rong Khun White Temple reflected in the pool with kinnaree naga guardian sculptures in cool-season sunlight, Chiang Rai" },
+    whenToGo:      { file: "when-to-go.jpg",    alt: "Giant white dragon sculpture at Wat Huay Pla Kang Nine-Tier Pagoda in Chiang Rai under clear cool-season sky" },
     neighborhood1: { file: "neighborhood1.jpg", alt: "Chiang Rai Clock Tower and Night Bazaar streets at dusk" },
     neighborhood2: { file: "neighborhood2.jpg", alt: "Kok River waterfront with a quiet riverside resort and tropical greenery" },
     activity:      { file: "activity.jpg",      alt: "Wat Rong Khun White Temple exterior and white naga lion guardian sculptures at Chiang Rai's mirrored temple complex" },
