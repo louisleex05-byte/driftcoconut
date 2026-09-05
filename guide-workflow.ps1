@@ -628,6 +628,115 @@ function Import-PresetsFromGuidePhoto {
 # stale hardcoded presets above. Silent on failure - hardcoded is the fallback.
 $global:AutoImportedPresetCount = Import-PresetsFromGuidePhoto -RepoRoot $PSScriptRoot
 
+# PERMANENT FIX: Append a new guide preset to components/GuidePhoto.tsx from
+# within the running app. Eliminates the "you have to ask Claude to add my new
+# guide" loop. The wizard button on Tab 3 calls this and Show-NewGuidePresetDialog.
+function Append-GuideToTsx {
+    param([string]$RepoRoot, [string]$Slug, [array]$Entries)
+    $tsxPath = Join-Path $RepoRoot "components\GuidePhoto.tsx"
+    if (-not (Test-Path $tsxPath)) { return @{ ok = $false; error = "GuidePhoto.tsx not found" } }
+    try {
+        $content = [System.IO.File]::ReadAllText($tsxPath)
+        $startIdx = $content.IndexOf('const GUIDES')
+        if ($startIdx -lt 0) { return @{ ok = $false; error = "const GUIDES not found" } }
+        $openIdx = $content.IndexOf('{', $startIdx)
+        $depth = 1; $i = $openIdx + 1
+        while ($i -lt $content.Length -and $depth -gt 0) {
+            if ($content[$i] -eq '{') { $depth++ }
+            elseif ($content[$i] -eq '}') { $depth-- }
+            $i++
+        }
+        if ($depth -ne 0) { return @{ ok = $false; error = "unbalanced braces in GUIDES" } }
+        $insertAt = $i - 1
+        $slugKey = if ($Slug -match '[-]') { "`"$Slug`"" } else { $Slug }
+        $sb = [System.Text.StringBuilder]::new()
+        $null = $sb.AppendLine("  $slugKey`: {")
+        foreach ($e in $Entries) {
+            $safeAlt = $e.alt -replace '\\', '\\' -replace '"', '\"'
+            $null = $sb.AppendLine("    $($e.slot)`: { file: `"$($e.file)`", alt: `"$safeAlt`" },")
+        }
+        $null = $sb.AppendLine("  },")
+        $newContent = $content.Substring(0, $insertAt) + $sb.ToString() + $content.Substring($insertAt)
+        [System.IO.File]::WriteAllText($tsxPath, $newContent, (New-Object System.Text.UTF8Encoding($false)))
+        return @{ ok = $true; error = "" }
+    } catch {
+        return @{ ok = $false; error = $_.Exception.Message }
+    }
+}
+
+# Modal wizard: user types slot|alt pairs, saves to GuidePhoto.tsx + registers with app.
+function Show-NewGuidePresetDialog {
+    param([string]$DefaultSlug)
+    $dlg = New-Object System.Windows.Forms.Form
+    $dlg.Text = "+ New Guide Preset"
+    $dlg.Size = New-Object System.Drawing.Size(720, 620)
+    $dlg.StartPosition = "CenterParent"
+    $dlg.FormBorderStyle = "FixedDialog"
+    $dlg.MinimizeBox = $false
+    $dlg.MaximizeBox = $false
+
+    $lblSlug = New-Object System.Windows.Forms.Label
+    $lblSlug.Text = "Guide slug (lowercase kebab-case, e.g. krabi or hua-hin):"
+    $lblSlug.Location = New-Object System.Drawing.Point(15, 15)
+    $lblSlug.Size = New-Object System.Drawing.Size(670, 18)
+    $dlg.Controls.Add($lblSlug)
+
+    $tSlug = New-Object System.Windows.Forms.TextBox
+    $tSlug.Location = New-Object System.Drawing.Point(15, 35)
+    $tSlug.Size = New-Object System.Drawing.Size(670, 22)
+    $tSlug.Text = ($DefaultSlug -replace '\s+', '-').ToLower()
+    $dlg.Controls.Add($tSlug)
+
+    $lblHint = New-Object System.Windows.Forms.Label
+    $lblHint.Text = "Enter one slot per line as 'slotName | alt text'. Filename auto-derives (camelCase to kebab-case + .jpg). hero + whenToGo come first."
+    $lblHint.Location = New-Object System.Drawing.Point(15, 70)
+    $lblHint.Size = New-Object System.Drawing.Size(670, 36)
+    $dlg.Controls.Add($lblHint)
+
+    $tPairs = New-Object System.Windows.Forms.TextBox
+    $tPairs.Location = New-Object System.Drawing.Point(15, 110)
+    $tPairs.Size = New-Object System.Drawing.Size(670, 380)
+    $tPairs.Multiline = $true
+    $tPairs.ScrollBars = "Vertical"
+    $tPairs.Font = New-Object System.Drawing.Font("Consolas", 9)
+    $tPairs.Text = "hero | Hero photo alt - main destination shot`r`nwhenToGo | Seasonal photo - festival, weather, or key event`r`nneighborhood1 | First neighborhood description`r`nneighborhood2 | Second neighborhood description`r`nactivity | Signature activity photo`r`nlocalFood | Signature local food dish"
+    $dlg.Controls.Add($tPairs)
+
+    $btnOK = New-Object System.Windows.Forms.Button
+    $btnOK.Text = "Save + Register"
+    $btnOK.Location = New-Object System.Drawing.Point(430, 510)
+    $btnOK.Size = New-Object System.Drawing.Size(150, 32)
+    $btnOK.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+    $btnOK.ForeColor = [System.Drawing.Color]::White
+    $btnOK.FlatStyle = "Flat"
+    $btnOK.DialogResult = [System.Windows.Forms.DialogResult]::OK
+    $dlg.AcceptButton = $btnOK
+    $dlg.Controls.Add($btnOK)
+
+    $btnCancel = New-Object System.Windows.Forms.Button
+    $btnCancel.Text = "Cancel"
+    $btnCancel.Location = New-Object System.Drawing.Point(590, 510)
+    $btnCancel.Size = New-Object System.Drawing.Size(95, 32)
+    $btnCancel.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+    $dlg.CancelButton = $btnCancel
+    $dlg.Controls.Add($btnCancel)
+
+    if ($dlg.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
+    $slug = ($tSlug.Text.Trim() -replace '\s+', '-').ToLower()
+    if (-not $slug) { return $null }
+    $entries = @()
+    foreach ($line in ($tPairs.Text -split "`r?`n")) {
+        if (-not $line -or -not $line.Contains('|')) { continue }
+        $parts = $line.Split('|', 2)
+        $slot = $parts[0].Trim(); $alt = $parts[1].Trim()
+        if (-not $slot -or -not $alt) { continue }
+        $file = ([regex]::Replace($slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+        $entries += [pscustomobject]@{ slot = $slot; file = $file; alt = $alt }
+    }
+    if ($entries.Count -eq 0) { return $null }
+    return @{ slug = $slug; entries = $entries }
+}
+
 # Active preset - defaults to current slug if there's a match, else "generic"
 $global:PhotoSlots = if ($global:PhotoSlotPresets.Contains($global:CurrentSlug)) {
     $global:PhotoSlotPresets[$global:CurrentSlug]
@@ -1451,9 +1560,45 @@ $global:panelPublish.Controls.Add($btnAutoFill)
 # or the current guide's slots changed), rebuilds the preset dropdown, reloads the
 # current slug's slot rows, and re-runs auto-fill. Handy after a git pull / external
 # edit / adding a new guide entry - no need to close and reopen the app.
+# PERMANENT FIX: "+ New Preset" wizard button. Click when your Guide slug isn't
+# in the dropdown - opens a modal to define slots + alt text, writes to
+# components/GuidePhoto.tsx, and immediately registers with the running app.
+# No more asking Claude to add a preset for every new destination.
+$btnNewGuide = New-Object System.Windows.Forms.Button
+$btnNewGuide.Text = "+ New Preset"
+$btnNewGuide.Location = New-Object System.Drawing.Point(626, 6)
+$btnNewGuide.Size = New-Object System.Drawing.Size(95, 24)
+$btnNewGuide.FlatStyle = "Flat"
+$btnNewGuide.BackColor = [System.Drawing.Color]::FromArgb(60, 140, 90)
+$btnNewGuide.ForeColor = [System.Drawing.Color]::White
+$btnNewGuide.Add_Click({
+    $res = Show-NewGuidePresetDialog -DefaultSlug $global:CurrentSlug
+    if (-not $res) { return }
+    $writeRes = Append-GuideToTsx -RepoRoot $PSScriptRoot -Slug $res.slug -Entries $res.entries
+    if (-not $writeRes.ok) {
+        $global:lblPublishStatus.Text = "FAIL to write GuidePhoto.tsx: $($writeRes.error)"
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        return
+    }
+    $global:PhotoSlotPresets[$res.slug] = $res.entries
+    $global:cmbPreset.Items.Clear()
+    foreach ($k in $global:PhotoSlotPresets.Keys) { [void]$global:cmbPreset.Items.Add($k) }
+    $global:cmbPreset.SelectedItem = $res.slug
+    $global:PhotoSlots = $global:PhotoSlotPresets[$res.slug]
+    Sync-PhotoSlotRows
+    if ($global:CurrentSlug -ne $res.slug) {
+        $txtHeaderSlug.Text = $res.slug
+        $global:CurrentSlug = $res.slug
+    }
+    AutoFill-Metadata -Force
+    $global:lblPublishStatus.Text = "Registered '$($res.slug)' with $($res.entries.Count) slots. Written to components/GuidePhoto.tsx. Commit + push GuidePhoto.tsx before publishing so Vercel can find the photos."
+    $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+}.GetNewClosure())
+$global:panelPublish.Controls.Add($btnNewGuide)
+
 $btnRefresh = New-Object System.Windows.Forms.Button
 $btnRefresh.Text = "Refresh"
-$btnRefresh.Location = New-Object System.Drawing.Point(626, 6); $btnRefresh.Size = New-Object System.Drawing.Size(75, 24)
+$btnRefresh.Location = New-Object System.Drawing.Point(726, 6); $btnRefresh.Size = New-Object System.Drawing.Size(75, 24)
 $btnRefresh.FlatStyle = "Flat"
 $btnRefresh.BackColor = [System.Drawing.Color]::FromArgb(90, 155, 175)
 $btnRefresh.ForeColor = [System.Drawing.Color]::White
