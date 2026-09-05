@@ -87,6 +87,14 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     nongNooch:  { file: "nong-nooch.jpg",  alt: "Nong Nooch Tropical Botanical Garden with topiary and orchid houses" },
     fishMarket: { file: "fish-market.jpg", alt: "Naklua Fish Market grilled seafood and local Thai stalls at dawn" },
   },
+  ayutthaya: {
+    hero: { file: "hero.jpg", alt: "Hero photo alt text - main destination shot" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Seasonal photo - festival, weather, or key event" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "First neighborhood description" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Second neighborhood description" },
+    activity: { file: "activity.jpg", alt: "Signature activity photo" },
+    localFood: { file: "local-food.jpg", alt: "Signature local food dish" },
+  },
 };
 
 export default function GuidePhoto({
