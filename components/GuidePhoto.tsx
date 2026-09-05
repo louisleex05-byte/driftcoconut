@@ -54,6 +54,17 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     phiPhi:     { file: "phi-phi.jpg",     alt: "Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
     khanomJeen: { file: "khanom-jeen.jpg", alt: "Southern Thai khanom jeen curry rice noodles with fresh vegetables" },
   },
+  krabi: {
+    hero:        { file: "hero.jpg",         alt: "Railay Beach limestone karst cliffs at sunset in Krabi Thailand" },
+    whenToGo:    { file: "when-to-go.jpg",   alt: "Ao Nang beach town dry season sunset on Andaman coast Krabi" },
+    aoNang:      { file: "ao-nang.jpg",      alt: "Ao Nang main beach strip longtail boats and restaurants Krabi" },
+    railay:      { file: "railay.jpg",       alt: "Railay Beach peninsula rock climbing limestone cliffs and jungle Krabi" },
+    nopparat:    { file: "nopparat.jpg",     alt: "Nopparat Thara Beach long quiet Andaman coast marine park Krabi" },
+    krabiTown:   { file: "krabi-town.jpg",   alt: "Krabi Town riverside night market and Chao Fa pier southern Thailand" },
+    phiPhi:      { file: "phi-phi.jpg",      alt: "Phi Phi Islands day trip Maya Bay turquoise water day trip from Krabi" },
+    emeraldPool: { file: "emerald-pool.jpg", alt: "Emerald Pool Sa Morakot jungle spring in Khao Nor Chuchi Krabi" },
+    khanomJeen:  { file: "khanom-jeen.jpg",  alt: "Southern Thai khanom jeen curry noodles with fresh vegetables Krabi" },
+  },
   pai: {
     hero:          { file: "hero.jpg",           alt: "Pai valley at sunrise with mist over rice paddies and mountain backdrop in northern Thailand" },
     whenToGo:      { file: "when-to-go.jpg",     alt: "Ban Rak Thai Yunnanese Chinese tea village lake at dawn in cool season" },
