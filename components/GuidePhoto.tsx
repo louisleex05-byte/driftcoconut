@@ -111,10 +111,10 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
   },
   chiangrai: {
     hero:          { file: "hero.jpg",          alt: "Misty sunrise over Chiang Rai's mountain ridges with soft northern Thai light" },
-    whenToGo:      { file: "when-to-go.jpg",    alt: "Wat Rong Khun White Temple under clear cool-season skies in Chiang Rai" },
+    whenToGo:      { file: "when-to-go.jpg",    alt: "Wat Rong Khun White Temple reflected in the pool with kinnaree naga guardian sculptures in cool-season sunlight, Chiang Rai" },
     neighborhood1: { file: "neighborhood1.jpg", alt: "Chiang Rai Clock Tower and Night Bazaar streets at dusk" },
     neighborhood2: { file: "neighborhood2.jpg", alt: "Kok River waterfront with a quiet riverside resort and tropical greenery" },
-    activity:      { file: "activity.jpg",      alt: "Wat Rong Khun (White Temple), Chiang Rai's white mirrored temple complex" },
+    activity:      { file: "activity.jpg",      alt: "Wat Rong Khun White Temple exterior and white naga lion guardian sculptures at Chiang Rai's mirrored temple complex" },
     localFood:     { file: "local-food.jpg",    alt: "Khao soi northern Thai curry noodles with pickled mustard greens and crispy noodles" },
   },
 };
