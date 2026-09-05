@@ -88,12 +88,15 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     fishMarket: { file: "fish-market.jpg", alt: "Naklua Fish Market grilled seafood and local Thai stalls at dawn" },
   },
   ayutthaya: {
-    hero: { file: "hero.jpg", alt: "Hero photo alt text - main destination shot" },
-    whenToGo: { file: "when-to-go.jpg", alt: "Seasonal photo - festival, weather, or key event" },
-    neighborhood1: { file: "neighborhood1.jpg", alt: "First neighborhood description" },
-    neighborhood2: { file: "neighborhood2.jpg", alt: "Second neighborhood description" },
-    activity: { file: "activity.jpg", alt: "Signature activity photo" },
-    localFood: { file: "local-food.jpg", alt: "Signature local food dish" },
+    hero:              { file: "hero.jpg",                alt: "Wat Mahathat sandstone Buddha head entwined in banyan tree roots at Ayutthaya Historical Park" },
+    whenToGo:          { file: "when-to-go.jpg",          alt: "Ayutthaya Historical Park Buddhist temple ruins during dry season sunset" },
+    historicalPark:    { file: "historical-park.jpg",     alt: "Ayutthaya Historical Park UNESCO ancient capital ruins with reclining Buddha" },
+    watMahathat:       { file: "wat-mahathat.jpg",        alt: "Wat Mahathat Buddha head embraced by fig tree roots in Ayutthaya" },
+    watPhraSiSanphet:  { file: "wat-phra-si-sanphet.jpg", alt: "Wat Phra Si Sanphet three white chedis royal Buddhist temple Ayutthaya" },
+    bangPaIn:          { file: "bang-pa-in.jpg",          alt: "Bang Pa-In Royal Summer Palace Thai gazebo on the lake near Ayutthaya" },
+    nightBazaar:       { file: "night-bazaar.jpg",        alt: "Ayutthaya night market food stalls and evening dining on the island" },
+    boatTrip:          { file: "boat-trip.jpg",           alt: "Longtail boat sunset river tour circling Ayutthaya historic island" },
+    boatNoodles:       { file: "boat-noodles.jpg",        alt: "Ayutthaya boat noodles kuay tiew rue with dark beef broth street food" },
   },
 };
 
