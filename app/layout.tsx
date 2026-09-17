@@ -3,6 +3,7 @@ import Script from "next/script";
 import { LanguageProvider } from "@/contexts/LanguageProvider";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 // Travelpayouts Drive script — loaded via env var so it's easy to toggle.
@@ -64,6 +65,8 @@ export default function RootLayout({
           strategy="afterInteractive"
           data-cmp-ab="2"
         />
+
+        <GoogleAnalytics />
       </body>
     </html>
   );
