@@ -125,7 +125,18 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     neighborhood2: { file: "neighborhood2.jpg", alt: "Khao Takiab fishing village headland and temple with Gulf of Thailand views south of Hua Hin" },
     activity: { file: "activity.jpg", alt: "Horse riding on Hua Hin wide sandy beach at golden hour with palm trees" },
     waterfall: { file: "waterfall.jpg", alt: "Pa La-U Waterfall multi-tiered cascade in Kaeng Krachan National Park rainforest west of Hua Hin" },
+    railway: { file: "railway.jpg", alt: "Hua Hin Railway Station iconic red and white Thai royal Victorian pavilion landmark architecture" },
     localFood: { file: "local-food.jpg", alt: "Grilled river prawns and fresh seafood at Dechanuchit night market Hua Hin" },
+  },
+  kanchanaburi: {
+    hero: { file: "hero.jpg", alt: "Bridge over the River Kwai historic WWII memorial railway crossing in Kanchanaburi at sunset" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Cool-season Kanchanaburi jungle mist over River Kwai at dawn November to February dry weather" },
+    riverKwai: { file: "river-kwai.jpg", alt: "Kwai Yai River floating raft houses and longtail boats with limestone jungle backdrop Kanchanaburi" },
+    deathRailway: { file: "death-railway.jpg", alt: "Death Railway train crossing Wang Pho wooden viaduct cliffside historic Thailand Burma route" },
+    erawan: { file: "erawan.jpg", alt: "Erawan Falls seven-tier emerald turquoise cascade in Erawan National Park Kanchanaburi" },
+    hellfirePass: { file: "hellfire-pass.jpg", alt: "Hellfire Pass Memorial Museum cutting through rock walls Thailand Burma railway WWII" },
+    cemetery: { file: "cemetery.jpg", alt: "Kanchanaburi War Cemetery rows of Allied POW gravestones and manicured lawns memorial" },
+    localFood: { file: "local-food.jpg", alt: "Grilled river fish yum pla duk foo and Thai curries served riverside on Kwai Yai Kanchanaburi" },
   },
 };
 
