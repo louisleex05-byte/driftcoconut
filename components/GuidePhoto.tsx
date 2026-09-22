@@ -132,7 +132,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     hero: { file: "hero.jpg", alt: "Bridge over the River Kwai historic WWII memorial railway crossing in Kanchanaburi at sunset" },
     whenToGo: { file: "when-to-go.jpg", alt: "Cool-season Kanchanaburi jungle mist over River Kwai at dawn November to February dry weather" },
     riverKwai: { file: "river-kwai.jpg", alt: "Kwai Yai River floating raft houses and longtail boats with limestone jungle backdrop Kanchanaburi" },
-    deathRailway: { file: "death-railway.jpg", alt: "Death Railway train crossing Wang Pho wooden viaduct cliffside historic Thailand Burma route" },
+    deathRailway: { file: "death-railway.jpg", alt: "Bridge over the River Kwai historic black iron truss and Death Railway train tracks with bomb memorial sculptures Kanchanaburi" },
     erawan: { file: "erawan.jpg", alt: "Erawan Falls seven-tier emerald turquoise cascade in Erawan National Park Kanchanaburi" },
     hellfirePass: { file: "hellfire-pass.jpg", alt: "Hellfire Pass Memorial Museum cutting through rock walls Thailand Burma railway WWII" },
     cemetery: { file: "cemetery.jpg", alt: "Kanchanaburi War Cemetery rows of Allied POW gravestones and manicured lawns memorial" },
