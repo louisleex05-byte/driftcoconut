@@ -124,6 +124,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     neighborhood1: { file: "neighborhood1.jpg", alt: "Hua Hin town centre with night market stalls and colonial railway station landmark" },
     neighborhood2: { file: "neighborhood2.jpg", alt: "Khao Takiab fishing village headland and temple with Gulf of Thailand views south of Hua Hin" },
     activity: { file: "activity.jpg", alt: "Horse riding on Hua Hin wide sandy beach at golden hour with palm trees" },
+    waterfall: { file: "waterfall.jpg", alt: "Pa La-U Waterfall multi-tiered cascade in Kaeng Krachan National Park rainforest west of Hua Hin" },
     localFood: { file: "local-food.jpg", alt: "Grilled river prawns and fresh seafood at Dechanuchit night market Hua Hin" },
   },
 };
