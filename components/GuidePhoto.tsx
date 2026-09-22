@@ -118,6 +118,14 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     doiTung:       { file: "doi-tung.jpg",       alt: "Mae Fah Luang Garden landscaped flower beds with mountain views at Doi Tung Royal Villa in Chiang Rai highlands" },
     localFood:     { file: "local-food.jpg",    alt: "Khao soi northern Thai curry noodles with pickled mustard greens and crispy noodles" },
   },
+  "hua-hin": {
+    hero: { file: "hero.jpg", alt: "Hua Hin beachfront promenade with fishing pier and royal beach town skyline at sunset" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Cool-season Hua Hin beach with calm Gulf of Thailand waves and blue skies November to February" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Hua Hin town centre with night market stalls and colonial railway station landmark" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Khao Takiab fishing village headland and temple with Gulf of Thailand views south of Hua Hin" },
+    activity: { file: "activity.jpg", alt: "Horse riding on Hua Hin wide sandy beach at golden hour with palm trees" },
+    localFood: { file: "local-food.jpg", alt: "Grilled river prawns and fresh seafood at Dechanuchit night market Hua Hin" },
+  },
 };
 
 export default function GuidePhoto({
