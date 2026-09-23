@@ -1,6 +1,14 @@
-// Trust strip shown under the hero — communicates who we source inventory from.
-// Uses styled text logotypes (no official logo images) — this is the safe route
-// until each affiliate program approves your account and provides co-branded assets.
+// Trust strip shown under the hero.
+//
+// STRIPPED DOWN to only actively-approved affiliate partners. Showing partner
+// logos we haven't signed with (Expedia, Hotels.com, Viator) implied
+// partnerships that don't exist - a soft FTC / Google trust risk and a
+// commission leak (users clicking those logos left the site without
+// attribution).
+//
+// Currently active: Booking.com CJ affiliate (publisher 101849416, approved
+// 14-May-2026, 4% lead commission). Add Agoda / Trip.com here ONLY after
+// approval so every logo maps to real earnings.
 
 import { Wave, Pebble, Coral, Conch } from "./Decorations";
 
@@ -8,25 +16,16 @@ type Partner = {
   name: string;
   color: string;
   note: string;
-  parent?: string; // Optional: "By Tripadvisor Group" style credit
 };
 
 const PARTNERS: Partner[] = [
-  { name: "Booking.com", color: "#003580", note: "Global inventory" },
-  { name: "Expedia", color: "#FFC72C", note: "Bundle & save" },
-  { name: "Hotels.com", color: "#D32F2F", note: "Rewards program" },
-  {
-    name: "Viator",
-    color: "#328E68",
-    note: "Tours & experiences",
-    parent: "By Tripadvisor Group",
-  },
+  { name: "Booking.com", color: "#003580", note: "2.3M+ properties worldwide" },
 ];
 
 export default function PartnerStrip() {
   return (
     <section
-      aria-label="Our booking partners"
+      aria-label="Our booking partner"
       className="relative -mt-1 border-b border-sea-100 bg-white/70 overflow-hidden rounded-b-2xl sm:rounded-b-3xl shadow-sm"
     >
       {/* Wave divider top */}
@@ -40,7 +39,7 @@ export default function PartnerStrip() {
 
       <div className="max-w-6xl mx-auto px-4 py-6 relative z-10">
         <div className="text-center text-xs uppercase tracking-widest text-slate-500 mb-4">
-          Live inventory from trusted booking partners
+          Live inventory from our trusted booking partner
         </div>
 
         <div className="flex flex-wrap items-end justify-center gap-x-5 sm:gap-x-8 gap-y-4">
@@ -48,27 +47,22 @@ export default function PartnerStrip() {
             <div
               key={p.name}
               className="flex flex-col items-center text-center"
-              title={p.parent ? `${p.name} — ${p.parent}` : p.note}
+              title={p.note}
             >
               <span
-                className="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-none"
+                className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-none"
                 style={{ color: p.color }}
               >
                 {p.name}
               </span>
-              {p.parent && (
-                <span className="text-[9px] italic text-slate-500 mt-0.5">
-                  {p.parent}
-                </span>
-              )}
-              <span className="text-[10px] uppercase tracking-wider text-slate-400 mt-0.5">
+              <span className="text-[10px] uppercase tracking-wider text-slate-400 mt-1">
                 {p.note}
               </span>
             </div>
           ))}
         </div>
 
-        {/* Trust indicators */}
+        {/* Trust indicators — all four apply to Booking.com's own guarantees */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-600">
           <span className="inline-flex items-center gap-1.5">
             <span className="text-green-600">✓</span> Best price guarantee
@@ -82,11 +76,6 @@ export default function PartnerStrip() {
           <span className="inline-flex items-center gap-1.5">
             <span className="text-green-600">✓</span> No booking fees
           </span>
-        </div>
-
-        {/* Powered by line — subtle attribution below trust indicators */}
-        <div className="mt-4 text-center text-[10px] uppercase tracking-widest text-slate-400">
-          Reviews & experiences powered by <span className="font-semibold text-slate-500">Tripadvisor Group</span>
         </div>
       </div>
     </section>
