@@ -51,6 +51,50 @@ export function bookingSearchUrl(destination: string): string {
 }
 
 /**
+ * Build a Booking.com search URL with pre-filled dates + guests.
+ * Used by the homepage SearchForm to send users DIRECTLY to Booking.com search
+ * results (with our CJ tracker applied via cjLink) instead of the internal mock
+ * listings page. Higher conversion, no sample-hotel confusion.
+ *
+ * @param destination - e.g. "Pai, Thailand"
+ * @param checkIn     - YYYY-MM-DD
+ * @param checkOut    - YYYY-MM-DD
+ * @param adults      - number of adult guests (defaults to 2)
+ */
+export function bookingSearchUrlWithParams(opts: {
+  destination: string;
+  checkIn: string;
+  checkOut: string;
+  adults?: number;
+}): string {
+  const cleaned = opts.destination.trim().replace(/\s+/g, " ");
+  const params = new URLSearchParams({
+    ss: cleaned,
+    checkin: opts.checkIn,
+    checkout: opts.checkOut,
+    group_adults: String(opts.adults ?? 2),
+    group_children: "0",
+    no_rooms: "1",
+  });
+  // URLSearchParams uses %20 for spaces; Booking.com prefers + for ss=
+  const qs = params.toString().replace(/ss=([^&]+)/, (_, v) => `ss=${v.replace(/%20/g, "+")}`);
+  return `https://www.booking.com/searchresults.html?${qs}`;
+}
+
+/**
+ * Shortcut: one-call fully-tracked deep link with dates + guests.
+ */
+export function bookingCJSearchWithParams(opts: {
+  destination: string;
+  checkIn: string;
+  checkOut: string;
+  adults?: number;
+  linkId?: keyof typeof BOOKING_CJ.advertiserIds;
+}): string {
+  return cjLink(bookingSearchUrlWithParams(opts), opts.linkId ?? "evergreen");
+}
+
+/**
  * Shortcut: build a fully-tracked Booking.com link for a destination in one call.
  */
 export function bookingCJSearch(
