@@ -39,9 +39,14 @@ export function cjLink(
 /**
  * Build a Booking.com search URL for a destination.
  * Booking auto-detects the user's browser locale — a Thai user gets Thai UI + THB.
+ *
+ * Uses encodeURIComponent so commas, apostrophes, and non-ASCII characters
+ * (Thai script, accented names) are safely escaped. Booking.com's search
+ * accepts multi-word destinations as `ss=Koh+Samui%2C+Thailand`.
  */
 export function bookingSearchUrl(destination: string): string {
-  const encoded = destination.trim().replace(/\s+/g, "+");
+  const cleaned = destination.trim().replace(/\s+/g, " ");
+  const encoded = encodeURIComponent(cleaned).replace(/%20/g, "+");
   return `https://www.booking.com/searchresults.html?ss=${encoded}`;
 }
 
@@ -56,21 +61,35 @@ export function bookingCJSearch(
 }
 
 /**
- * Pre-built deep links for our most-featured Asia destinations.
+ * Pre-built deep links for our most-featured destinations.
  * Use these directly in destination guides / seasonal content.
+ * Thailand block matches every published guide slug.
  */
 export const BOOKING_DESTINATIONS = {
-  bali:          bookingSearchUrl("Bali"),
-  bangkok:       bookingSearchUrl("Bangkok"),
-  chiangMai:     bookingSearchUrl("Chiang Mai"),
-  phuket:        bookingSearchUrl("Phuket"),
-  hoChiMinhCity: bookingSearchUrl("Ho Chi Minh City"),
-  kyoto:         bookingSearchUrl("Kyoto"),
-  tokyo:         bookingSearchUrl("Tokyo"),
-  osaka:         bookingSearchUrl("Osaka"),
+  // Thailand - primary focus
+  bangkok:       bookingSearchUrl("Bangkok, Thailand"),
+  chiangMai:     bookingSearchUrl("Chiang Mai, Thailand"),
+  phuket:        bookingSearchUrl("Phuket, Thailand"),
+  krabi:         bookingSearchUrl("Krabi, Thailand"),
+  samui:         bookingSearchUrl("Koh Samui, Thailand"),
+  pattaya:       bookingSearchUrl("Pattaya, Thailand"),
+  chiangRai:     bookingSearchUrl("Chiang Rai, Thailand"),
+  ayutthaya:     bookingSearchUrl("Ayutthaya, Thailand"),
+  pai:           bookingSearchUrl("Pai, Thailand"),
+  maeHongSon:    bookingSearchUrl("Mae Hong Son, Thailand"),
+  huaHin:        bookingSearchUrl("Hua Hin, Thailand"),
+  kanchanaburi:  bookingSearchUrl("Kanchanaburi, Thailand"),
+  kohLanta:      bookingSearchUrl("Koh Lanta, Thailand"),
+  kohChang:      bookingSearchUrl("Koh Chang, Thailand"),
+  // Rest of Asia
+  bali:          bookingSearchUrl("Bali, Indonesia"),
+  hoChiMinhCity: bookingSearchUrl("Ho Chi Minh City, Vietnam"),
+  kyoto:         bookingSearchUrl("Kyoto, Japan"),
+  tokyo:         bookingSearchUrl("Tokyo, Japan"),
+  osaka:         bookingSearchUrl("Osaka, Japan"),
   singapore:     bookingSearchUrl("Singapore"),
   hongKong:      bookingSearchUrl("Hong Kong"),
-  boracay:       bookingSearchUrl("Boracay"),
+  boracay:       bookingSearchUrl("Boracay, Philippines"),
   maldives:      bookingSearchUrl("Maldives"),
 } as const;
 
