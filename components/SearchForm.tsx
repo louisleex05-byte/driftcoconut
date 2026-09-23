@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CITIES } from "@/lib/cities";
+import { bookingCJSearchWithParams } from "@/lib/booking";
 import { useT } from "@/contexts/LanguageProvider";
 
 /** Format a Date as YYYY-MM-DD using LOCAL time (not UTC). */
@@ -30,7 +30,6 @@ function nextDay(isoDate: string): string {
 
 export default function SearchForm() {
   const t = useT();
-  const router = useRouter();
   const [cityId, setCityId] = useState<number>(CITIES[0].id);
   const [checkIn, setCheckIn] = useState(tomorrow(0));
   const [checkOut, setCheckOut] = useState(tomorrow(1));
@@ -63,15 +62,28 @@ export default function SearchForm() {
     return g;
   }, []);
 
+  /**
+   * Send the user DIRECTLY to Booking.com search results with our CJ tracker
+   * applied. No internal sample-listings page in between — Booking.com's real
+   * live inventory for the exact destination + dates + guests they picked.
+   *
+   * Opens in a new tab so the user keeps driftcoconut.com open (helps repeat
+   * visits + return-to-guide navigation). Booking.com attributes commission
+   * back to driftcoconut via the CJ publisher ID in the wrapped URL.
+   */
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const q = new URLSearchParams({
-      cityId: String(cityId),
+    const city = CITIES.find((c) => c.id === cityId);
+    if (!city) return;
+    const href = bookingCJSearchWithParams({
+      destination: city.name,
       checkIn,
       checkOut,
-      adults: String(adults),
+      adults,
     });
-    router.push(`/search?${q.toString()}`);
+    // Open in same tab so mobile users don't lose the search context;
+    // no need for _blank since Booking.com is the intended destination.
+    window.location.href = href;
   }
 
   return (

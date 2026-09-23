@@ -1,10 +1,7 @@
-import { searchAgoda } from "@/lib/agoda";
-import HotelCard from "@/components/HotelCard";
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import { PalmLeaf, Conch } from "@/components/Decorations";
 import { CITIES } from "@/lib/cities";
-import SearchBookingCard from "@/components/SearchBookingCard";
-import SearchMockNotice from "@/components/SearchMockNotice";
+import { bookingCJSearchWithParams, bookingCJSearch } from "@/lib/booking";
 
 type SearchParams = {
   cityId?: string;
@@ -13,6 +10,13 @@ type SearchParams = {
   adults?: string;
 };
 
+/**
+ * /search route now server-redirects to Booking.com via our CJ tracker.
+ * No more sample listings page - users go straight to live Booking.com results
+ * for their exact destination + dates + guests. Any legacy bookmark or shared
+ * URL still routes correctly. Commission attribution stays intact via the
+ * publisher-ID-wrapped URL.
+ */
 export default async function SearchPage({
   searchParams,
 }: {
@@ -20,74 +24,32 @@ export default async function SearchPage({
 }) {
   const sp = await searchParams;
 
-  if (!sp.cityId || !sp.checkIn || !sp.checkOut) {
+  // Malformed URL - fall back to homepage rather than showing an empty page
+  if (!sp.cityId) {
     return (
       <div className="text-center py-16">
-        <p>Missing search parameters.</p>
-        <Link href="/" className="text-sea-700 underline">Go back</Link>
+        <p className="text-slate-500">Missing destination.</p>
+        <Link href="/" className="text-sea-700 underline mt-4 inline-block">
+          Start a new search
+        </Link>
       </div>
     );
   }
 
   const cityIdNum = Number(sp.cityId);
   const cityMatch = CITIES.find((c) => c.id === cityIdNum);
-  const cityName = cityMatch?.name ?? "your destination";
-  const isMock = process.env.AGODA_MOCK === "true";
+  const cityName = cityMatch?.name ?? "Thailand";
 
-  let hotels: Awaited<ReturnType<typeof searchAgoda>> = [];
-  let errorMsg: string | null = null;
+  // If dates were provided, forward them; otherwise send a plain destination
+  // search so Booking.com prompts the user for dates on the destination page.
+  const href = sp.checkIn && sp.checkOut
+    ? bookingCJSearchWithParams({
+        destination: cityName,
+        checkIn: sp.checkIn,
+        checkOut: sp.checkOut,
+        adults: Number(sp.adults ?? 2),
+      })
+    : bookingCJSearch(cityName);
 
-  try {
-    hotels = await searchAgoda({
-      cityId: cityIdNum,
-      checkIn: sp.checkIn,
-      checkOut: sp.checkOut,
-      adults: Number(sp.adults ?? 2),
-    });
-  } catch (err) {
-    errorMsg = err instanceof Error ? err.message : "Search failed";
-  }
-
-  return (
-    <div className="space-y-6 relative">
-      {/* Ambient corner accents on results page */}
-      <PalmLeaf className="hidden lg:block absolute -top-4 -right-8 w-24 text-sea-200 opacity-55 rotate-45 pointer-events-none" />
-      <Conch className="hidden lg:block fixed bottom-24 left-4 w-14 text-sea-300 opacity-45 pointer-events-none -z-10" />
-
-      <div>
-        <Link href="/" className="text-sm text-slate-500 hover:text-sea-700">
-          ← New search
-        </Link>
-        <h1 className="text-2xl font-bold mt-2">
-          {hotels.length} hotels · {cityName} · {sp.checkIn} → {sp.checkOut}
-        </h1>
-      </div>
-
-      {/* Booking.com CJ — city-aware "real inventory" CTA (top of results) */}
-      <SearchBookingCard cityName={cityName} />
-
-      {/* Mock-mode notice — only shown when we're serving sample listings */}
-      {isMock && <SearchMockNotice />}
-
-      {errorMsg ? (
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
-          <div className="font-semibold">Search error</div>
-          <div className="text-sm mt-1">{errorMsg}</div>
-          <div className="text-xs mt-2 text-red-700">
-            Make sure AGODA_SITE_ID and AGODA_API_KEY are set in .env.local
-          </div>
-        </div>
-      ) : hotels.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
-          No hotels found for these dates.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {hotels.map((h) => (
-            <HotelCard key={h.hotelId} hotel={h} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  redirect(href);
 }
