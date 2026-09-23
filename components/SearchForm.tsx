@@ -46,11 +46,19 @@ export default function SearchForm() {
     setCheckOut(nextDay(newCheckIn));
   }
 
-  // Group cities by region for the dropdown
+  // Group cities by region for the dropdown.
+  // Region order matters: Thailand first (site's primary focus), then everything else
+  // in the order it appears in CITIES. Object literal insertion order is preserved.
   const grouped = useMemo(() => {
     const g: Record<string, typeof CITIES> = {};
+    // Seed with Thailand first so it always appears at the top of the dropdown
+    g["Thailand"] = [];
     for (const c of CITIES) {
       (g[c.region] ??= []).push(c);
+    }
+    // Drop empty region groups (safety if seeded region has no members)
+    for (const key of Object.keys(g)) {
+      if (g[key].length === 0) delete g[key];
     }
     return g;
   }, []);
