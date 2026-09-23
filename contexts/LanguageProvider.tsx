@@ -16,11 +16,22 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
 
-  // Load persisted choice on mount (client only — avoids hydration mismatch)
+  // Load persisted choice on mount (client only — avoids hydration mismatch).
+  // Also detect route-based locale: /zh/... URLs force locale=zh regardless of
+  // localStorage. This makes Xiaohongshu / Weibo deep-links open in Chinese UI
+  // even when the user has no prior visit history.
   useEffect(() => {
     try {
+      // Route detection wins - a user landing on /zh/guides/bangkok wants Chinese
+      const path = typeof window !== "undefined" ? window.location.pathname : "";
+      if (path.startsWith("/zh")) {
+        setLocaleState("zh");
+        document.documentElement.lang = "zh-CN";
+        return;
+      }
+      // Otherwise honour persisted preference
       const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved && (LOCALES as string[]).includes(saved)) {
+      if (saved && (LOCALES as string[]).includes(saved) && saved !== "zh") {
         setLocaleState(saved as Locale);
         document.documentElement.lang = saved;
       }
