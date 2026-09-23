@@ -25,19 +25,43 @@ export default function HomePage() {
 
   return (
     <div className="relative">
-      <div className="mb-10">
+      {/* HERO + partner strip / expanded guide tip box.
+          PartnerStrip is now single-logo (Booking.com only) - much narrower.
+          GuideTipsBadge takes equal weight on desktop for better balance. */}
+      <div className="mb-8">
         <Hero />
-        {/* PartnerStrip on the left, GuideTipsBadge on the right (lg+); stacks on smaller screens */}
-        <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
           <PartnerStrip />
-          <div className="lg:pt-2">
+          <div>
             <GuideTipsBadge featuredSlug="bangkok" />
           </div>
         </div>
       </div>
 
-      {/* Where to drift next */}
-      <section id="deals" className="relative pt-2 pb-6 mb-6">
+      {/* MAIN SEARCH FORM - moved up as the primary conversion CTA.
+          Sits directly under the hero/partner block so users don't scroll to book. */}
+      <section id="search-form" className="mb-8 scroll-mt-24">
+        <div className="text-center mb-4">
+          <div className="text-xs uppercase tracking-widest text-sea-600 font-semibold">
+            {t("search_eyebrow")}
+          </div>
+          <h2 className="font-display text-2xl md:text-3xl font-semibold text-sea-800 mt-1">
+            {t("search_title")}
+          </h2>
+        </div>
+        <SearchForm />
+      </section>
+
+      {/* Divider decorations between Search and Drift sections */}
+      <div className="relative h-3 flex items-center justify-center mb-4">
+        <Boat className="hidden md:block absolute left-1/4 w-12 text-sea-400 opacity-45 pointer-events-none" />
+        <StrawHat className="hidden md:block absolute right-1/4 w-10 text-sea-400 opacity-45 pointer-events-none rotate-6" />
+        <Conch className="hidden lg:block absolute left-2/3 w-8 text-sea-500 opacity-45 pointer-events-none -rotate-12" />
+      </div>
+
+      {/* WHERE TO DRIFT NEXT - moved up (now below Search Hotels instead of above it).
+          Cards live under the primary CTA so users can book direct OR browse by mood. */}
+      <section id="deals" className="relative pt-2 pb-6 mb-8">
         <Hibiscus className="absolute -top-6 -right-2 w-20 md:w-28 text-sea-300 opacity-70 rotate-12 pointer-events-none" />
         <Starfish className="hidden sm:block absolute -bottom-4 -left-4 w-20 md:w-24 text-sea-400 opacity-70 -rotate-12 pointer-events-none" />
 
@@ -50,7 +74,6 @@ export default function HomePage() {
           </h2>
         </div>
 
-        {/* 3 destination cards, full width (Guide Tips badge moved up next to PartnerStrip) */}
         <div className="relative z-10">
           <div className="grid md:grid-cols-3 gap-4">
             {(
@@ -94,26 +117,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="relative h-3 flex items-center justify-center">
-        <Boat className="hidden md:block absolute left-1/4 w-12 text-sea-400 opacity-45 pointer-events-none" />
-        <StrawHat className="hidden md:block absolute right-1/4 w-10 text-sea-400 opacity-45 pointer-events-none rotate-6" />
-        <Conch className="hidden lg:block absolute left-2/3 w-8 text-sea-500 opacity-45 pointer-events-none -rotate-12" />
-      </div>
-
-      {/* Main search form */}
-      <section id="search-form" className="mb-10 scroll-mt-24 pt-2">
-        <div className="text-center mb-4">
-          <div className="text-xs uppercase tracking-widest text-sea-600 font-semibold">
-            {t("search_eyebrow")}
-          </div>
-          <h2 className="font-display text-2xl md:text-3xl font-semibold text-sea-800 mt-1">
-            {t("search_title")}
-          </h2>
-        </div>
-        <SearchForm />
-      </section>
-
-      <section className="mt-10 mb-10">
+      <section className="mt-6 mb-10">
         <TravelEssentials />
       </section>
 

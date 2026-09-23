@@ -38,17 +38,17 @@ export default function GuideTipsBadge({
           {t("guide_tips_eyebrow")}
         </div>
 
-        <h3 className="font-display text-base sm:text-lg font-semibold text-sea-800 leading-tight">
+        <h3 className="font-display text-lg sm:text-xl md:text-2xl font-semibold text-sea-800 leading-tight">
           {t("guide_tips_featured_title")}
         </h3>
 
-        <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-600 mt-2 sm:mt-3 leading-relaxed">
           {t("guide_tips_featured_teaser")}
         </p>
 
         <Link
           href={`/guides/${featuredSlug}`}
-          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-white bg-sea-600 hover:bg-sea-700 transition-colors px-4 py-2 rounded-lg"
+          className="mt-4 sm:mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white bg-sea-600 hover:bg-sea-700 transition-colors px-5 py-2.5 rounded-lg"
         >
           {t("guide_tips_read_cta")}
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5" aria-hidden="true">
