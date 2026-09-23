@@ -1,25 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useT } from "@/contexts/LanguageProvider";
+import { useLanguage } from "@/contexts/LanguageProvider";
 import { PalmLeaf } from "@/components/Decorations";
 
 /**
  * Homepage callout that promotes the latest destination guide.
- * Ported from the PC-session GuideTipsBadge — sea-blue palette,
- * corner "GUIDE TIPS" pill, featured guide card, "See all guides" link.
- *
- * NOTE: The `/guides` route + Bangkok MDX still need to be scaffolded on this
- * instance of the repo. Until then, the "Read the guide" CTA links to
- * `/guides/bangkok` which will 404 locally; on the PC-side push, it will
- * resolve to the real content.
+ * Locale-aware: when the user is on the Chinese locale, both CTAs route to
+ * the /zh/... equivalent so Chinese-viewing users don't get bounced back
+ * to the English guide after clicking "阅读指南".
  */
 export default function GuideTipsBadge({
   featuredSlug = "bangkok",
 }: {
   featuredSlug?: string;
 }) {
-  const t = useT();
+  const { locale, t } = useLanguage();
+  const localePrefix = locale === "zh" ? "/zh" : "";
+  const guideHref = `${localePrefix}/guides/${featuredSlug}`;
+  const allGuidesHref = `${localePrefix}/guides`;
   return (
     <aside
       aria-label={t("guide_tips_pill")}
@@ -47,7 +46,7 @@ export default function GuideTipsBadge({
         </p>
 
         <Link
-          href={`/guides/${featuredSlug}`}
+          href={guideHref}
           className="mt-4 sm:mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-coral-gradient hover:opacity-90 hover:shadow-tropical transition-all px-5 py-2.5 rounded-lg shadow-md"
         >
           {t("guide_tips_read_cta")}
@@ -59,7 +58,7 @@ export default function GuideTipsBadge({
 
         <div className="mt-4 pt-3 border-t border-sea-100">
           <Link
-            href="/guides"
+            href={allGuidesHref}
             className="inline-flex items-center gap-1 text-xs font-medium text-sea-700 hover:text-sea-900 transition-colors"
           >
             {t("guide_tips_see_all")}

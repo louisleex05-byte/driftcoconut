@@ -30,8 +30,10 @@ export default function LanguageToggle() {
       type="button"
       onClick={() => pick(val)}
       aria-pressed={locale === val}
-      className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 transition-colors ${
-        locale === val ? "bg-sea-600 text-white" : "text-slate-600 hover:text-sea-700"
+      className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 transition-all ${
+        locale === val
+          ? "bg-coral-gradient text-white font-semibold shadow-sm"
+          : "text-slate-600 hover:text-coral-600"
       }`}
     >
       {label}
@@ -40,7 +42,7 @@ export default function LanguageToggle() {
 
   return (
     <div
-      className="inline-flex items-center rounded-full border border-sea-200 bg-white/70 text-[10px] sm:text-[11px] font-medium overflow-hidden flex-shrink-0"
+      className="inline-flex items-center rounded-full border border-coral-200 bg-white/80 text-[10px] sm:text-[11px] font-medium overflow-hidden flex-shrink-0 shadow-sm"
       role="group"
       aria-label={t("lang_toggle_aria")}
     >
