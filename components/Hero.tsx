@@ -32,6 +32,13 @@ export default function Hero() {
             fill
             priority={i === 0}
             sizes="100vw"
+            // Bypass Vercel's image optimizer for hero photos.
+            // Rationale: 22 rotating slides x every deploy = quota hits on the free
+            // tier -> intermittent 500s / blanks. Files are already reasonable size
+            // (200-1200 KB), so serving them raw from the CDN is cheaper AND more
+            // reliable than paying quota to convert them to WebP on the fly.
+            unoptimized
+            loading={i === 0 ? "eager" : "lazy"}
             className="object-cover transition-opacity duration-1000 ease-in-out"
             style={{
               objectPosition: photo.position,
