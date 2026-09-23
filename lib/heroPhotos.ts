@@ -51,6 +51,13 @@ export const HERO_PHOTOS: HeroPhoto[] = [
     position: "center 35%",
   },
   {
+    src: "/hero/maldives-beach.jpg",
+    alt: "Pristine Maldives beach with white sand and turquoise water",
+    caption: "White sand beach, Maldives",
+    credit: "Photo: Pixabay",
+    position: "center center",
+  },
+  {
     src: "/hero/maldives-dhoni.jpg",
     alt: "Traditional Maldivian dhoni boat at a resort dock with turquoise lagoon",
     caption: "Resort dhoni, Maldives",
