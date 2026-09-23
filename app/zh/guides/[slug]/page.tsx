@@ -8,7 +8,8 @@ import { getGuide, getGuideSlugs } from "@/lib/guides";
 import AffiliateLink from "@/components/AffiliateLink";
 import GuidePhoto from "@/components/GuidePhoto";
 
-// Statically generate all guide slugs at build time.
+// Statically generate all guide slugs at build time (Chinese variants).
+// Falls back to English content if `.zh.mdx` doesn't exist for a slug.
 export async function generateStaticParams() {
   const slugs = await getGuideSlugs();
   return slugs.map((slug) => ({ slug }));
@@ -22,32 +23,25 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const guide = await getGuide(slug);
-  if (!guide) return { title: "Guide not found" };
-
-  // hreflang: link this English page to its Chinese counterpart when it exists.
-  // Google uses this to serve the right language variant to Chinese searchers.
-  const languages: Record<string, string> = {
-    en: `/guides/${slug}`,
-    "x-default": `/guides/${slug}`,
-  };
-  if (guide.hasLocale?.includes("zh")) {
-    languages["zh-CN"] = `/zh/guides/${slug}`;
-  }
-
+  const guide = await getGuide(slug, "zh");
+  if (!guide) return { title: "指南未找到" };
   return {
     title: guide.title,
     description: guide.description,
     alternates: {
-      canonical: `/guides/${slug}`,
-      languages,
+      canonical: `/zh/guides/${slug}`,
+      languages: {
+        en: `/guides/${slug}`,
+        "zh-CN": `/zh/guides/${slug}`,
+        "x-default": `/guides/${slug}`,
+      },
     },
     openGraph: {
       title: guide.title,
       description: guide.description,
       images: guide.hero ? [{ url: guide.hero, alt: guide.heroAlt ?? guide.title }] : undefined,
       type: "article",
-      locale: "en_US",
+      locale: "zh_CN",
       publishedTime: guide.publishDate,
       modifiedTime: guide.lastUpdated,
       authors: [guide.author],
@@ -55,15 +49,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function GuidePage({
+export default async function GuidePageZh({
   params,
 }: {
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const guide = await getGuide(slug);
-  // Bind guideSlug so MDX authors can write `<GuidePhoto slot="oldCity" />`
-  // and the correct per-guide photo dict is used automatically.
+  const guide = await getGuide(slug, "zh");
   const BoundGuidePhoto = (props: { slot: string }) => (
     <GuidePhoto slot={props.slot} guideSlug={slug} />
   );
@@ -77,17 +69,13 @@ export default async function GuidePage({
     <article className="max-w-3xl mx-auto">
       {/* Breadcrumb */}
       <nav className="text-xs text-slate-500 mb-6">
-        <Link href="/" className="hover:text-sea-600">Home</Link>
+        <Link href="/zh" className="hover:text-sea-600">首页</Link>
         <span className="mx-1.5">·</span>
-        <Link href="/guides" className="hover:text-sea-600">Guides</Link>
+        <Link href="/zh/guides" className="hover:text-sea-600">指南</Link>
         <span className="mx-1.5">·</span>
         <span className="text-slate-700">{guide.destination}</span>
-        {guide.hasLocale?.includes("zh") && (
-          <>
-            <span className="mx-2">·</span>
-            <Link href={`/zh/guides/${slug}`} className="text-slate-400 hover:text-sea-600 italic">中文</Link>
-          </>
-        )}
+        <span className="mx-2">·</span>
+        <Link href={`/guides/${slug}`} className="text-slate-400 hover:text-sea-600 italic">EN</Link>
       </nav>
 
       {/* Hero image */}
@@ -107,13 +95,13 @@ export default async function GuidePage({
       {/* Title block */}
       <header className="mb-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-sea-500 mb-2">
-          Guide · {guide.destination}
+          指南 · {guide.destination}
         </p>
         <h1 className="font-display text-3xl sm:text-4xl font-semibold text-sea-800 leading-tight mb-3">
           {guide.title}
         </h1>
         <p className="text-sm text-slate-500">
-          By {guide.author} · Updated {formatDate(guide.lastUpdated)} · {guide.readingMinutes} min read
+          作者 {guide.author} · 更新于 {formatDateZh(guide.lastUpdated)} · 阅读时间 {guide.readingMinutes} 分钟
         </p>
       </header>
 
@@ -125,9 +113,9 @@ export default async function GuidePage({
       {/* Footer CTA */}
       <div className="mt-12 pt-8 border-t border-sea-100">
         <div className="rounded-2xl bg-sea-50 border border-sea-100 p-6 sm:p-8 text-center">
-          <p className="text-xs uppercase tracking-wide text-sea-500 mb-2">Ready to book?</p>
+          <p className="text-xs uppercase tracking-wide text-sea-500 mb-2">准备预订?</p>
           <h2 className="font-display text-xl font-semibold text-sea-800 mb-3">
-            Search hotels in {guide.destination.split(",")[0]}
+            搜索 {guide.destination.split(",")[0]} 酒店
           </h2>
           <a
             href={bookingCJSearch(guide.destination.split(",")[0])}
@@ -135,21 +123,21 @@ export default async function GuidePage({
             rel="sponsored noopener noreferrer"
             className="inline-block px-6 py-3 rounded-full bg-brand text-white font-semibold text-sm hover:bg-brand-dark transition-colors"
           >
-            Browse on Booking.com →
+            前往 Booking.com →
           </a>
         </div>
 
         <p className="mt-8 text-center text-xs text-slate-400">
-          <Link href="/guides" className="hover:text-sea-600">← All destination guides</Link>
+          <Link href="/zh/guides" className="hover:text-sea-600">← 全部目的地指南</Link>
         </p>
       </div>
     </article>
   );
 }
 
-function formatDate(iso: string): string {
+function formatDateZh(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString("en-US", {
+    return new Date(iso).toLocaleDateString("zh-CN", {
       year: "numeric",
       month: "long",
       day: "numeric",
