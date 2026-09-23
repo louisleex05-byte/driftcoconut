@@ -26,7 +26,7 @@ export default function PartnerStrip() {
   return (
     <section
       aria-label="Our booking partner"
-      className="relative -mt-1 border-b border-sea-100 bg-white/70 overflow-hidden rounded-b-2xl sm:rounded-b-3xl shadow-sm"
+      className="relative -mt-1 border border-lagoon-200 bg-gradient-to-br from-lagoon-50 via-white to-sea-50 overflow-hidden rounded-2xl sm:rounded-3xl shadow-tropical h-full"
     >
       {/* Wave divider top */}
       <Wave className="absolute -top-3 left-0 w-full h-6 text-sea-300" />
@@ -38,7 +38,7 @@ export default function PartnerStrip() {
       <Pebble className="hidden md:block absolute bottom-2 right-32 w-16 text-sea-300 opacity-60 -scale-x-100 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 py-6 relative z-10">
-        <div className="text-center text-xs uppercase tracking-widest text-slate-500 mb-4">
+        <div className="text-center text-xs section-eyebrow mb-4">
           Live inventory from our trusted booking partner
         </div>
 
