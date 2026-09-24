@@ -37,6 +37,10 @@ export const metadata: Metadata = {
     ...(process.env.NEXT_PUBLIC_AGODA_VERIFICATION && {
       "agoda-site-verification": process.env.NEXT_PUBLIC_AGODA_VERIFICATION,
     }),
+    // CueLinks affiliate network - domain-ownership verification
+    // Token expires 25-Sep-2026 09:22 AM. Once CueLinks confirms verification,
+    // the tag can stay in place indefinitely (they don't re-check).
+    "cuelinks-verification": "VERIFY-CL-EMDYHQDD",
   },
   verification: {
     ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
