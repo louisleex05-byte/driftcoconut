@@ -117,22 +117,36 @@ function AutoFill-Metadata {
     $dest = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
     $country = if ($global:txtCountry) { $global:txtCountry.Text.Trim() } else { "" }
     $month = if ($global:txtMonth) { $global:txtMonth.Text.Trim() } else { "" }
-    if (-not $dest) { return }  # nothing to derive from
 
     # Extract year from "September 2026" or similar
     $year = ""
     if ($month -match '(\d{4})') { $year = $Matches[1] }
     if (-not $year) { $year = (Get-Date).Year.ToString() }
 
+    # --- Determine display name ---
+    # Priority: Guide-field slug (if it holds a valid known preset) → Tab 1 destination.
+    # This means typing "hua-hin" in the Guide field produces "Hua Hin" in Title/Destination
+    # even when Tab 1 still shows an old guide (e.g. "Chiang Mai").
+    $currentSlug = if ($global:txtHeaderSlug) { $global:txtHeaderSlug.Text.Trim() } else { "" }
+    $slugIsValid = $currentSlug -and $currentSlug -ne 'generic' -and
+                   $global:PhotoSlotPresets -and $global:PhotoSlotPresets.Contains($currentSlug)
+    if ($slugIsValid) {
+        $destDisplay = (Get-Culture).TextInfo.ToTitleCase($currentSlug.Replace('-', ' '))
+    } elseif ($dest) {
+        $destDisplay = (Get-Culture).TextInfo.ToTitleCase($dest.ToLower().Replace('-', ' '))
+    } else {
+        return   # nothing to derive from
+    }
+
     # Derive candidate values
-    $titleGuess = "$dest Travel Guide ${year}: Where to Stay, When to Go & What to Eat"
-    $destGuess = if ($country) { "$dest, $country" } else { $dest }
+    $titleGuess = "$destDisplay Travel Guide ${year}: Where to Stay, When to Go & What to Eat"
+    $destGuess = if ($country) { "$destDisplay, $country" } else { $destDisplay }
 
     # Description = draft italic subtitle if present, else generated
     $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
     $descGuess = Get-DraftSubtitle -Text $draftText
     if (-not $descGuess) {
-        $descGuess = "A local's $dest guide - where to stay, when to visit, what to eat, and where to book."
+        $descGuess = "A local's $destDisplay guide — where to stay, when to visit, what to eat, and where to book."
     }
 
     # Hero alt from active photo preset's `hero` slot
@@ -148,6 +162,21 @@ function AutoFill-Metadata {
     if ($Force -or -not $global:txtMetaDescription.Text) { $global:txtMetaDescription.Text = $descGuess }
     if ($Force -or -not $global:txtMetaDestination.Text) { $global:txtMetaDestination.Text = $destGuess }
     if ($Force -or -not $global:txtMetaHeroAlt.Text)     { $global:txtMetaHeroAlt.Text = $heroAltGuess }
+
+    # Sync Guide slug field ONLY when it is blank or stuck on "generic".
+    # Never overwrite a slug the user has already typed — that would revert the
+    # preset back to whatever Tab 1 still says (e.g. chiang-mai while user wants hua-hin).
+    if ($dest -and $global:txtHeaderSlug) {
+        $currentSlug = $global:txtHeaderSlug.Text.Trim()
+        $noValidSlug = (-not $currentSlug) -or ($currentSlug -eq 'generic') -or
+                       ($global:PhotoSlotPresets -and -not $global:PhotoSlotPresets.Contains($currentSlug))
+        if ($noValidSlug) {
+            $slugGuess = $dest.Trim().ToLower() -replace '[^a-z0-9]+', '-' -replace '^-|-$', ''
+            if ($global:txtHeaderSlug.Text -ne $slugGuess) {
+                $global:txtHeaderSlug.Text = $slugGuess   # TextChanged fires → preset auto-syncs
+            }
+        }
+    }
 
     if ($global:lblPublishStatus) {
         $src = if (Get-DraftSubtitle -Text $draftText) { "draft italic subtitle" } else { "generated from Tab 1 fields" }
@@ -524,6 +553,16 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="nongNooch";   file="nong-nooch.jpg";   alt="Nong Nooch Tropical Botanical Garden with topiary and orchid houses" },
         [pscustomobject]@{ slot="fishMarket";  file="fish-market.jpg";  alt="Naklua Fish Market grilled seafood and local Thai stalls at dawn" }
     )
+    "hua-hin" = @(
+        [pscustomobject]@{ slot="hero";          file="hero.jpg";          alt="Hua Hin beachfront promenade with fishing pier and royal beach town skyline at sunset" },
+        [pscustomobject]@{ slot="whenToGo";      file="when-to-go.jpg";    alt="Cool-season Hua Hin beach with calm Gulf of Thailand waves and blue skies November to February" },
+        [pscustomobject]@{ slot="neighborhood1"; file="neighborhood1.jpg"; alt="Hua Hin town centre with night market stalls and colonial railway station landmark" },
+        [pscustomobject]@{ slot="neighborhood2"; file="neighborhood2.jpg"; alt="Khao Takiab fishing village headland and temple with Gulf of Thailand views south of Hua Hin" },
+        [pscustomobject]@{ slot="activity";      file="activity.jpg";      alt="Horse riding on Hua Hin wide sandy beach at golden hour with palm trees" },
+        [pscustomobject]@{ slot="waterfall";     file="waterfall.jpg";     alt="Pa La-U Waterfall multi-tiered cascade in Kaeng Krachan National Park rainforest west of Hua Hin" },
+        [pscustomobject]@{ slot="railway";       file="railway.jpg";       alt="Hua Hin Railway Station iconic red and white Thai royal Victorian pavilion landmark architecture" },
+        [pscustomobject]@{ slot="localFood";     file="local-food.jpg";    alt="Grilled river prawns and fresh seafood at Dechanuchit night market Hua Hin" }
+    )
     "generic" = @(
         [pscustomobject]@{ slot="hero";          file="hero.jpg";          alt="Hero image - main destination shot" },
         [pscustomobject]@{ slot="whenToGo";      file="when-to-go.jpg";    alt="Seasonal image (festival, weather)" },
@@ -628,13 +667,258 @@ function Import-PresetsFromGuidePhoto {
 # stale hardcoded presets above. Silent on failure - hardcoded is the fallback.
 $global:AutoImportedPresetCount = Import-PresetsFromGuidePhoto -RepoRoot $PSScriptRoot
 
+# ===========================================================================
+# AUTO-PRESET FROM DRAFT - derive slots from the MDX/markdown draft body
+# ===========================================================================
+# Scans the current draft for <GuidePhoto slot="..." /> tags and pulls context
+# from the nearest heading above each tag. Combined with the destination name
+# and the hero alt from the metadata section, this produces a ready-to-register
+# preset without going through the wizard. Ship-ready alt texts every time.
+function Build-PresetFromDraft {
+    param(
+        [string]$DraftText,
+        [string]$Destination,
+        [string]$HeroAlt
+    )
+    if (-not $DraftText -or -not $Destination) { return @() }
+
+    $entries = @()
+    $seenSlots = @{}
+
+    # Normalise destination for alt-text prose (kebab -> spaced, title case)
+    $destDisplay = (Get-Culture).TextInfo.ToTitleCase($Destination.ToLower().Replace('-', ' '))
+
+    # Hero always first, taken from the metadata Hero alt when it's meaningful
+    $heroAltFinal = if ($HeroAlt -and $HeroAlt.Length -ge 25 -and -not (Test-IsPlaceholderAlt -Alt $HeroAlt)) {
+        $HeroAlt
+    } else {
+        "$destDisplay signature landmark and destination hero shot at golden hour"
+    }
+    $entries += [pscustomobject]@{ slot="hero"; file="hero.jpg"; alt=$heroAltFinal }
+    $seenSlots["hero"] = $true
+
+    $lines = $DraftText -split "`r?`n"
+    $currentH2 = ""
+    $currentH3 = ""
+
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        $line = $lines[$i]
+
+        if ($line -match '^##\s+([^#].+)$') {
+            $currentH2 = $matches[1].Trim()
+            $currentH3 = ""
+            continue
+        }
+        if ($line -match '^###\s+(.+)$') {
+            # Strip day-length prefixes for cleaner alt text
+            $currentH3 = $matches[1].Trim() -replace '^\s*(Full-day|Half-day|Multi-day|Morning|Afternoon|Evening|Night)\s*:\s*', ''
+            continue
+        }
+        if ($line -match '<GuidePhoto\s+slot="([^"]+)"\s*/?\s*>') {
+            $slot = $matches[1]
+            if ($seenSlots.ContainsKey($slot)) { continue }
+
+            # Pick the deepest heading in scope
+            $context = if ($currentH3) { $currentH3 } elseif ($currentH2) { $currentH2 } else { "" }
+            # Also grab the first non-blank paragraph line above the tag for extra detail
+            $prevLine = ""
+            for ($k = $i - 1; $k -ge [Math]::Max(0, $i - 6); $k--) {
+                $L = $lines[$k].Trim()
+                if ($L -and -not $L.StartsWith('#') -and -not $L.StartsWith('<') -and -not $L.StartsWith('-') -and -not $L.StartsWith('*')) {
+                    # Take up to first 60 chars of the paragraph, no markdown syntax
+                    $clean = $L -replace '\[([^\]]+)\]\([^\)]+\)', '$1' -replace '[*_`]', ''
+                    if ($clean.Length -gt 60) { $clean = $clean.Substring(0, 57).TrimEnd() + "..." }
+                    $prevLine = $clean
+                    break
+                }
+            }
+
+            # Compose alt: Destination + heading + brief prose context
+            $altParts = @($destDisplay)
+            if ($context) { $altParts += $context }
+            if ($prevLine -and $prevLine.Length -gt 20) { $altParts += $prevLine }
+            $alt = ($altParts -join " - ") -replace '\s+', ' '
+            $alt = $alt.Trim()
+
+            # Guarantee it passes the Layer 2 placeholder detector (>= 25 chars, no template)
+            if ($alt.Length -lt 25) {
+                $alt = "$destDisplay $slot signature destination scene photo landmark"
+            }
+            if (Test-IsPlaceholderAlt -Alt $alt) {
+                $alt = "$destDisplay $context signature destination photo scene"
+            }
+
+            $file = ([regex]::Replace($slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+            $entries += [pscustomobject]@{ slot=$slot; file=$file; alt=$alt }
+            $seenSlots[$slot] = $true
+        }
+    }
+
+    return $entries
+}
+
+# ===========================================================================
+# SMART DEFAULTS - anchor for wizard pre-population
+# ===========================================================================
+# Known destinations get real, ship-ready alt texts pre-loaded into the + New
+# Preset wizard so the user just reviews and saves - no REPLACE-ME editing.
+# Extend this table when planning new guides. Alt texts follow the ~60-char,
+# no-template-phrases rule so they pass the Layer 2 placeholder detector.
+$global:GuideAltSuggestions = @{
+    "kanchanaburi" = @(
+        @{ slot="hero";         alt="Bridge over the River Kwai historic WWII memorial railway crossing in Kanchanaburi at sunset" },
+        @{ slot="whenToGo";     alt="Cool-season Kanchanaburi jungle mist over River Kwai at dawn November to February dry weather" },
+        @{ slot="riverKwai";    alt="Kwai Yai River floating raft houses and longtail boats with limestone jungle backdrop Kanchanaburi" },
+        @{ slot="deathRailway"; alt="Bridge over the River Kwai historic black iron truss and Death Railway train tracks with bomb memorial sculptures Kanchanaburi" },
+        @{ slot="erawan";       alt="Erawan Falls seven-tier emerald turquoise cascade in Erawan National Park Kanchanaburi" },
+        @{ slot="hellfirePass"; alt="Hellfire Pass Memorial Museum cutting through rock walls Thailand Burma railway WWII" },
+        @{ slot="cemetery";     alt="Kanchanaburi War Cemetery rows of Allied POW gravestones and manicured lawns memorial" },
+        @{ slot="localFood";    alt="Grilled river fish yum pla duk foo and Thai curries served riverside on Kwai Yai Kanchanaburi" }
+    )
+    "koh-lanta" = @(
+        @{ slot="hero";          alt="Koh Lanta Long Beach Phra Ae sunset with longtail boats and palm silhouettes Andaman coast" },
+        @{ slot="whenToGo";      alt="Cool dry-season Koh Lanta with calm Andaman sea and blue skies November to April" },
+        @{ slot="neighborhood1"; alt="Long Beach Phra Ae strip with beach bars restaurants and mid-range resorts Koh Lanta" },
+        @{ slot="neighborhood2"; alt="Kantiang Bay southern Koh Lanta boutique cliffside resorts and quiet horseshoe cove" },
+        @{ slot="oldTown";       alt="Lanta Old Town wooden stilt shophouses and Sino-Portuguese Chinese fishing village heritage" },
+        @{ slot="activity";      alt="Snorkeling day trip to Koh Rok limestone islands and coral reefs from Koh Lanta" },
+        @{ slot="waterfall";     alt="Mu Ko Lanta National Park lighthouse cape jungle trails and viewpoint Koh Lanta" },
+        @{ slot="localFood";     alt="Southern Thai seafood curry and grilled squid at Old Town riverfront restaurants Koh Lanta" }
+    )
+    "koh-chang" = @(
+        @{ slot="hero";          alt="Koh Chang White Sand Beach Hat Sai Khao sunset with palm trees and Gulf of Thailand" },
+        @{ slot="whenToGo";      alt="Cool dry-season Koh Chang jungle interior with clear rivers November to April" },
+        @{ slot="neighborhood1"; alt="White Sand Beach Hat Sai Khao main tourist strip with beach bars and resorts Koh Chang" },
+        @{ slot="neighborhood2"; alt="Lonely Beach Bang Bao backpacker village and quieter south of Koh Chang" },
+        @{ slot="jungle";        alt="Klong Plu Waterfall multi-tier jungle cascade in Mu Koh Chang National Park" },
+        @{ slot="activity";      alt="Bang Bao stilt fishing village pier and snorkeling boats to Koh Wai Koh Chang" },
+        @{ slot="viewpoint";     alt="Kai Bae viewpoint Gulf of Thailand islands and elephant grass overlook Koh Chang" },
+        @{ slot="localFood";     alt="Fresh Trat-province seafood and Thai curries at Bang Bao pier restaurants Koh Chang" }
+    )
+    "hua-hin" = @(
+        @{ slot="hero";          alt="Hua Hin beachfront promenade with fishing pier and royal beach town skyline at sunset" },
+        @{ slot="whenToGo";      alt="Cool-season Hua Hin beach with calm Gulf of Thailand waves and blue skies November to February" },
+        @{ slot="neighborhood1"; alt="Hua Hin town centre with night market stalls and colonial railway station landmark" },
+        @{ slot="neighborhood2"; alt="Khao Takiab fishing village headland and temple with Gulf of Thailand views south of Hua Hin" },
+        @{ slot="activity";      alt="Horse riding on Hua Hin wide sandy beach at golden hour with palm trees" },
+        @{ slot="waterfall";     alt="Pa La-U Waterfall multi-tiered cascade in Kaeng Krachan National Park rainforest west of Hua Hin" },
+        @{ slot="railway";       alt="Hua Hin Railway Station iconic red and white Thai royal Victorian pavilion landmark architecture" },
+        @{ slot="localFood";     alt="Grilled river prawns and fresh seafood at Dechanuchit night market Hua Hin" }
+    )
+}
+
+# ===========================================================================
+# PLACEHOLDER DETECTION - anchor for anti-overwrite safety
+# ===========================================================================
+# Recognises the exact wizard-default alt texts AND generic template phrasings
+# ("Hero photo alt - ...", "First neighborhood", "Signature ...", "REPLACE-ME" etc.)
+# Any alt text matching these patterns is treated as "not real content" and blocked
+# from being written to GuidePhoto.tsx. Central to Layers 2 and 4 of the safety guard.
+$global:PlaceholderAltPatterns = @(
+    '^Hero photo alt',
+    '^Seasonal photo\b',
+    '^First neighborhood',
+    '^Second neighborhood',
+    '^Signature (activity|local food)',
+    '^REPLACE[- ]?ME',
+    '\bmain destination shot\b',
+    '\bfestival, weather, or key event\b',
+    '\bdescription$'
+)
+
+function Test-IsPlaceholderAlt {
+    param([string]$Alt)
+    if (-not $Alt) { return $true }
+    foreach ($pat in $global:PlaceholderAltPatterns) {
+        if ($Alt -match $pat) { return $true }
+    }
+    # Also: alt text under 20 chars is suspiciously short for real content
+    if ($Alt.Trim().Length -lt 20) { return $true }
+    return $false
+}
+
+function Test-EntriesHavePlaceholders {
+    param([array]$Entries)
+    $bad = @()
+    foreach ($e in $Entries) {
+        if (Test-IsPlaceholderAlt -Alt $e.alt) { $bad += $e.slot }
+    }
+    return $bad
+}
+
+# Reads GuidePhoto.tsx and returns @{ exists=$true/$false; hasRealContent=$true/$false }
+# for a given slug. Used to decide whether Append-GuideToTsx should refuse to overwrite.
+function Get-ExistingPresetStatus {
+    param([string]$RepoRoot, [string]$Slug)
+    $tsxPath = Join-Path $RepoRoot "components\GuidePhoto.tsx"
+    if (-not (Test-Path $tsxPath)) { return @{ exists = $false; hasRealContent = $false } }
+    $content = [System.IO.File]::ReadAllText($tsxPath)
+    # Find the slug's block: either  slug: {  or  "slug": {
+    $patterns = @("`"$Slug`"`:", "$Slug`:")
+    $blockStart = -1
+    foreach ($pat in $patterns) {
+        $idx = $content.IndexOf("  $pat")
+        if ($idx -ge 0) { $blockStart = $idx; break }
+    }
+    if ($blockStart -lt 0) { return @{ exists = $false; hasRealContent = $false } }
+    # Walk to matching close brace
+    $openIdx = $content.IndexOf('{', $blockStart)
+    if ($openIdx -lt 0) { return @{ exists = $true; hasRealContent = $false } }
+    $d = 1; $j = $openIdx + 1
+    while ($j -lt $content.Length -and $d -gt 0) {
+        if ($content[$j] -eq '{') { $d++ }
+        elseif ($content[$j] -eq '}') { $d-- }
+        $j++
+    }
+    if ($d -ne 0) { return @{ exists = $true; hasRealContent = $false } }
+    $blockBody = $content.Substring($openIdx + 1, $j - $openIdx - 2)
+    # Extract alt values and test them
+    $altMatches = [regex]::Matches($blockBody, 'alt:\s*"([^"]+)"')
+    if ($altMatches.Count -eq 0) { return @{ exists = $true; hasRealContent = $false } }
+    foreach ($m in $altMatches) {
+        if (-not (Test-IsPlaceholderAlt -Alt $m.Groups[1].Value)) {
+            return @{ exists = $true; hasRealContent = $true }
+        }
+    }
+    return @{ exists = $true; hasRealContent = $false }
+}
+
 # PERMANENT FIX: Append a new guide preset to components/GuidePhoto.tsx from
 # within the running app. Eliminates the "you have to ask Claude to add my new
 # guide" loop. The wizard button on Tab 3 calls this and Show-NewGuidePresetDialog.
+#
+# LAYER 4 SAFETY GUARD: Refuses to overwrite an existing preset that already has
+# real (non-placeholder) alt texts unless -Force is passed. Also refuses to write
+# placeholder alt texts at all. Two structural checks that make it impossible for
+# the wizard to silently clobber good data with wizard defaults - anchored in the
+# file-write function itself so no future caller can bypass them.
 function Append-GuideToTsx {
-    param([string]$RepoRoot, [string]$Slug, [array]$Entries)
+    param(
+        [string]$RepoRoot,
+        [string]$Slug,
+        [array]$Entries,
+        [switch]$Force   # explicit consent required to overwrite real content
+    )
     $tsxPath = Join-Path $RepoRoot "components\GuidePhoto.tsx"
     if (-not (Test-Path $tsxPath)) { return @{ ok = $false; error = "GuidePhoto.tsx not found" } }
+
+    # === Placeholder check on incoming entries ===
+    # If any alt text is a wizard-default placeholder or a suspiciously short string,
+    # refuse to write. This is the anchor: no caller, ever, can write placeholder alts.
+    $badSlots = Test-EntriesHavePlaceholders -Entries $Entries
+    if ($badSlots.Count -gt 0) {
+        return @{ ok = $false
+                  error = "Refused to write placeholder alt texts for slots: $($badSlots -join ', '). Fill in real descriptive alt texts for each slot before saving. The wizard defaults are intentionally invalid and must be replaced." }
+    }
+
+    # === Existing-preset overwrite check ===
+    # If the slug already has real content in GuidePhoto.tsx, refuse unless -Force.
+    # Blocks the recurring bug where re-clicking + New Preset clobbers good data.
+    $status = Get-ExistingPresetStatus -RepoRoot $RepoRoot -Slug $Slug
+    if ($status.exists -and $status.hasRealContent -and -not $Force) {
+        return @{ ok = $false
+                  error = "Preset '$Slug' already exists in GuidePhoto.tsx with real alt texts. Refusing to overwrite. Edit GuidePhoto.tsx directly if you need to update it, or pass -Force to overwrite explicitly." }
+    }
     try {
         $content = [System.IO.File]::ReadAllText($tsxPath)
 
@@ -692,11 +976,20 @@ function Append-GuideToTsx {
 }
 
 # Modal wizard: user types slot|alt pairs, saves to GuidePhoto.tsx + registers with app.
+#
+# LAYERS 1 + 3 SAFETY GUARD:
+#   Layer 1 - if the slug already exists in GuidePhoto.tsx AND has real alt texts,
+#             the dialog title turns red and the button reads "OVERWRITE existing preset"
+#             so the user knows they're editing an existing entry, not creating fresh.
+#   Layer 3 - when editing an existing preset, the current real alt texts are
+#             pre-loaded into the pairs box so the user isn't tempted to just click OK
+#             on the wizard's own placeholder defaults.
+#   Defaults are now REPLACE-ME markers that the Layer 2 placeholder detector rejects.
 function Show-NewGuidePresetDialog {
     param([string]$DefaultSlug)
     $dlg = New-Object System.Windows.Forms.Form
     $dlg.Text = "+ New Guide Preset"
-    $dlg.Size = New-Object System.Drawing.Size(720, 620)
+    $dlg.Size = New-Object System.Drawing.Size(720, 640)
     $dlg.StartPosition = "CenterParent"
     $dlg.FormBorderStyle = "FixedDialog"
     $dlg.MinimizeBox = $false
@@ -714,25 +1007,64 @@ function Show-NewGuidePresetDialog {
     $tSlug.Text = ($DefaultSlug -replace '\s+', '-').ToLower()
     $dlg.Controls.Add($tSlug)
 
+    $lblWarn = New-Object System.Windows.Forms.Label
+    $lblWarn.Location = New-Object System.Drawing.Point(15, 62)
+    $lblWarn.Size = New-Object System.Drawing.Size(670, 18)
+    $lblWarn.Text = ""
+    $lblWarn.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+    $dlg.Controls.Add($lblWarn)
+
     $lblHint = New-Object System.Windows.Forms.Label
-    $lblHint.Text = "Enter one slot per line as 'slotName | alt text'. Filename auto-derives (camelCase to kebab-case + .jpg). hero + whenToGo come first."
-    $lblHint.Location = New-Object System.Drawing.Point(15, 70)
-    $lblHint.Size = New-Object System.Drawing.Size(670, 36)
+    $lblHint.Text = "Enter one slot per line as 'slotName | alt text'. Filename auto-derives (camelCase to kebab-case + .jpg). REPLACE-ME defaults will be rejected on save - fill in real descriptions."
+    $lblHint.Location = New-Object System.Drawing.Point(15, 84)
+    $lblHint.Size = New-Object System.Drawing.Size(670, 40)
     $dlg.Controls.Add($lblHint)
 
     $tPairs = New-Object System.Windows.Forms.TextBox
-    $tPairs.Location = New-Object System.Drawing.Point(15, 110)
-    $tPairs.Size = New-Object System.Drawing.Size(670, 380)
+    $tPairs.Location = New-Object System.Drawing.Point(15, 128)
+    $tPairs.Size = New-Object System.Drawing.Size(670, 370)
     $tPairs.Multiline = $true
     $tPairs.ScrollBars = "Vertical"
     $tPairs.Font = New-Object System.Drawing.Font("Consolas", 9)
-    $tPairs.Text = "hero | Hero photo alt - main destination shot`r`nwhenToGo | Seasonal photo - festival, weather, or key event`r`nneighborhood1 | First neighborhood description`r`nneighborhood2 | Second neighborhood description`r`nactivity | Signature activity photo`r`nlocalFood | Signature local food dish"
+    # Defaults use REPLACE-ME markers so the Layer 2 detector rejects unedited defaults.
+    # The user MUST replace these before save can succeed.
+    # BASELINE POLICY: 8 slots minimum per guide (hero, whenToGo, 2 neighborhoods,
+    # activity, landmark, waterfall/nature, localFood). Remove or rename slots
+    # you don't need before saving - just don't drop below 8 for a proper guide.
+    $tPairs.Text = "hero | REPLACE-ME with a specific description of the main destination shot`r`nwhenToGo | REPLACE-ME with a specific description of the seasonal/festival photo`r`nneighborhood1 | REPLACE-ME with a specific description of the first neighborhood`r`nneighborhood2 | REPLACE-ME with a specific description of the second neighborhood`r`nactivity | REPLACE-ME with a specific description of the signature activity`r`nlandmark | REPLACE-ME with a specific description of an iconic landmark or temple`r`nwaterfall | REPLACE-ME with a specific description of a nature or waterfall photo`r`nlocalFood | REPLACE-ME with a specific description of the local food dish"
     $dlg.Controls.Add($tPairs)
+
+    # LAYER 1: Detect existing preset. On slug change, re-check and update warning + button label.
+    $updateExistingWarning = {
+        $slug = ($tSlug.Text.Trim() -replace '\s+', '-').ToLower()
+        if (-not $slug) {
+            $lblWarn.Text = ""; $lblWarn.ForeColor = [System.Drawing.Color]::Black
+            $btnOK.Text = "Save + Register"
+            $btnOK.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+            return
+        }
+        $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
+        if ($status.exists -and $status.hasRealContent) {
+            $lblWarn.Text = "WARNING: '$slug' already exists in GuidePhoto.tsx with real content. Saving will REQUIRE overwrite confirmation. Edit the file directly if you're just tweaking one alt text."
+            $lblWarn.ForeColor = [System.Drawing.Color]::Firebrick
+            $btnOK.Text = "OVERWRITE existing preset"
+            $btnOK.BackColor = [System.Drawing.Color]::FromArgb(180, 60, 60)
+        } elseif ($status.exists) {
+            $lblWarn.Text = "Note: '$slug' exists in GuidePhoto.tsx but only has placeholder alt texts. Save will replace them."
+            $lblWarn.ForeColor = [System.Drawing.Color]::DarkOrange
+            $btnOK.Text = "Save + Register"
+            $btnOK.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+        } else {
+            $lblWarn.Text = ""
+            $btnOK.Text = "Save + Register"
+            $btnOK.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+        }
+    }.GetNewClosure()
 
     $btnOK = New-Object System.Windows.Forms.Button
     $btnOK.Text = "Save + Register"
-    $btnOK.Location = New-Object System.Drawing.Point(430, 510)
-    $btnOK.Size = New-Object System.Drawing.Size(150, 32)
+    $btnOK.Location = New-Object System.Drawing.Point(430, 530)
+    $btnOK.Size = New-Object System.Drawing.Size(170, 32)
     $btnOK.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
     $btnOK.ForeColor = [System.Drawing.Color]::White
     $btnOK.FlatStyle = "Flat"
@@ -742,26 +1074,111 @@ function Show-NewGuidePresetDialog {
 
     $btnCancel = New-Object System.Windows.Forms.Button
     $btnCancel.Text = "Cancel"
-    $btnCancel.Location = New-Object System.Drawing.Point(590, 510)
-    $btnCancel.Size = New-Object System.Drawing.Size(95, 32)
+    $btnCancel.Location = New-Object System.Drawing.Point(610, 530)
+    $btnCancel.Size = New-Object System.Drawing.Size(80, 32)
     $btnCancel.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
     $dlg.CancelButton = $btnCancel
     $dlg.Controls.Add($btnCancel)
 
-    if ($dlg.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
-    $slug = ($tSlug.Text.Trim() -replace '\s+', '-').ToLower()
-    if (-not $slug) { return $null }
-    $entries = @()
-    foreach ($line in ($tPairs.Text -split "`r?`n")) {
-        if (-not $line -or -not $line.Contains('|')) { continue }
-        $parts = $line.Split('|', 2)
-        $slot = $parts[0].Trim(); $alt = $parts[1].Trim()
-        if (-not $slot -or -not $alt) { continue }
-        $file = ([regex]::Replace($slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
-        $entries += [pscustomobject]@{ slot = $slot; file = $file; alt = $alt }
+    # LAYER 3 + SMART DEFAULTS pre-load, priority order:
+    #   1. If slug already has real content in GuidePhoto.tsx -> load current values (edit mode)
+    #   2. Else if slug is in $global:GuideAltSuggestions -> load ship-ready smart defaults
+    #   3. Else if the draft has <GuidePhoto> tags -> auto-derive from draft context
+    #   4. Else -> keep the REPLACE-ME markers (which Layer 2 will reject on save)
+    $applySmartDefaults = {
+        param($slug)
+        if (-not $slug) { return }
+        $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
+        if ($status.exists -and $status.hasRealContent -and $global:PhotoSlotPresets.Contains($slug)) {
+            # Priority 1: existing real content
+            $lines = @()
+            foreach ($e in $global:PhotoSlotPresets[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
+            $tPairs.Text = ($lines -join "`r`n")
+        } elseif ($global:GuideAltSuggestions.ContainsKey($slug)) {
+            # Priority 2: smart defaults for known destinations
+            $lines = @()
+            foreach ($e in $global:GuideAltSuggestions[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
+            $tPairs.Text = ($lines -join "`r`n")
+        } else {
+            # Priority 3: auto-derive from draft body + destination
+            $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+            $destination = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
+            $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
+            if ($draftText -and $destination) {
+                $entries = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
+                if ($entries.Count -ge 2) {
+                    $lines = @()
+                    foreach ($e in $entries) { $lines += "$($e.slot) | $($e.alt)" }
+                    $tPairs.Text = ($lines -join "`r`n")
+                }
+            }
+        }
+    }.GetNewClosure()
+
+    # Wire live warning updates + smart-defaults re-population on slug change + initial render
+    $tSlug.Add_TextChanged({
+        & $updateExistingWarning
+        & $applySmartDefaults ($tSlug.Text.Trim().ToLower())
+    }.GetNewClosure())
+    & $applySmartDefaults ($tSlug.Text.Trim().ToLower())
+    & $updateExistingWarning
+
+    # === Modal loop with anchored placeholder + overwrite checks ===
+    # Loops instead of returning immediately so the dialog stays open on validation
+    # failure - user sees the error, fixes it, hits Save again.
+    while ($true) {
+        if ($dlg.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
+        $slug = ($tSlug.Text.Trim() -replace '\s+', '-').ToLower()
+        if (-not $slug) {
+            [System.Windows.Forms.MessageBox]::Show("Slug is required.", "Missing slug", 'OK', 'Warning') | Out-Null
+            continue
+        }
+        $entries = @()
+        foreach ($line in ($tPairs.Text -split "`r?`n")) {
+            if (-not $line -or -not $line.Contains('|')) { continue }
+            $parts = $line.Split('|', 2)
+            $slot = $parts[0].Trim(); $alt = $parts[1].Trim()
+            if (-not $slot -or -not $alt) { continue }
+            $file = ([regex]::Replace($slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+            $entries += [pscustomobject]@{ slot = $slot; file = $file; alt = $alt }
+        }
+        if ($entries.Count -eq 0) {
+            [System.Windows.Forms.MessageBox]::Show("At least one slot|alt line is required.", "No entries", 'OK', 'Warning') | Out-Null
+            continue
+        }
+
+        # BASELINE POLICY: enforce 8-slot minimum for new guides. Existing presets
+        # can stay at their current slot count when re-editing, but a fresh guide
+        # must ship with at least 8 photo slots for parity across the site.
+        $isExisting = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
+        if (-not $isExisting.hasRealContent -and $entries.Count -lt 8) {
+            $ans = [System.Windows.Forms.MessageBox]::Show(
+                "Only $($entries.Count) slots defined - baseline policy is at least 8 photo slots per guide for parity with existing destinations.`n`nContinue with $($entries.Count) slots anyway?",
+                "Below 8-slot baseline", 'YesNo', 'Warning')
+            if ($ans -ne [System.Windows.Forms.DialogResult]::Yes) { continue }
+        }
+
+        # LAYER 2: reject placeholder alt texts before returning to caller.
+        $bad = Test-EntriesHavePlaceholders -Entries $entries
+        if ($bad.Count -gt 0) {
+            [System.Windows.Forms.MessageBox]::Show(
+                "These slots still have placeholder / REPLACE-ME / too-short alt texts:`n`n  $($bad -join "`n  ")`n`nWrite a real descriptive alt text (20+ characters, no template phrases) for each before saving.",
+                "Placeholder alt text detected", 'OK', 'Warning') | Out-Null
+            continue
+        }
+
+        # LAYER 1: if overwriting existing real content, require explicit YES confirmation.
+        $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
+        $overwrite = $false
+        if ($status.exists -and $status.hasRealContent) {
+            $ans = [System.Windows.Forms.MessageBox]::Show(
+                "'$slug' already exists in GuidePhoto.tsx with real alt texts.`n`nOverwrite them?`n`n(Cancel goes back to the wizard so you can adjust the slug or edit GuidePhoto.tsx directly instead.)",
+                "Overwrite existing preset?", 'YesNo', 'Warning')
+            if ($ans -ne [System.Windows.Forms.DialogResult]::Yes) { continue }
+            $overwrite = $true
+        }
+        return @{ slug = $slug; entries = $entries; overwrite = $overwrite }
     }
-    if ($entries.Count -eq 0) { return $null }
-    return @{ slug = $slug; entries = $entries }
 }
 
 # Active preset - defaults to current slug if there's a match, else "generic"
@@ -1079,18 +1496,51 @@ $txtHeaderSlug.Add_TextChanged({
     $global:CurrentSlug = $raw
     if ($global:CurrentSlug) { $global:Meta.slug = $global:CurrentSlug }
 
-    # Auto-switch photo preset when slug matches a known preset key.
-    # CRITICAL: fall back to "generic" when the slug is unknown - otherwise the
-    # dropdown silently sticks to the previous preset and the user thinks they're
-    # configuring the current guide when they're actually seeing the old one's slots.
-    if ($global:cmbPreset -and $raw) {
-        $target = if ($global:PhotoSlotPresets.Contains($raw)) { $raw } else { "generic" }
-        if ($global:cmbPreset.SelectedItem -ne $target) {
-            $global:cmbPreset.SelectedItem = $target
+    # Auto-switch photo preset when slug matches a KNOWN preset key.
+    # Only switch when the typed slug is a complete valid preset - otherwise the
+    # dropdown would flicker to "generic" on every keystroke while typing (e.g.
+    # 'h' -> generic, 'hu' -> generic, 'hua' -> generic, 'hua-hin' -> hua-hin),
+    # resetting the slot rows each time and losing anything the user was setting up.
+    # If the field is CLEARED entirely, only then fall back to "generic".
+    if ($global:cmbPreset) {
+        if (-not $raw) {
+            if ($global:cmbPreset.SelectedItem -ne "generic") {
+                $global:cmbPreset.SelectedItem = "generic"
+            }
+        } elseif ($global:PhotoSlotPresets.Contains($raw)) {
+            if ($global:cmbPreset.SelectedItem -ne $raw) {
+                $global:cmbPreset.SelectedItem = $raw
+            }
+        }
+        # else: partial/unknown slug - keep the current preset, user is still typing
+    }
+
+    # STALE-PRESET WARNING: if the typed slug isn't a known preset but IS a plausible
+    # complete slug (>=3 chars, kebab-case), flag it visually so the user knows the
+    # sidebar rows and Hero alt still belong to the OLD guide, not what they typed.
+    # Prevents the "why is Chiang Mai data showing for Kanchanaburi?" confusion.
+    if ($global:lblSlugWarn) {
+        if ($raw -and $raw.Length -ge 3 -and -not $global:PhotoSlotPresets.Contains($raw)) {
+            $global:lblSlugWarn.Text = "No preset for '$raw' yet - sidebar shows stale data. Click + New Preset to create it."
+            $global:lblSlugWarn.ForeColor = [System.Drawing.Color]::Firebrick
+            $global:lblSlugWarn.Visible = $true
+        } else {
+            $global:lblSlugWarn.Visible = $false
         }
     }
 }.GetNewClosure())
 $header.Controls.Add($txtHeaderSlug)
+
+# STALE-PRESET WARNING label - lit up in red when the Guide field holds a slug
+# that has no matching preset yet, so the user knows the sidebar data is stale.
+$global:lblSlugWarn = New-Object System.Windows.Forms.Label
+$global:lblSlugWarn.Location = New-Object System.Drawing.Point(8, 30)
+$global:lblSlugWarn.Size = New-Object System.Drawing.Size(600, 14)
+$global:lblSlugWarn.Font = New-Object System.Drawing.Font("Segoe UI", 7.5, [System.Drawing.FontStyle]::Bold)
+$global:lblSlugWarn.ForeColor = [System.Drawing.Color]::Firebrick
+$global:lblSlugWarn.Text = ""
+$global:lblSlugWarn.Visible = $false
+$header.Controls.Add($global:lblSlugWarn)
 
 # API toggle checkbox - lets user switch between "auto" (call Claude API directly)
 # and "manual" (copy prompts to Claude Cowork / Perplexity / Gemini, paste back).
@@ -1601,10 +2051,17 @@ $btnNewGuide.ForeColor = [System.Drawing.Color]::White
 $btnNewGuide.Add_Click({
     $res = Show-NewGuidePresetDialog -DefaultSlug $global:CurrentSlug
     if (-not $res) { return }
-    $writeRes = Append-GuideToTsx -RepoRoot $PSScriptRoot -Slug $res.slug -Entries $res.entries
+    # Pass -Force ONLY when the wizard's Layer 1 dialog got explicit user consent to overwrite.
+    # Without that flag, Layer 4 in Append-GuideToTsx will refuse to overwrite real content.
+    $writeRes = if ($res.overwrite) {
+        Append-GuideToTsx -RepoRoot $PSScriptRoot -Slug $res.slug -Entries $res.entries -Force
+    } else {
+        Append-GuideToTsx -RepoRoot $PSScriptRoot -Slug $res.slug -Entries $res.entries
+    }
     if (-not $writeRes.ok) {
         $global:lblPublishStatus.Text = "FAIL to write GuidePhoto.tsx: $($writeRes.error)"
         $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        [System.Windows.Forms.MessageBox]::Show($writeRes.error, "Safety guard blocked write", 'OK', 'Warning') | Out-Null
         return
     }
     $global:PhotoSlotPresets[$res.slug] = $res.entries
@@ -1623,9 +2080,81 @@ $btnNewGuide.Add_Click({
 }.GetNewClosure())
 $global:panelPublish.Controls.Add($btnNewGuide)
 
+# ONE-CLICK AUTO PRESET: build preset from draft body + destination + hero alt,
+# write to GuidePhoto.tsx, register in memory, refresh sidebar - no wizard.
+# Uses Build-PresetFromDraft to parse <GuidePhoto> tags and their heading context.
+$btnAutoPreset = New-Object System.Windows.Forms.Button
+$btnAutoPreset.Text = "Auto Preset"
+$btnAutoPreset.Location = New-Object System.Drawing.Point(726, 6)
+$btnAutoPreset.Size = New-Object System.Drawing.Size(90, 24)
+$btnAutoPreset.FlatStyle = "Flat"
+$btnAutoPreset.BackColor = [System.Drawing.Color]::FromArgb(180, 130, 40)
+$btnAutoPreset.ForeColor = [System.Drawing.Color]::White
+$btnAutoPreset.Add_Click({
+    $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+    $destination = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
+    $slug = $global:CurrentSlug
+    $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
+
+    if (-not $slug) {
+        [System.Windows.Forms.MessageBox]::Show("Set the Guide slug first (top-left field on Tab 3).", "Missing slug", 'OK', 'Warning') | Out-Null
+        return
+    }
+    if (-not $destination) {
+        [System.Windows.Forms.MessageBox]::Show("Set the Destination on Tab 1 first.", "Missing destination", 'OK', 'Warning') | Out-Null
+        return
+    }
+    if (-not $draftText) {
+        [System.Windows.Forms.MessageBox]::Show("No draft body found on Tab 2. Auto Preset derives slots from <GuidePhoto> tags in your draft.", "Missing draft", 'OK', 'Warning') | Out-Null
+        return
+    }
+
+    $entries = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
+    if ($entries.Count -lt 2) {
+        [System.Windows.Forms.MessageBox]::Show("Draft has no <GuidePhoto slot=`"...`" /> tags. Add them to your draft body first, or use + New Preset.", "No slots found", 'OK', 'Warning') | Out-Null
+        return
+    }
+
+    # Check overwrite consent (Layer 4 will refuse otherwise)
+    $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
+    $useForce = $false
+    if ($status.exists -and $status.hasRealContent) {
+        $ans = [System.Windows.Forms.MessageBox]::Show(
+            "'$slug' already exists in GuidePhoto.tsx with real content.`n`nOverwrite with $($entries.Count) auto-derived slots from the draft?",
+            "Overwrite existing preset?", 'YesNo', 'Warning')
+        if ($ans -ne [System.Windows.Forms.DialogResult]::Yes) { return }
+        $useForce = $true
+    }
+
+    $writeRes = if ($useForce) {
+        Append-GuideToTsx -RepoRoot $PSScriptRoot -Slug $slug -Entries $entries -Force
+    } else {
+        Append-GuideToTsx -RepoRoot $PSScriptRoot -Slug $slug -Entries $entries
+    }
+    if (-not $writeRes.ok) {
+        $global:lblPublishStatus.Text = "Auto Preset failed: $($writeRes.error)"
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        [System.Windows.Forms.MessageBox]::Show($writeRes.error, "Safety guard blocked write", 'OK', 'Warning') | Out-Null
+        return
+    }
+
+    # Register + sync everything (mirrors + New Preset success path)
+    $global:PhotoSlotPresets[$slug] = $entries
+    $global:cmbPreset.Items.Clear()
+    foreach ($k in $global:PhotoSlotPresets.Keys) { [void]$global:cmbPreset.Items.Add($k) }
+    $global:cmbPreset.SelectedItem = $slug
+    $global:PhotoSlots = $entries
+    Sync-PhotoSlotRows
+    AutoFill-Metadata -Force
+
+    $global:lblPublishStatus.Text = "Auto Preset registered '$slug' with $($entries.Count) slots derived from draft. Written to GuidePhoto.tsx."
+    $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+}.GetNewClosure())
+$global:panelPublish.Controls.Add($btnAutoPreset)
+
 $btnRefresh = New-Object System.Windows.Forms.Button
 $btnRefresh.Text = "Refresh"
-$btnRefresh.Location = New-Object System.Drawing.Point(726, 6); $btnRefresh.Size = New-Object System.Drawing.Size(75, 24)
+$btnRefresh.Location = New-Object System.Drawing.Point(820, 6); $btnRefresh.Size = New-Object System.Drawing.Size(75, 24)
 $btnRefresh.FlatStyle = "Flat"
 $btnRefresh.BackColor = [System.Drawing.Color]::FromArgb(90, 155, 175)
 $btnRefresh.ForeColor = [System.Drawing.Color]::White
@@ -1657,7 +2186,7 @@ $global:panelPublish.Controls.Add($btnRefresh)
 
 $lblAutoFillHint = New-Object System.Windows.Forms.Label
 $lblAutoFillHint.Text = "(auto-runs on Tab 3 switch if fields are empty)"
-$lblAutoFillHint.Location = New-Object System.Drawing.Point(708, 10); $lblAutoFillHint.Size = New-Object System.Drawing.Size(230, 18)
+$lblAutoFillHint.Location = New-Object System.Drawing.Point(10, 36); $lblAutoFillHint.Size = New-Object System.Drawing.Size(400, 14)
 $lblAutoFillHint.ForeColor = [System.Drawing.Color]::DimGray
 $global:panelPublish.Controls.Add($lblAutoFillHint)
 
@@ -1727,17 +2256,44 @@ function Sync-PhotoSlotRows {
     $global:PhotoLabels.Clear()
     $global:PhotoAlts.Clear()
 
+    # Single tooltip controller for all rows - reused across renders
+    if (-not $global:PhotoRowTooltip) {
+        $global:PhotoRowTooltip = New-Object System.Windows.Forms.ToolTip
+        $global:PhotoRowTooltip.AutoPopDelay = 15000
+        $global:PhotoRowTooltip.InitialDelay = 400
+        $global:PhotoRowTooltip.ReshowDelay = 200
+        $global:PhotoRowTooltip.ShowAlways = $true
+    }
+
     for ($i = 0; $i -lt $global:PhotoSlots.Count; $i++) {
         $slot = $global:PhotoSlots[$i]
-        $y = $photoTop + ($i * 30)
+        $y = $photoTop + ($i * 38)   # was 30 - extra 8px per row for the alt preview line
+
+        # Truncate alt text for inline preview - keeps rows readable at a glance
+        # while the full alt shows in the tooltip on hover.
+        $altPreview = $slot.alt
+        if ($altPreview.Length -gt 40) { $altPreview = $altPreview.Substring(0, 37).TrimEnd() + "..." }
 
         $lblSlot = New-Object System.Windows.Forms.Label
         $lblSlot.Text = "$($slot.slot) ($($slot.file))"
         $lblSlot.Location = New-Object System.Drawing.Point(10, ($y + 2))
-        $lblSlot.Size = New-Object System.Drawing.Size(160, 18)
+        $lblSlot.Size = New-Object System.Drawing.Size(150, 18)
+        $lblSlot.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
         $lblSlot.Tag = "photorow:$($slot.slot)"
         $global:panelPublish.Controls.Add($lblSlot)
         $global:PhotoLabels[$slot.slot] = $lblSlot
+        $global:PhotoRowTooltip.SetToolTip($lblSlot, "Search query for this slot:`n`n$($slot.alt)")
+
+        # Alt-text preview label - shows a truncated version of what Search will use
+        $lblAltPreview = New-Object System.Windows.Forms.Label
+        $lblAltPreview.Text = $altPreview
+        $lblAltPreview.Location = New-Object System.Drawing.Point(10, ($y + 18))
+        $lblAltPreview.Size = New-Object System.Drawing.Size(160, 14)
+        $lblAltPreview.Font = New-Object System.Drawing.Font("Segoe UI", 7.5, [System.Drawing.FontStyle]::Italic)
+        $lblAltPreview.ForeColor = [System.Drawing.Color]::FromArgb(110, 130, 145)
+        $lblAltPreview.Tag = "photorow:$($slot.slot)"
+        $global:panelPublish.Controls.Add($lblAltPreview)
+        $global:PhotoRowTooltip.SetToolTip($lblAltPreview, "Full alt text (used as Search query):`n`n$($slot.alt)")
 
         $txtPath = New-Object System.Windows.Forms.TextBox
         $txtPath.Location = New-Object System.Drawing.Point(170, $y)
@@ -1761,6 +2317,7 @@ function Sync-PhotoSlotRows {
             $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
         }.GetNewClosure())
         $global:panelPublish.Controls.Add($btnSearch)
+        $global:PhotoRowTooltip.SetToolTip($btnSearch, "Search $($global:cmbPhotoSource.SelectedItem) for:`n`n$($slot.alt)")
 
         $btnPick = New-Object System.Windows.Forms.Button
         $btnPick.Text = "Pick..."
@@ -1794,12 +2351,20 @@ function Sync-PhotoSlotRows {
     }
 }
 
-# Wire preset change: swap the slot table and re-render rows
+# Wire preset change: swap the slot table, re-render rows, refresh metadata.
+# Re-running AutoFill-Metadata here (only for real presets, not "generic") means
+# the Hero alt / Title / Destination fields update to match the new preset instead
+# of showing stale data from the previous guide.
 $global:cmbPreset.Add_SelectedIndexChanged({
     $picked = $global:cmbPreset.SelectedItem
     if ($global:PhotoSlotPresets.Contains($picked)) {
         $global:PhotoSlots = $global:PhotoSlotPresets[$picked]
         Sync-PhotoSlotRows
+        # Refresh metadata whenever a real preset is loaded so Hero alt etc. sync.
+        # Skip for "generic" - that's a fallback, not a real destination.
+        if ($picked -ne "generic") {
+            AutoFill-Metadata -Force
+        }
         $global:lblPublishStatus.Text = "Loaded preset: $picked ($($global:PhotoSlots.Count) slots)"
         $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
     }
@@ -1809,7 +2374,7 @@ $global:cmbPreset.Add_SelectedIndexChanged({
 Sync-PhotoSlotRows
 
 # --- Action buttons at bottom ---
-$actionY = $photoTop + ($global:PhotoSlots.Count * 30) + 20
+$actionY = $photoTop + ($global:PhotoSlots.Count * 38) + 20   # per-row height matches Sync-PhotoSlotRows
 
 $btnCopyPhotos = New-Object System.Windows.Forms.Button
 $btnCopyPhotos.Text = "Copy Photos -> public/guides/<slug>/"
