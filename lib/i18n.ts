@@ -25,8 +25,11 @@ export const dictionary = {
     header_search_aria: "Search destinations",
 
     // Hero
+    // Honest positioning: we're locally-written Asia guides + Booking.com booking convenience,
+    // NOT a metasearch. "Compare thousands" wording was misleading after stripping the strip
+    // down to Booking.com only. Now the subtitle matches what the site actually delivers.
     hero_title: "Find your next stay",
-    hero_subtitle: "Compare thousands of hotels worldwide and book the perfect room.",
+    hero_subtitle: "Locally-written Asia travel guides. Book worldwide with Booking.com.",
 
     // Deals section
     deals_eyebrow: "Curated for wanderers",
@@ -146,7 +149,7 @@ export const dictionary = {
 
     // Hero
     hero_title: "ค้นหาที่พักครั้งต่อไป",
-    hero_subtitle: "เปรียบเทียบโรงแรมนับพันทั่วโลก และจองห้องพักที่ใช่สำหรับคุณ",
+    hero_subtitle: "คู่มือเที่ยวเอเชียโดยคนในพื้นที่ จองที่พักทั่วโลกผ่าน Booking.com",
 
     // Deals section
     deals_eyebrow: "คัดสรรสำหรับนักเดินทาง",
@@ -266,7 +269,7 @@ export const dictionary = {
 
     // Hero
     hero_title: "发现您的下一个住宿",
-    hero_subtitle: "比较全球数千家酒店,预订完美房间。",
+    hero_subtitle: "本地人撰写的亚洲旅行指南 · 通过 Booking.com 预订全球住宿。",
 
     // Deals section
     deals_eyebrow: "为漫游者精选",
