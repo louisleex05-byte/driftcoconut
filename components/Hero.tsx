@@ -83,9 +83,9 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Photo credit — sits inside hero, subtle bottom-right */}
+      {/* Destination caption — bottom-right, no photographer/source credit */}
       <div className="absolute bottom-2 right-3 text-[10px] sm:text-xs text-white/80 transition-opacity duration-500 z-10 drop-shadow">
-        {current.caption} · {current.credit}
+        {current.caption}
       </div>
     </section>
   );

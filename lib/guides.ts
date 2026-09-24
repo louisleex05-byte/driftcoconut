@@ -71,10 +71,21 @@ export async function listGuides(locale: GuideLocale = "en"): Promise<GuideSumma
     .filter((f) => f.endsWith(".mdx") && !f.match(/\.(zh|th)\.mdx$/))
     .map((f) => f.replace(/\.mdx$/, ""));
   const guides = await Promise.all(slugs.map((s) => readGuideFile(s, locale)));
+
+  // Sort priority for the guides index:
+  //   1. Guides that HAVE a Chinese translation come first (promoted to first row)
+  //      so users see the fully-translated content immediately after landing.
+  //   2. Within each group, sort by publishDate DESC (newest first) as before.
+  // This applies to BOTH /guides and /zh/guides.
   return guides
     .filter((g): g is GuideFull => g !== null)
-    .map(({ content: _content, hasLocale: _h, ...summary }) => summary)
-    .sort((a, b) => (b.publishDate ?? "").localeCompare(a.publishDate ?? ""));
+    .sort((a, b) => {
+      const aHasZh = a.hasLocale?.includes("zh") ? 1 : 0;
+      const bHasZh = b.hasLocale?.includes("zh") ? 1 : 0;
+      if (aHasZh !== bHasZh) return bHasZh - aHasZh;  // translated guides win
+      return (b.publishDate ?? "").localeCompare(a.publishDate ?? "");
+    })
+    .map(({ content: _content, hasLocale: _h, ...summary }) => summary);
 }
 
 export async function getGuideSlugs(): Promise<string[]> {
