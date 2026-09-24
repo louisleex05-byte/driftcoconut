@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/contexts/LanguageProvider";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CueLinksScript from "@/components/CueLinksScript";
 import "./globals.css";
 
 // Travelpayouts Drive script — loaded via env var so it's easy to toggle.
@@ -71,6 +72,7 @@ export default function RootLayout({
         />
 
         <GoogleAnalytics />
+        <CueLinksScript />
       </body>
     </html>
   );

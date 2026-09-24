@@ -1,8 +1,11 @@
 import { bookingCJSearch } from "@/lib/booking";
+import { makeMyTripCJ, goibiboCJ } from "@/lib/cuelinks";
 import { AFFILIATE_LINKS } from "@/lib/affiliateLinks";
 
 type AffiliateType =
   | "booking"
+  | "makemytrip"
+  | "goibibo"
   | "klook"
   | "welcomePickups"
   | "airalo"
@@ -46,6 +49,15 @@ function resolveHref(type: AffiliateType, query?: string): string | null {
     case "booking":
       if (!query) return null;
       return bookingCJSearch(query);
+    case "makemytrip":
+      // India-audience hotel affiliate via CueLinks (CID 323072).
+      // Query = city name, e.g. "Bangkok" / "Chiang Mai" / "Koh Samui".
+      if (!query) return null;
+      return makeMyTripCJ(query);
+    case "goibibo":
+      // India's #2 booking site (MMT-owned). Same CueLinks tracker.
+      if (!query) return null;
+      return goibiboCJ(query);
     case "klook":
       return AFFILIATE_LINKS.klook;
     case "welcomePickups":
