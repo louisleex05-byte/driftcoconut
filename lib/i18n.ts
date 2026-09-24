@@ -135,7 +135,7 @@ export const dictionary = {
     // Lists ONLY active affiliate relationships. Do not add programs before approval;
     // the earlier version listed Expedia and Tripadvisor which we never signed with.
     footer_ftc_disclosure:
-      "driftcoconut participates in affiliate programs with Booking.com, Klook, Airalo, and Welcome Pickups. We may earn a commission when you book through our links, at no cost to you.",
+      "driftcoconut participates in affiliate programs with Booking.com, MakeMyTrip, Goibibo, Klook, Airalo, and Welcome Pickups. We may earn a commission when you book through our links, at no cost to you.",
 
     // Language toggle
     lang_toggle_aria: "Switch language",
@@ -255,7 +255,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut เข้าร่วมโปรแกรม Affiliate กับ Booking.com, Klook, Airalo และ Welcome Pickups เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
+      "driftcoconut เข้าร่วมโปรแกรม Affiliate กับ Booking.com, MakeMyTrip, Goibibo, Klook, Airalo และ Welcome Pickups เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
 
     // Language toggle
     lang_toggle_aria: "เปลี่ยนภาษา",
@@ -375,7 +375,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut 参与与 Booking.com、Klook、Airalo 和 Welcome Pickups 的关联营销项目。您通过我们的链接预订时,我们可能获得佣金,您无需支付额外费用。",
+      "driftcoconut 参与与 Booking.com、MakeMyTrip、Goibibo、Klook、Airalo 和 Welcome Pickups 的关联营销项目。您通过我们的链接预订时,我们可能获得佣金,您无需支付额外费用。",
 
     // Language toggle
     lang_toggle_aria: "切换语言",

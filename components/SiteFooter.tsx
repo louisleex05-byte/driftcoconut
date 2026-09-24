@@ -52,8 +52,8 @@ export default function SiteFooter() {
           */}
           <ul className="space-y-1.5 text-slate-500 text-xs">
             <li>Booking.com</li>
-            <li>Klook</li>
-            <li>Airalo</li>
+            <li>MakeMyTrip · Goibibo</li>
+            <li>Klook · Airalo</li>
             <li>Welcome Pickups</li>
           </ul>
         </div>
