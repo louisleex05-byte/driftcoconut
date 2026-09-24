@@ -95,7 +95,7 @@ export const dictionary = {
       "We pull live availability and pricing from major hotel booking networks, then present it in a simple, unified search experience. When you find a stay you like, we send you directly to our partner's secure booking page to complete your reservation. We never charge you more than the partner's listed rate — our income comes from a small referral fee paid by the partner, at no cost to you.",
     about_partners_h2: "Our partners",
     about_partners_body:
-      "We work with reputable global hotel networks including Booking.com, Expedia Group (Hotels.com, Expedia, Vrbo), and Tripadvisor Group (Viator). Every listing you see is verified inventory from one of these networks.",
+      "We work with Booking.com for global hotel inventory (2.3M+ properties), plus Klook for tours and experiences, Airalo for local eSIMs, and Welcome Pickups for airport transfers. Every stay is booked directly through Booking.com's verified inventory.",
     about_contact_h2: "Contact",
     about_contact_body_prefix: "Questions, feedback, or partnership inquiries? Email ",
     about_disclaimer:
@@ -132,8 +132,10 @@ export const dictionary = {
     search_booking_card_body: "See live availability & prices from Booking.com's 2.3M+ properties.",
 
     // Site-wide FTC disclosure (footer)
+    // Lists ONLY active affiliate relationships. Do not add programs before approval;
+    // the earlier version listed Expedia and Tripadvisor which we never signed with.
     footer_ftc_disclosure:
-      "driftcoconut participates in affiliate programs including Booking.com, Expedia, Tripadvisor Group (Viator), Klook, and other travel partners. We may earn a commission when you book through our links, at no cost to you.",
+      "driftcoconut participates in affiliate programs with Booking.com, Klook, Airalo, and Welcome Pickups. We may earn a commission when you book through our links, at no cost to you.",
 
     // Language toggle
     lang_toggle_aria: "Switch language",
@@ -215,7 +217,7 @@ export const dictionary = {
       "เราดึงข้อมูลห้องว่างและราคาแบบเรียลไทม์จากเครือข่ายจองโรงแรมชั้นนำ แล้วนำเสนอในหน้าค้นหาที่ใช้งานง่ายเป็นหนึ่งเดียว เมื่อคุณพบที่พักที่ถูกใจ เราจะพาคุณไปจองบนหน้าเว็บของพาร์ทเนอร์โดยตรง เราไม่คิดเงินเพิ่มจากราคาที่พาร์ทเนอร์แสดง — รายได้ของเรามาจากค่าแนะนำเล็กน้อยที่พาร์ทเนอร์จ่ายให้ โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
     about_partners_h2: "พาร์ทเนอร์ของเรา",
     about_partners_body:
-      "เราทำงานร่วมกับเครือข่ายโรงแรมระดับโลกที่น่าเชื่อถือ รวมถึง Booking.com, Expedia Group (Hotels.com, Expedia, Vrbo) และ Tripadvisor Group (Viator) รายการโรงแรมทุกรายการที่คุณเห็นได้รับการยืนยันจากเครือข่ายเหล่านี้",
+      "เราทำงานร่วมกับ Booking.com สำหรับที่พักทั่วโลก (โรงแรม 2.3 ล้านแห่ง) พร้อมทั้ง Klook สำหรับทัวร์และประสบการณ์ Airalo สำหรับ eSIM ท้องถิ่น และ Welcome Pickups สำหรับรับส่งสนามบิน การจองที่พักทุกครั้งดำเนินการผ่านคลังสินค้าที่ได้รับการยืนยันของ Booking.com โดยตรง",
     about_contact_h2: "ติดต่อเรา",
     about_contact_body_prefix: "มีคำถาม ข้อเสนอแนะ หรือสนใจร่วมเป็นพาร์ทเนอร์? อีเมล ",
     about_disclaimer:
@@ -253,7 +255,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut เข้าร่วมโปรแกรม Affiliate รวมถึง Booking.com, Expedia, Tripadvisor Group (Viator), Klook และพาร์ทเนอร์การเดินทางรายอื่น เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
+      "driftcoconut เข้าร่วมโปรแกรม Affiliate กับ Booking.com, Klook, Airalo และ Welcome Pickups เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
 
     // Language toggle
     lang_toggle_aria: "เปลี่ยนภาษา",
@@ -335,7 +337,7 @@ export const dictionary = {
       "我们从主要酒店预订网络实时获取房态和价格,以简洁统一的搜索体验呈现给您。当您找到心仪的住宿,我们将直接跳转到合作伙伴的安全预订页面完成预订。我们从不高于合作伙伴的公开价格 — 我们的收入来自合作伙伴支付的少量推介费,您无需承担任何额外费用。",
     about_partners_h2: "我们的合作伙伴",
     about_partners_body:
-      "我们与信誉良好的全球酒店网络合作,包括 Booking.com、Expedia 集团(Hotels.com、Expedia、Vrbo)以及 Tripadvisor 集团(Viator)。您看到的每一条房源都是这些网络的经过核实的房源。",
+      "我们与 Booking.com 合作提供全球酒店库存(230 万+ 房源),加上 Klook 用于旅游和体验、Airalo 用于本地 eSIM、Welcome Pickups 用于机场接送。每次预订都直接通过 Booking.com 经过核实的库存完成。",
     about_contact_h2: "联系我们",
     about_contact_body_prefix: "如有问题、反馈或合作意向?邮件 ",
     about_disclaimer:
@@ -373,7 +375,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut 参与关联营销项目,包括 Booking.com、Expedia、Tripadvisor 集团(Viator)、Klook 及其他旅行合作伙伴。您通过我们的链接预订时,我们可能获得佣金,您无需支付额外费用。",
+      "driftcoconut 参与与 Booking.com、Klook、Airalo 和 Welcome Pickups 的关联营销项目。您通过我们的链接预订时,我们可能获得佣金,您无需支付额外费用。",
 
     // Language toggle
     lang_toggle_aria: "切换语言",

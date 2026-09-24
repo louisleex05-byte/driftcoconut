@@ -41,11 +41,20 @@ export default function SiteFooter() {
         </div>
         <div>
           <div className="font-semibold text-slate-900 mb-2">{t("footer_col_partners")}</div>
+          {/*
+            Partner list must reflect ONLY active affiliate relationships used on the site.
+            Currently active:
+              - Booking.com (CJ, approved 14-May-2026, 4% lead) - hero Search + guide "Where to stay"
+              - Klook (Travelpayouts) - guide "Things to do" tour bookings
+              - Airalo (Travelpayouts) - guide "Getting around" eSIM
+              - Welcome Pickups (Travelpayouts) - guide "Getting around" airport transfers
+            Removed to match honest positioning: Expedia, Hotels.com, Viator, Tripadvisor, Aviasales.
+          */}
           <ul className="space-y-1.5 text-slate-500 text-xs">
             <li>Booking.com</li>
-            <li>Expedia · Hotels.com</li>
-            <li>Viator · Tripadvisor Group</li>
-            <li>Klook · Aviasales</li>
+            <li>Klook</li>
+            <li>Airalo</li>
+            <li>Welcome Pickups</li>
           </ul>
         </div>
       </div>
