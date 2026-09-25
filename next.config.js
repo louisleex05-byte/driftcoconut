@@ -9,6 +9,14 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
+  async redirects() {
+    return [
+      // /guides/pai was misleading — its content was always Mae Hong Son.
+      // Renamed the slug on 2026-09-25; 301 so any inbound links keep working.
+      { source: "/guides/pai", destination: "/guides/mae-hong-son", permanent: true },
+      { source: "/zh/guides/pai", destination: "/zh/guides/mae-hong-son", permanent: true },
+    ];
+  },
 };
 
 module.exports = nextConfig;

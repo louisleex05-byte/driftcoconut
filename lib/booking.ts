@@ -119,7 +119,6 @@ export const BOOKING_DESTINATIONS = {
   pattaya:       bookingSearchUrl("Pattaya, Thailand"),
   chiangRai:     bookingSearchUrl("Chiang Rai, Thailand"),
   ayutthaya:     bookingSearchUrl("Ayutthaya, Thailand"),
-  pai:           bookingSearchUrl("Pai, Thailand"),
   maeHongSon:    bookingSearchUrl("Mae Hong Son, Thailand"),
   huaHin:        bookingSearchUrl("Hua Hin, Thailand"),
   kanchanaburi:  bookingSearchUrl("Kanchanaburi, Thailand"),
