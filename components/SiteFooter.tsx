@@ -30,6 +30,7 @@ export default function SiteFooter() {
           <ul className="space-y-1.5 text-slate-500">
             <li><Link href="/about" className="hover:text-sea-600 transition-colors">{t("nav_about")}</Link></li>
             <li><a href="mailto:hello@driftcoconut.com" className="hover:text-sea-600 transition-colors">{t("footer_link_contact")}</a></li>
+            <li><a href="https://www.pinterest.com/Driftcoconut/" target="_blank" rel="noopener noreferrer" className="hover:text-sea-600 transition-colors">Pinterest</a></li>
           </ul>
         </div>
         <div>
