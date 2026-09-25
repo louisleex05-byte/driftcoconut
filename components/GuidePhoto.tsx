@@ -65,7 +65,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     emeraldPool: { file: "emerald-pool.jpg", alt: "Emerald Pool Sa Morakot jungle spring in Khao Nor Chuchi Krabi" },
     khanomJeen:  { file: "khanom-jeen.jpg",  alt: "Southern Thai khanom jeen curry noodles with fresh vegetables Krabi" },
   },
-  pai: {
+  "mae-hong-son": {
     hero:          { file: "hero.jpg",           alt: "Pai valley at sunrise with mist over rice paddies and mountain backdrop in northern Thailand" },
     whenToGo:      { file: "when-to-go.jpg",     alt: "Ban Rak Thai Yunnanese Chinese tea village lake at dawn in cool season" },
     pai:           { file: "pai.jpg",            alt: "Pai Walking Street night market with hipster cafes and travelers in Mae Hong Son" },
@@ -137,6 +137,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     hellfirePass: { file: "hellfire-pass.jpg", alt: "Hellfire Pass Memorial Museum cutting through rock walls Thailand Burma railway WWII" },
     cemetery: { file: "cemetery.jpg", alt: "Kanchanaburi War Cemetery rows of Allied POW gravestones and manicured lawns memorial" },
     localFood: { file: "local-food.jpg", alt: "Grilled river fish yum pla duk foo and Thai curries served riverside on Kwai Yai Kanchanaburi" },
+  },
+  "koh-lanta": {
+    hero: { file: "hero.jpg", alt: "Koh Lanta Long Beach Phra Ae sunset with longtail boats and palm silhouettes Andaman coast" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Cool dry-season Koh Lanta with calm Andaman sea and blue skies November to April" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Long Beach Phra Ae strip with beach bars restaurants and mid-range resorts Koh Lanta" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Kantiang Bay southern Koh Lanta boutique cliffside resorts and quiet horseshoe cove" },
+    oldTown: { file: "old-town.jpg", alt: "Lanta Old Town wooden stilt shophouses and Sino-Portuguese Chinese fishing village heritage" },
+    activity: { file: "activity.jpg", alt: "Snorkeling day trip to Koh Rok limestone islands and coral reefs from Koh Lanta" },
+    waterfall: { file: "waterfall.jpg", alt: "Mu Ko Lanta National Park lighthouse cape jungle trails and viewpoint Koh Lanta" },
+    localFood: { file: "local-food.jpg", alt: "Southern Thai seafood curry and grilled squid at Old Town riverfront restaurants Koh Lanta" },
   },
 };
 
