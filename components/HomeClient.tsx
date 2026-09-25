@@ -13,7 +13,13 @@ import { bookingCJSearch } from "@/lib/booking";
 import { shuffleDrift, type Category } from "@/lib/driftDestinations";
 import type { GuideSummary } from "@/lib/guides";
 
-export default function HomeClient({ guides }: { guides: GuideSummary[] }) {
+export default function HomeClient({
+  guidesEn,
+  guidesZh,
+}: {
+  guidesEn: GuideSummary[];
+  guidesZh: GuideSummary[];
+}) {
   const t = useT();
 
   // Randomized drift-card destinations. Start with a deterministic set for the
@@ -59,7 +65,7 @@ export default function HomeClient({ guides }: { guides: GuideSummary[] }) {
           Placed right after the primary search CTA so it's still above or just
           below the fold, giving visitors an internal-content path before the
           external Booking.com "Where to Drift Next" cards. */}
-      <FeaturedGuides guides={guides} />
+      <FeaturedGuides guidesEn={guidesEn} guidesZh={guidesZh} />
 
       {/* Divider decorations between Search and Drift sections */}
       <div className="relative h-3 flex items-center justify-center mb-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useT } from "@/contexts/LanguageProvider";
+import { useLanguage } from "@/contexts/LanguageProvider";
 import GuideCard from "@/components/GuideCard";
 import type { GuideSummary } from "@/lib/guides";
 
@@ -12,9 +12,25 @@ import type { GuideSummary } from "@/lib/guides";
  * Booking.com search CTAs. This section puts 3 real guides above the fold
  * (right after search) so first-time visitors have an obvious path into the
  * content that actually holds attention.
+ *
+ * Locale-aware: "/" serves EN/TH/ZH from one URL (the toggle switches UI copy
+ * client-side, it doesn't route to /zh). Without this, toggling to Chinese
+ * left the guide cards themselves stuck in English — this picks the matching
+ * locale's guide data and points hrefs at /zh/guides/... when appropriate,
+ * same pattern GuideTipsBadge already uses. Thai has no translated guides yet,
+ * so th falls through to the English set/links, matching guide pages sitewide.
  */
-export default function FeaturedGuides({ guides }: { guides: GuideSummary[] }) {
-  const t = useT();
+export default function FeaturedGuides({
+  guidesEn,
+  guidesZh,
+}: {
+  guidesEn: GuideSummary[];
+  guidesZh: GuideSummary[];
+}) {
+  const { locale, t } = useLanguage();
+  const isZh = locale === "zh";
+  const guides = isZh ? guidesZh : guidesEn;
+  const hrefPrefix = isZh ? "/zh" : "";
   if (guides.length === 0) return null;
 
   return (
@@ -30,13 +46,13 @@ export default function FeaturedGuides({ guides }: { guides: GuideSummary[] }) {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {guides.map((g) => (
-          <GuideCard key={g.slug} guide={g} />
+          <GuideCard key={g.slug} guide={g} hrefPrefix={hrefPrefix} />
         ))}
       </div>
 
       <div className="text-center mt-8">
         <Link
-          href="/guides"
+          href={`${hrefPrefix}/guides`}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-sea-700 hover:text-sea-900 transition-colors"
         >
           {t("featured_guides_cta")}
