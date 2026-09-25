@@ -125,6 +125,12 @@ export const dictionary = {
     guide_tips_read_cta: "Read the guide",
     guide_tips_see_all: "See all guides",
 
+    // Featured guides section (homepage funnel into written guide content)
+    featured_guides_eyebrow: "Written by people who've been there",
+    featured_guides_title: "Start with a guide",
+    featured_guides_subtitle: "Skip the generic listicles — real neighborhoods, real prices, real opinions.",
+    featured_guides_cta: "Browse all guides",
+
     // Mock-mode notice on search results
     search_mock_notice_title: "You're viewing sample listings",
     search_mock_notice_body: "Our live hotel inventory is coming soon. For real available rooms in this city, use Booking.com below — we'll credit your booking to us.",
@@ -247,6 +253,12 @@ export const dictionary = {
     guide_tips_read_cta: "อ่านคู่มือ",
     guide_tips_see_all: "ดูคู่มือทั้งหมด",
 
+    // Featured guides section (homepage funnel into written guide content)
+    featured_guides_eyebrow: "เขียนโดยคนที่เคยไปมาจริง",
+    featured_guides_title: "เริ่มต้นด้วยคู่มือ",
+    featured_guides_subtitle: "ข้ามลิสต์ทั่วไป — ย่านจริง ราคาจริง ความเห็นจริง",
+    featured_guides_cta: "ดูคู่มือทั้งหมด",
+
     // Mock-mode notice on search results
     search_mock_notice_title: "คุณกำลังดูรายการตัวอย่าง",
     search_mock_notice_body: "ระบบค้นหาโรงแรมสดของเราเร็วๆ นี้ สำหรับห้องพักจริงในเมืองนี้ ใช้ Booking.com ด้านล่างได้เลย — เราจะได้ค่าคอมมิชชั่นจากการจองของคุณ",
@@ -366,6 +378,12 @@ export const dictionary = {
     guide_tips_featured_teaser: "本地人的推荐:住哪里、什么时候去、跳过什么 — 来自一位常驻曼谷的作者。",
     guide_tips_read_cta: "阅读指南",
     guide_tips_see_all: "查看全部指南",
+
+    // Featured guides section (homepage funnel into written guide content)
+    featured_guides_eyebrow: "由亲身去过的人撰写",
+    featured_guides_title: "从一篇指南开始",
+    featured_guides_subtitle: "跳过千篇一律的清单 — 真实的街区、真实的价格、真实的看法。",
+    featured_guides_cta: "浏览全部指南",
 
     // Mock-mode notice on search results
     search_mock_notice_title: "您正在查看示例房源",
