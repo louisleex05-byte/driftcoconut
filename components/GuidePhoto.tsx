@@ -148,6 +148,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     waterfall: { file: "waterfall.jpg", alt: "Mu Ko Lanta National Park lighthouse cape jungle trails and viewpoint Koh Lanta" },
     localFood: { file: "local-food.jpg", alt: "Southern Thai seafood curry and grilled squid at Old Town riverfront restaurants Koh Lanta" },
   },
+  "koh-chang": {
+    hero: { file: "hero.jpg", alt: "Koh Chang White Sand Beach Hat Sai Khao sunset with palm trees and Gulf of Thailand" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Cool dry-season Koh Chang jungle interior with clear rivers November to April" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "White Sand Beach Hat Sai Khao main tourist strip with beach bars and resorts Koh Chang" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Lonely Beach Bang Bao backpacker village and quieter south of Koh Chang" },
+    jungle: { file: "jungle.jpg", alt: "Klong Plu Waterfall multi-tier jungle cascade in Mu Koh Chang National Park" },
+    activity: { file: "activity.jpg", alt: "Bang Bao stilt fishing village pier and snorkeling boats to Koh Wai Koh Chang" },
+    viewpoint: { file: "viewpoint.jpg", alt: "Kai Bae viewpoint Gulf of Thailand islands and elephant grass overlook Koh Chang" },
+    localFood: { file: "local-food.jpg", alt: "Fresh Trat-province seafood and Thai curries at Bang Bao pier restaurants Koh Chang" },
+  },
 };
 
 export default function GuidePhoto({
