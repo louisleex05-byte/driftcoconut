@@ -158,6 +158,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     viewpoint: { file: "viewpoint.jpg", alt: "Kai Bae viewpoint Gulf of Thailand islands and elephant grass overlook Koh Chang" },
     localFood: { file: "local-food.jpg", alt: "Fresh Trat-province seafood and Thai curries at Bang Bao pier restaurants Koh Chang" },
   },
+  "koh-phangan": {
+    hero: { file: "hero.jpg", alt: "Sri Thanu west-coast beach on Koh Phangan with pale sand and calm water at golden hour" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Calm turquoise water and clear skies during Koh Phangan's dry season from February to April" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Thong Sala pier town with the ferry pier, Pantip Market food stalls, and scooter rental shops" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Sri Thanu west-coast cafes, yoga studios, and sunset bars near Zen Beach on Koh Phangan" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Haad Yao and Haad Salad pale-sand beaches with the Koh Ma sandbar on northwest Koh Phangan" },
+    fullMoonParty: { file: "full-moon-party.jpg", alt: "Haad Rin Nok beach crowded with lights and fire shows during the Full Moon Party" },
+    activity: { file: "activity.jpg", alt: "Longtail boat day trip through the limestone islands and lagoon of Ang Thong Marine Park" },
+    waterfall: { file: "waterfall.jpg", alt: "Than Sadet waterfall and jungle rock pools on the quiet east coast of Koh Phangan" },
+  },
 };
 
 export default function GuidePhoto({
