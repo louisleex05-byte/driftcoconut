@@ -1015,6 +1015,65 @@ function Get-ExistingPresetStatus {
     return @{ exists = $true; hasRealContent = $false }
 }
 
+# ROOT-CAUSE FIX for the recurring "photos missing on live guide" bug:
+# Append-GuideToTsx is only ever invoked from the "+ New Guide" wizard and the
+# "Auto Preset" button - NEVER automatically from Publish. If a user runs
+# Publish without having clicked one of those first (or after editing the
+# draft's <GuidePhoto> tags afterward), the MDX ships with slot references
+# that have no matching entry in GuidePhoto.tsx. GuidePhoto.tsx then silently
+# renders nothing for that slot (by design - see components/GuidePhoto.tsx,
+# it returns null rather than falling back to another guide's photos). No
+# error, no warning - the guide just quietly ends up with missing photos.
+# This happened to cha-am, sukhothai, and koh-tao before being caught by hand.
+#
+# Scans the given MDX text for every <GuidePhoto slot="..." /> tag and checks
+# each one resolves to a real entry in GuidePhoto.tsx's block for $Slug.
+# Returns the list of slots referenced in the MDX but missing from
+# GuidePhoto.tsx (empty array = fully covered, safe to publish).
+function Test-GuidePhotoCoverage {
+    param([string]$RepoRoot, [string]$Slug, [string]$MdxText)
+
+    $referenced = [System.Collections.Generic.List[string]]::new()
+    foreach ($m in [regex]::Matches($MdxText, '<GuidePhoto\s+slot="([^"]+)"\s*/?\s*>')) {
+        $s = $m.Groups[1].Value
+        if (-not $referenced.Contains($s)) { $referenced.Add($s) }
+    }
+    if ($referenced.Count -eq 0) { return @() }
+
+    $tsxPath = Join-Path $RepoRoot "components\GuidePhoto.tsx"
+    if (-not (Test-Path $tsxPath)) { return $referenced }
+    $content = [System.IO.File]::ReadAllText($tsxPath)
+
+    # Find this slug's block: either  slug: {  or  "slug": {
+    $patterns = @("`"$Slug`"`:", "$Slug`:")
+    $blockStart = -1
+    foreach ($pat in $patterns) {
+        $idx = $content.IndexOf("  $pat")
+        if ($idx -ge 0) { $blockStart = $idx; break }
+    }
+    if ($blockStart -lt 0) { return $referenced }  # no entry at all for this guide - everything is missing
+
+    $openIdx = $content.IndexOf('{', $blockStart)
+    if ($openIdx -lt 0) { return $referenced }
+    $d = 1; $j = $openIdx + 1
+    while ($j -lt $content.Length -and $d -gt 0) {
+        if ($content[$j] -eq '{') { $d++ }
+        elseif ($content[$j] -eq '}') { $d-- }
+        $j++
+    }
+    if ($d -ne 0) { return $referenced }
+    $blockBody = $content.Substring($openIdx + 1, $j - $openIdx - 2)
+
+    $missing = @()
+    foreach ($slot in $referenced) {
+        $esc = [regex]::Escape($slot)
+        if ($blockBody -notmatch "(?m)^\s*`"?$esc`"?\s*:") {
+            $missing += $slot
+        }
+    }
+    return $missing
+}
+
 # PERMANENT FIX: Append a new guide preset to components/GuidePhoto.tsx from
 # within the running app. Eliminates the "you have to ask Claude to add my new
 # guide" loop. The wizard button on Tab 3 calls this and Show-NewGuidePresetDialog.
@@ -2822,6 +2881,21 @@ $btnPublishMDX.Add_Click({
         $global:progressPublish.Visible = $false
         return
     }
+
+    # SAFETY GUARD (root-cause fix): refuse to publish if any <GuidePhoto slot="..." />
+    # tag in the final MDX has no matching entry in GuidePhoto.tsx for this slug.
+    # This is what let cha-am, sukhothai, and koh-tao ship with silently-missing
+    # photos - Publish used to stage GuidePhoto.tsx without ever checking it was
+    # actually up to date. Now Publish hard-stops instead of shipping broken photos.
+    $mdxTextForCheck = [System.IO.File]::ReadAllText($srcMdx)
+    $missingSlots = Test-GuidePhotoCoverage -RepoRoot $global:ProjectRoot -Slug $slug -MdxText $mdxTextForCheck
+    if ($missingSlots.Count -gt 0) {
+        $global:lblPublishStatus.Text = "[ABORT] $($missingSlots.Count) photo slot(s) in the draft have no entry in GuidePhoto.tsx for '$slug': $($missingSlots -join ', '). Click 'Auto Preset' (or '+ New Guide') on this tab first so every <GuidePhoto> tag resolves to a real photo, then Publish again. Publishing now would ship a guide with missing photos."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
+
     $dstMdx = Join-Path $global:PublishedRoot "$slug.mdx"
     try {
         Copy-Item -Path $srcMdx -Destination $dstMdx -Force
