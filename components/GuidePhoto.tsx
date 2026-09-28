@@ -193,6 +193,17 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     activityJetski:        { file: "activity-jetski.jpg",         alt: "Jet ski riders and families wading in the shallows along Cha-am beach" },
     batCave:               { file: "bat-cave.jpg",                alt: "An estimated two million fruit bats emerging from a mountain cave near Cha-am at sunset" },
   },
+  sukhothai: {
+    songthaew:          { file: "songthaew.jpg",          alt: "Blue and white Old City to New City songthaew truck with driver at Sukhothai bus station" },
+    whenToGo:           { file: "when-to-go.jpg",          alt: "Floating krathong offerings lit with candles and incense on water during Loy Krathong in Sukhothai" },
+    neighborhood1:       { file: "neighborhood1.jpg",      alt: "Traditional teak guesthouse with carved wooden cart in Old Sukhothai near the Historical Park" },
+    neighborhood2:       { file: "neighborhood2.jpg",      alt: "New Sukhothai street market stalls piled with fresh vegetables and local produce" },
+    siSatchanalai:       { file: "si-satchanalai.jpg",     alt: "Wat Chang Lom bell-shaped chedi ringed by elephant buttresses at Si Satchanalai Historical Park" },
+    sunsetRuins:         { file: "sunset-ruins.jpg",       alt: "Sukhothai Historical Park temple ruins lit at dusk and reflected in the lotus pond" },
+    activity:            { file: "activity.jpg",           alt: "Weathered brick prang and standing Buddha niche at Wat Mahathat against a dramatic sky" },
+    sunsetSilhouette:    { file: "sunset-silhouette.jpg",  alt: "Silhouetted seated Buddha statue, temple ruins, and palm tree against a purple and orange sunset sky" },
+    oldTownGuesthouse:   { file: "old-town-guesthouse.jpg", alt: "Red teak guesthouse row on a quiet Old Sukhothai street near the Historical Park" },
+  },
 };
 
 export default function GuidePhoto({
