@@ -185,8 +185,13 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     neighborhood2: { file: "neighborhood2.jpg",  alt: "Cha-am town center market near the train station with local food stalls" },
     activity:      { file: "activity.jpg",       alt: "Jet skiing and banana boat rides along Cha-am's beach road" },
     landmark:      { file: "landmark.jpg",       alt: "Maruekhathaiyawan Palace golden teak royal palace architecture near Cha-am" },
-    kaengKrachan:  { file: "kaeng-krachan.jpg",  alt: "Kaeng Krachan National Park rainforest, waterfalls, and wildlife inland from Cha-am" },
-    batCave:       { file: "bat-cave.jpg",       alt: "An estimated two million fruit bats emerging from a mountain cave near Cha-am at sunset" },
+    kaengKrachan:          { file: "kaeng-krachan.jpg",          alt: "Kaeng Krachan National Park rainforest, waterfalls, and wildlife inland from Cha-am" },
+    kaengKrachanWaterfall: { file: "kaeng-krachan-waterfall.jpg", alt: "Rainforest waterfall and emerald pool with smooth rocks in Kaeng Krachan National Park" },
+    kaengKrachanMist:      { file: "kaeng-krachan-mist.jpg",      alt: "Morning mist over the Kaeng Krachan rainforest canopy with mountain ridges in the distance" },
+    landmarkFront:         { file: "landmark-front.jpg",          alt: "Maruekhathaiyawan Palace raised teak pavilions with red-tiled roofs and blue shutters near Cha-am" },
+    landmark2:             { file: "landmark2.jpg",               alt: "Maruekhathaiyawan Palace long covered seaside corridor with columns and ocean view" },
+    activityJetski:        { file: "activity-jetski.jpg",         alt: "Jet ski riders and families wading in the shallows along Cha-am beach" },
+    batCave:               { file: "bat-cave.jpg",                alt: "An estimated two million fruit bats emerging from a mountain cave near Cha-am at sunset" },
   },
 };
 
