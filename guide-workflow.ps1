@@ -2969,6 +2969,38 @@ $btnPublishMDX.Add_Click({
     $lines += "      Live URL: $liveUrl"
     $global:lblPublishStatus.Text = ($lines -join "`n")
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+    [System.Windows.Forms.Application]::DoEvents()
+
+    # --- Stage 6: IndexNow ping (best-effort, never blocks a successful publish) ---
+    # Notifies Bing + Yandex the instant this guide goes live instead of waiting
+    # for their next scheduled sitemap crawl. See lib/indexnow.ts for the
+    # Next.js-side equivalent / docs - this is the PowerShell mirror of it so
+    # Publish doesn't depend on hitting a Node/Next.js route to fire the ping.
+    try {
+        $indexNowKey = "8c49cefe230e24a34dc92e8999c37d54"
+        $indexNowHost = "driftcoconut.com"
+        $urlList = @("https://$indexNowHost/guides/$slug")
+        $zhPath = Join-Path $global:PublishedRoot "$slug.zh.mdx"
+        if (Test-Path $zhPath) { $urlList += "https://$indexNowHost/zh/guides/$slug" }
+
+        $body = @{
+            host        = $indexNowHost
+            key         = $indexNowKey
+            keyLocation = "https://$indexNowHost/$indexNowKey.txt"
+            urlList     = $urlList
+        } | ConvertTo-Json
+
+        $inResp = Invoke-WebRequest -Uri "https://api.indexnow.org/indexnow" -Method Post -Body $body -ContentType "application/json; charset=utf-8" -UseBasicParsing -TimeoutSec 15
+        if ($inResp.StatusCode -eq 200 -or $inResp.StatusCode -eq 202) {
+            $lines += "[6/6] IndexNow: pinged Bing/Yandex for $($urlList.Count) URL(s)."
+        } else {
+            $lines += "[6/6] IndexNow: unexpected status $($inResp.StatusCode) (non-fatal, publish still succeeded)."
+        }
+    } catch {
+        # Never fail the publish over this - just note it and move on.
+        $lines += "[6/6] IndexNow ping failed (non-fatal, publish still succeeded): $($_.Exception.Message)"
+    }
+    $global:lblPublishStatus.Text = ($lines -join "`n")
 }.GetNewClosure())
 
 $form.Controls.Add($global:panelPublish)
