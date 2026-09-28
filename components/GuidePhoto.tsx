@@ -178,6 +178,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     viewpoint: { file: "viewpoint.jpg", alt: "John-Suwan Viewpoint panoramic bay view from the southern tip of Koh Tao" },
     diveClass: { file: "dive-class.jpg", alt: "PADI Open Water students practicing diving skills in shallow water off Koh Tao" },
   },
+  "cha-am": {
+    hero:          { file: "hero.jpg",          alt: "Cha-am beach at sunset with rows of beach chairs and umbrellas along the sand" },
+    whenToGo:      { file: "when-to-go.jpg",    alt: "Cha-am Beach Road quiet on a weekday morning with empty beach chairs and umbrellas" },
+    neighborhood1: { file: "neighborhood1.jpg",  alt: "Cha-am Beach Road resorts and seafood restaurants lining the sand" },
+    neighborhood2: { file: "neighborhood2.jpg",  alt: "Cha-am town center market near the train station with local food stalls" },
+    activity:      { file: "activity.jpg",       alt: "Jet skiing and banana boat rides along Cha-am's beach road" },
+    landmark:      { file: "landmark.jpg",       alt: "Maruekhathaiyawan Palace golden teak royal palace architecture near Cha-am" },
+    kaengKrachan:  { file: "kaeng-krachan.jpg",  alt: "Kaeng Krachan National Park rainforest, waterfalls, and wildlife inland from Cha-am" },
+    batCave:       { file: "bat-cave.jpg",       alt: "An estimated two million fruit bats emerging from a mountain cave near Cha-am at sunset" },
+  },
 };
 
 export default function GuidePhoto({
@@ -187,7 +197,8 @@ export default function GuidePhoto({
   slot: string;
   guideSlug?: string;
 }) {
-  const guide = GUIDES[guideSlug] ?? GUIDES.bangkok;
+  const guide = GUIDES[guideSlug];
+  if (!guide) return null; // No entry for this guide — render nothing, never fall back to another guide's photos
   const meta = guide[slot];
   if (!meta) return null;
   return (
