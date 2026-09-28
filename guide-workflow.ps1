@@ -1428,7 +1428,7 @@ $global:Meta = [pscustomobject]@{
     slug        = "chiang-mai"
     title       = ""
     description = ""
-    author      = "Niphon Srisawat"
+    author      = "Mr. Padthai Jaidee"
     destination = ""
     publishDate = (Get-Date -Format "yyyy-MM-dd")
     lastUpdated = (Get-Date -Format "yyyy-MM-dd")
@@ -1550,7 +1550,7 @@ BRAND VOICE RULES (strict):
 - Concrete over abstract: name streets, name restaurants, name price points in local currency + USD
 - Never symmetric bullet patterns like "whether you're X, Y, or Z"
 - Every claim must be backed by the research doc below - don't invent
-- The author is a Thailand-based traveler (Niphon Srisawat, founder of driftcoconut). Write with local Asia insider authority.
+- The author is a Thailand-based traveler (Mr. Padthai Jaidee, founder of driftcoconut). Write with local Asia insider authority.
 
 STRUCTURE (must follow exactly):
 
@@ -2493,7 +2493,7 @@ function New-MetaField {
 
 $global:txtMetaTitle       = New-MetaField "Title:"       32  810
 $global:txtMetaDescription = New-MetaField "Description:" 58  810
-$global:txtMetaAuthor      = New-MetaField "Author:"      84  810 "Niphon Srisawat"
+$global:txtMetaAuthor      = New-MetaField "Author:"      84  810 "Mr. Padthai Jaidee"
 $global:txtMetaDestination = New-MetaField "Destination:" 110 810
 $global:txtMetaHeroAlt     = New-MetaField "Hero alt:"    136 810
 

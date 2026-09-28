@@ -1,7 +1,7 @@
 # driftcoconut — Full Session Notes
 
 **Session date:** August 3, 2026
-**Owner:** Niphon Srisawat (Louis Leex / louisleex05@gmail.com)
+**Owner:** Mr. Padthai Jaidee (Louis Leex / louisleex05@gmail.com)
 **Live site:** https://driftcoconut.com
 **GitHub repo:** https://github.com/louisleex05-byte/travel-site
 **Vercel project:** driftcoconut
