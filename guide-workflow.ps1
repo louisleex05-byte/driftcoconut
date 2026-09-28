@@ -714,10 +714,14 @@ function Build-PresetFromDraft {
             $currentH3 = $matches[1].Trim() -replace '^\s*(Full-day|Half-day|Multi-day|Morning|Afternoon|Evening|Night)\s*:\s*', ''
             continue
         }
+        # Match BOTH <GuidePhoto slot="xxx" /> AND <!-- PHOTO SLOT: xxx --> patterns
+        $slot = $null
         if ($line -match '<GuidePhoto\s+slot="([^"]+)"\s*/?\s*>') {
             $slot = $matches[1]
-            if ($seenSlots.ContainsKey($slot)) { continue }
-
+        } elseif ($line -match '<!--\s*PHOTO\s+SLOT:\s*(\S+)\s*-->') {
+            $slot = $matches[1]
+        }
+        if ($slot -and -not $seenSlots.ContainsKey($slot)) {
             # Pick the deepest heading in scope
             $context = if ($currentH3) { $currentH3 } elseif ($currentH2) { $currentH2 } else { "" }
             # Also grab the first non-blank paragraph line above the tag for extra detail
@@ -751,6 +755,94 @@ function Build-PresetFromDraft {
             $file = ([regex]::Replace($slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
             $entries += [pscustomobject]@{ slot=$slot; file=$file; alt=$alt }
             $seenSlots[$slot] = $true
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # FALLBACK: if the draft has no <GuidePhoto> or <!-- PHOTO SLOT --> tags,
+    # auto-generate a standard 8-slot preset from the draft's ## / ### headings.
+    # This guarantees + New Preset NEVER produces REPLACE-ME markers.
+    # -----------------------------------------------------------------------
+    if ($entries.Count -le 1) {
+        # Collect all H2 and H3 headings with their text
+        $h2List = @()
+        $h3List = @()
+        foreach ($line in $lines) {
+            if ($line -match '^##\s+([^#].+)$') {
+                $h2List += $matches[1].Trim()
+            } elseif ($line -match '^###\s+(.+)$') {
+                $h3 = $matches[1].Trim() -replace '^\s*(Full-day|Half-day|Multi-day|Morning|Afternoon|Evening|Night)\s*:\s*', ''
+                $h3List += $h3
+            }
+        }
+
+        # Standard slots derived from headings
+        $slotMap = [ordered]@{
+            "whenToGo"      = "When to go"
+            "neighborhood1" = ""
+            "neighborhood2" = ""
+            "neighborhood3" = ""
+            "activity"      = "Things to do"
+        }
+
+        # Fill neighborhood slots from ### headings (typically area names under "Where to stay")
+        $neighborIdx = 1
+        foreach ($h3 in $h3List) {
+            if ($neighborIdx -gt 3) { break }
+            # Skip generic headings that aren't neighborhood names
+            if ($h3 -match '^(Half-day|Full-day|Multi-day|FAQ|Related)') { continue }
+            $slotKey = "neighborhood$neighborIdx"
+            if (-not $seenSlots.ContainsKey($slotKey)) {
+                $alt = "$destDisplay $h3 area neighborhood and accommodation options"
+                if ($alt.Length -lt 25) { $alt = "$destDisplay $h3 destination area photo landmark scene" }
+                $file = "neighborhood$neighborIdx.jpg"
+                $entries += [pscustomobject]@{ slot=$slotKey; file=$file; alt=$alt }
+                $seenSlots[$slotKey] = $true
+                $neighborIdx++
+            }
+        }
+
+        # Fill remaining standard slots
+        foreach ($slotKey in $slotMap.Keys) {
+            if ($seenSlots.ContainsKey($slotKey)) { continue }
+            $context = $slotMap[$slotKey]
+            if (-not $context) { continue }
+            $alt = "$destDisplay $context scenic view and travel destination photo"
+            if ($alt.Length -lt 25) { $alt = "$destDisplay $slotKey signature destination scene photo landmark" }
+            $file = ([regex]::Replace($slotKey, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+            $entries += [pscustomobject]@{ slot=$slotKey; file=$file; alt=$alt }
+            $seenSlots[$slotKey] = $true
+        }
+
+        # Fill remaining slots from unused H3 headings to reach 8 total
+        $extraIdx = 0
+        foreach ($h3 in $h3List) {
+            if ($entries.Count -ge 8) { break }
+            $slotName = ($h3 -replace '[^a-zA-Z0-9]', '' -replace '^(\w)', { $_.Value.ToLower() })
+            if ($slotName.Length -lt 3) { continue }
+            # Truncate overly long slot names
+            if ($slotName.Length -gt 20) { $slotName = $slotName.Substring(0, 20) }
+            if ($seenSlots.ContainsKey($slotName)) { continue }
+            $alt = "$destDisplay $h3 travel destination scene and local atmosphere"
+            $file = ([regex]::Replace($slotName, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+            $entries += [pscustomobject]@{ slot=$slotName; file=$file; alt=$alt }
+            $seenSlots[$slotName] = $true
+            $extraIdx++
+        }
+
+        # If still under 8, pad with generic but descriptive slots
+        $padSlots = @(
+            @{ slot="landmark";  alt="$destDisplay iconic landmark and historical architecture photo" },
+            @{ slot="localFood"; alt="$destDisplay local street food market and regional cuisine dishes" },
+            @{ slot="transport"; alt="$destDisplay local transport and getting around the destination" },
+            @{ slot="sunset";    alt="$destDisplay scenic sunset view over the destination landscape" }
+        )
+        foreach ($p in $padSlots) {
+            if ($entries.Count -ge 8) { break }
+            if ($seenSlots.ContainsKey($p.slot)) { continue }
+            $file = ([regex]::Replace($p.slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+            $entries += [pscustomobject]@{ slot=$p.slot; file=$file; alt=$p.alt }
+            $seenSlots[$p.slot] = $true
         }
     }
 
@@ -804,6 +896,46 @@ $global:GuideAltSuggestions = @{
         @{ slot="waterfall";     alt="Pa La-U Waterfall multi-tiered cascade in Kaeng Krachan National Park rainforest west of Hua Hin" },
         @{ slot="railway";       alt="Hua Hin Railway Station iconic red and white Thai royal Victorian pavilion landmark architecture" },
         @{ slot="localFood";     alt="Grilled river prawns and fresh seafood at Dechanuchit night market Hua Hin" }
+    )
+    "koh-phangan" = @(
+        @{ slot="hero";          alt="Sri Thanu west-coast beach on Koh Phangan with pale sand and calm water at golden hour" },
+        @{ slot="whenToGo";      alt="Calm turquoise water and clear skies during Koh Phangan's dry season from February to April" },
+        @{ slot="neighborhood1"; alt="Thong Sala pier town with the ferry pier, Pantip Market food stalls, and scooter rental shops" },
+        @{ slot="neighborhood2"; alt="Sri Thanu west-coast cafes, yoga studios, and sunset bars near Zen Beach on Koh Phangan" },
+        @{ slot="neighborhood3"; alt="Haad Yao and Haad Salad pale-sand beaches with the Koh Ma sandbar on northwest Koh Phangan" },
+        @{ slot="fullMoonParty"; alt="Haad Rin Nok beach crowded with lights and fire shows during the Full Moon Party" },
+        @{ slot="activity";      alt="Longtail boat day trip through the limestone islands and lagoon of Ang Thong Marine Park" },
+        @{ slot="waterfall";     alt="Than Sadet waterfall and jungle rock pools on the quiet east coast of Koh Phangan" }
+    )
+    "koh-tao" = @(
+        @{ slot="hero";          alt="Sairee Beach Koh Tao at sunset with longtail boats moored along the sand" },
+        @{ slot="whenToGo";      alt="Calm turquoise water at Sairee Beach with a dive boat heading out at sunrise" },
+        @{ slot="neighborhood1"; alt="Sairee Beach main strip on Koh Tao with dive shops, longtail boats, and beachfront bars" },
+        @{ slot="neighborhood2"; alt="Chalok Baan Kao quiet southern bay on Koh Tao with low-key dive resorts" },
+        @{ slot="maeHaad";       alt="Mae Haad pier town on Koh Tao where ferries from Chumphon and Koh Phangan arrive" },
+        @{ slot="activity";      alt="Divers exploring a coral reef underwater off the coast of Koh Tao" },
+        @{ slot="viewpoint";     alt="John-Suwan Viewpoint panoramic bay view from the southern tip of Koh Tao" },
+        @{ slot="diveClass";     alt="PADI Open Water students practicing diving skills in shallow water off Koh Tao" }
+    )
+    "cha-am" = @(
+        @{ slot="hero";          alt="Cha-am beach at sunset with rows of beach chairs and umbrellas along the sand" },
+        @{ slot="whenToGo";      alt="Cha-am Beach Road quiet on a weekday morning with empty beach chairs and umbrellas" },
+        @{ slot="neighborhood1"; alt="Cha-am Beach Road resorts and seafood restaurants lining the sand" },
+        @{ slot="neighborhood2"; alt="Cha-am town center market near the train station with local food stalls" },
+        @{ slot="activity";      alt="Jet skiing and banana boat rides along Cha-am's beach road" },
+        @{ slot="landmark";      alt="Maruekhathaiyawan Palace golden teak royal palace architecture near Cha-am" },
+        @{ slot="kaengKrachan";  alt="Kaeng Krachan National Park rainforest, waterfalls, and wildlife inland from Cha-am" },
+        @{ slot="batCave";       alt="An estimated two million fruit bats emerging from a mountain cave near Cha-am at sunset" }
+    )
+    "sukhothai" = @(
+        @{ slot="hero";          alt="Sukhothai Historical Park Buddha statue at sunset with a lotus pond in the foreground" },
+        @{ slot="whenToGo";      alt="Loy Krathong festival lanterns and candles reflected in the historical park's ponds" },
+        @{ slot="neighborhood1"; alt="Old Sukhothai guesthouse area within walking distance of the historical park entrance" },
+        @{ slot="neighborhood2"; alt="New Sukhothai town center market and main street near the bus station" },
+        @{ slot="activity";      alt="Wat Mahathat lotus-bud chedis with a bicycle parked among the ancient ruins" },
+        @{ slot="siSatchanalai"; alt="Si Satchanalai Historical Park ancient chedis and ruins a short drive from Sukhothai" },
+        @{ slot="songthaew";     alt="Blue songthaew truck connecting New Sukhothai town to the historical park" },
+        @{ slot="sunsetRuins";   alt="Sukhothai Historical Park ancient chedis and moat reflected at golden hour" }
     )
 }
 
@@ -1004,7 +1136,7 @@ function Show-NewGuidePresetDialog {
     $tSlug = New-Object System.Windows.Forms.TextBox
     $tSlug.Location = New-Object System.Drawing.Point(15, 35)
     $tSlug.Size = New-Object System.Drawing.Size(670, 22)
-    $tSlug.Text = ($DefaultSlug -replace '\s+', '-').ToLower()
+    $tSlug.Text = ($DefaultSlug -replace '([a-z])([A-Z])', '$1-$2' -replace '\s+', '-').ToLower()
     $dlg.Controls.Add($tSlug)
 
     $lblWarn = New-Object System.Windows.Forms.Label
@@ -1118,9 +1250,9 @@ function Show-NewGuidePresetDialog {
     # Wire live warning updates + smart-defaults re-population on slug change + initial render
     $tSlug.Add_TextChanged({
         & $updateExistingWarning
-        & $applySmartDefaults ($tSlug.Text.Trim().ToLower())
+        & $applySmartDefaults (($tSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2').ToLower())
     }.GetNewClosure())
-    & $applySmartDefaults ($tSlug.Text.Trim().ToLower())
+    & $applySmartDefaults (($tSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2').ToLower())
     & $updateExistingWarning
 
     # === Modal loop with anchored placeholder + overwrite checks ===
@@ -1128,7 +1260,7 @@ function Show-NewGuidePresetDialog {
     # failure - user sees the error, fixes it, hits Save again.
     while ($true) {
         if ($dlg.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
-        $slug = ($tSlug.Text.Trim() -replace '\s+', '-').ToLower()
+        $slug = ($tSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2' -replace '\s+', '-').ToLower()
         if (-not $slug) {
             [System.Windows.Forms.MessageBox]::Show("Slug is required.", "Missing slug", 'OK', 'Warning') | Out-Null
             continue
@@ -1486,7 +1618,8 @@ $txtHeaderSlug.Size = New-Object System.Drawing.Size(150, 22)
 $txtHeaderSlug.Add_TextChanged({
     # Force lowercase + kebab-case (Linux/Vercel filesystems are case-sensitive; slugs
     # must match the URL exactly). Prevents the Bali.mdx / Pattaya.mdx case-mismatch bug.
-    $raw = $txtHeaderSlug.Text.Trim().ToLower() -replace '\s+', '-'
+    $raw = $txtHeaderSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2'
+    $raw = $raw.ToLower() -replace '\s+', '-'
     if ($raw -ne $txtHeaderSlug.Text) {
         # Preserve cursor position while rewriting the field
         $pos = $txtHeaderSlug.SelectionStart
