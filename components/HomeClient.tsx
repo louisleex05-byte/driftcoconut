@@ -46,8 +46,12 @@ export default function HomeClient({
         </div>
       </div>
 
-      {/* MAIN SEARCH FORM - moved up as the primary conversion CTA.
-          Sits directly under the hero/partner block so users don't scroll to book. */}
+      {/* FEATURED GUIDES - homepage-to-guide funnel fix (Sep 2026).
+          Placed right after hero so visitors see internal content first,
+          before the external Booking.com search CTA. */}
+      <FeaturedGuides guidesEn={guidesEn} guidesZh={guidesZh} />
+
+      {/* MAIN SEARCH FORM - hotel search CTA below the guide cards. */}
       <section id="search-form" className="mb-8 scroll-mt-24 fade-slide-up">
         <div className="text-center mb-5">
           <div className="text-xs section-eyebrow mb-2">
@@ -60,12 +64,6 @@ export default function HomeClient({
         </div>
         <SearchForm />
       </section>
-
-      {/* FEATURED GUIDES - homepage-to-guide funnel fix (Sep 2026).
-          Placed right after the primary search CTA so it's still above or just
-          below the fold, giving visitors an internal-content path before the
-          external Booking.com "Where to Drift Next" cards. */}
-      <FeaturedGuides guidesEn={guidesEn} guidesZh={guidesZh} />
 
       {/* Divider decorations between Search and Drift sections */}
       <div className="relative h-3 flex items-center justify-center mb-4">
