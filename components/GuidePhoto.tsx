@@ -168,6 +168,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     activity: { file: "activity.jpg", alt: "Longtail boat day trip through the limestone islands and lagoon of Ang Thong Marine Park" },
     waterfall: { file: "waterfall.jpg", alt: "Than Sadet waterfall and jungle rock pools on the quiet east coast of Koh Phangan" },
   },
+  "koh-tao": {
+    hero: { file: "hero.jpg", alt: "Sairee Beach Koh Tao at sunset with longtail boats moored along the sand" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Calm turquoise water at Sairee Beach with a dive boat heading out at sunrise" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Sairee Beach main strip on Koh Tao with dive shops, longtail boats, and beachfront bars" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Chalok Baan Kao quiet southern bay on Koh Tao with low-key dive resorts" },
+    maeHaad: { file: "mae-haad.jpg", alt: "Mae Haad pier town on Koh Tao where ferries from Chumphon and Koh Phangan arrive" },
+    activity: { file: "activity.jpg", alt: "Divers exploring a coral reef underwater off the coast of Koh Tao" },
+    viewpoint: { file: "viewpoint.jpg", alt: "John-Suwan Viewpoint panoramic bay view from the southern tip of Koh Tao" },
+    diveClass: { file: "dive-class.jpg", alt: "PADI Open Water students practicing diving skills in shallow water off Koh Tao" },
+  },
 };
 
 export default function GuidePhoto({

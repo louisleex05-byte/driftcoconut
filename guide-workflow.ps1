@@ -1136,7 +1136,17 @@ function Show-NewGuidePresetDialog {
     $tSlug = New-Object System.Windows.Forms.TextBox
     $tSlug.Location = New-Object System.Drawing.Point(15, 35)
     $tSlug.Size = New-Object System.Drawing.Size(670, 22)
-    $tSlug.Text = ($DefaultSlug -replace '([a-z])([A-Z])', '$1-$2' -replace '\s+', '-').ToLower()
+    # Normalize the slug the same way the main Guide field does: lowercase, camelCase split,
+    # spaces to hyphens, then resolve against known keys so "kohtao" -> "koh-tao".
+    $initSlug = ($DefaultSlug -creplace '([a-z])([A-Z])', '$1-$2' -replace '\s+', '-' -replace '-+', '-' -replace '(^-|-$)', '').ToLower()
+    $initNorm = $initSlug -replace '-', ''
+    if ($initNorm.Length -ge 3 -and -not $global:PhotoSlotPresets.Contains($initSlug)) {
+        foreach ($k in $global:PhotoSlotPresets.Keys) { if (($k -replace '-', '') -eq $initNorm) { $initSlug = $k; break } }
+        if (-not $global:PhotoSlotPresets.Contains($initSlug) -and $global:GuideAltSuggestions) {
+            foreach ($k in $global:GuideAltSuggestions.Keys) { if (($k -replace '-', '') -eq $initNorm) { $initSlug = $k; break } }
+        }
+    }
+    $tSlug.Text = $initSlug
     $dlg.Controls.Add($tSlug)
 
     $lblWarn = New-Object System.Windows.Forms.Label
@@ -1220,6 +1230,18 @@ function Show-NewGuidePresetDialog {
     $applySmartDefaults = {
         param($slug)
         if (-not $slug) { return }
+
+        # Canonical resolution — same normalizer as the main Guide field
+        $norm = $slug -replace '-', ''
+        if ($norm.Length -ge 3) {
+            foreach ($k in $global:PhotoSlotPresets.Keys) { if (($k -replace '-', '') -eq $norm) { $slug = $k; break } }
+            if (-not $global:PhotoSlotPresets.Contains($slug) -and $global:GuideAltSuggestions) {
+                foreach ($k in $global:GuideAltSuggestions.Keys) { if (($k -replace '-', '') -eq $norm) { $slug = $k; break } }
+            }
+            # Fix the slug field to canonical form
+            if ($slug -ne $tSlug.Text.Trim()) { $tSlug.Text = $slug }
+        }
+
         $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
         if ($status.exists -and $status.hasRealContent -and $global:PhotoSlotPresets.Contains($slug)) {
             # Priority 1: existing real content
@@ -1227,7 +1249,7 @@ function Show-NewGuidePresetDialog {
             foreach ($e in $global:PhotoSlotPresets[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
             $tPairs.Text = ($lines -join "`r`n")
         } elseif ($global:GuideAltSuggestions.ContainsKey($slug)) {
-            # Priority 2: smart defaults for known destinations
+            # Priority 2: smart defaults (exact match — canonical resolution already ran)
             $lines = @()
             foreach ($e in $global:GuideAltSuggestions[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
             $tPairs.Text = ($lines -join "`r`n")
@@ -1250,9 +1272,9 @@ function Show-NewGuidePresetDialog {
     # Wire live warning updates + smart-defaults re-population on slug change + initial render
     $tSlug.Add_TextChanged({
         & $updateExistingWarning
-        & $applySmartDefaults (($tSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2').ToLower())
+        & $applySmartDefaults (($tSlug.Text.Trim() -creplace '([a-z])([A-Z])', '$1-$2').ToLower())
     }.GetNewClosure())
-    & $applySmartDefaults (($tSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2').ToLower())
+    & $applySmartDefaults (($tSlug.Text.Trim() -creplace '([a-z])([A-Z])', '$1-$2').ToLower())
     & $updateExistingWarning
 
     # === Modal loop with anchored placeholder + overwrite checks ===
@@ -1260,7 +1282,12 @@ function Show-NewGuidePresetDialog {
     # failure - user sees the error, fixes it, hits Save again.
     while ($true) {
         if ($dlg.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
-        $slug = ($tSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2' -replace '\s+', '-').ToLower()
+        $slug = ($tSlug.Text.Trim() -creplace '([a-z])([A-Z])', '$1-$2' -replace '\s+', '-' -replace '-+', '-' -replace '(^-|-$)', '').ToLower()
+        # Canonical resolution on save too
+        $sNorm = $slug -replace '-', ''
+        if ($sNorm.Length -ge 3) {
+            foreach ($k in $global:GuideAltSuggestions.Keys) { if (($k -replace '-', '') -eq $sNorm) { $slug = $k; break } }
+        }
         if (-not $slug) {
             [System.Windows.Forms.MessageBox]::Show("Slug is required.", "Missing slug", 'OK', 'Warning') | Out-Null
             continue
@@ -1616,12 +1643,43 @@ $txtHeaderSlug.Text = $global:CurrentSlug
 $txtHeaderSlug.Location = New-Object System.Drawing.Point(55, 10)
 $txtHeaderSlug.Size = New-Object System.Drawing.Size(150, 22)
 $txtHeaderSlug.Add_TextChanged({
-    # Force lowercase + kebab-case (Linux/Vercel filesystems are case-sensitive; slugs
-    # must match the URL exactly). Prevents the Bali.mdx / Pattaya.mdx case-mismatch bug.
-    $raw = $txtHeaderSlug.Text.Trim() -replace '([a-z])([A-Z])', '$1-$2'
-    $raw = $raw.ToLower() -replace '\s+', '-'
+    # =====================================================================
+    # UNIVERSAL SLUG NORMALIZER (Sep 2026 - permanent fix)
+    # Accepts ANY input: "kohtao", "KohTao", "KOHTAO", "Koh Tao", "koh tao",
+    # "koh-tao", "KOH-TAO" — all resolve to the canonical "koh-tao".
+    #
+    # Step 1: basic cleanup (lowercase, camelCase split, spaces to hyphens)
+    # Step 2: canonical resolution — strip hyphens and match against ALL known
+    #         keys in PhotoSlotPresets + GuideAltSuggestions. If found, rewrite
+    #         to the canonical hyphenated form. This is the SINGLE place where
+    #         spelling variants are resolved — no fuzzy matching needed downstream.
+    # Step 3: auto-register from GuideAltSuggestions or Build-PresetFromDraft
+    #         when the slug is known but not yet in PhotoSlotPresets.
+    # =====================================================================
+
+    # Step 1: basic normalization
+    $raw = $txtHeaderSlug.Text.Trim() -creplace '([a-z])([A-Z])', '$1-$2'
+    $raw = $raw.ToLower() -replace '\s+', '-' -replace '-+', '-' -replace '(^-|-$)', ''
+
+    # Step 2: canonical slug resolution — match against known keys
+    if ($raw.Length -ge 3 -and -not $global:PhotoSlotPresets.Contains($raw)) {
+        $norm = $raw -replace '-', ''
+        if ($norm.Length -ge 3) {
+            # Check PhotoSlotPresets keys first (already-imported presets)
+            foreach ($k in $global:PhotoSlotPresets.Keys) {
+                if (($k -replace '-', '') -eq $norm) { $raw = $k; break }
+            }
+            # If still unresolved, check GuideAltSuggestions keys (smart defaults)
+            if (-not $global:PhotoSlotPresets.Contains($raw) -and $global:GuideAltSuggestions) {
+                foreach ($k in $global:GuideAltSuggestions.Keys) {
+                    if (($k -replace '-', '') -eq $norm) { $raw = $k; break }
+                }
+            }
+        }
+    }
+
+    # Rewrite the field if normalization/resolution changed it
     if ($raw -ne $txtHeaderSlug.Text) {
-        # Preserve cursor position while rewriting the field
         $pos = $txtHeaderSlug.SelectionStart
         $txtHeaderSlug.Text = $raw
         $txtHeaderSlug.SelectionStart = [Math]::Min($pos, $raw.Length)
@@ -1629,35 +1687,74 @@ $txtHeaderSlug.Add_TextChanged({
     $global:CurrentSlug = $raw
     if ($global:CurrentSlug) { $global:Meta.slug = $global:CurrentSlug }
 
-    # Auto-switch photo preset when slug matches a KNOWN preset key.
-    # Only switch when the typed slug is a complete valid preset - otherwise the
-    # dropdown would flicker to "generic" on every keystroke while typing (e.g.
-    # 'h' -> generic, 'hu' -> generic, 'hua' -> generic, 'hua-hin' -> hua-hin),
-    # resetting the slot rows each time and losing anything the user was setting up.
-    # If the field is CLEARED entirely, only then fall back to "generic".
+    # =====================================================================
+    # PRESET AUTO-SWITCH + AUTO-REGISTER
+    # After canonical resolution above, $raw is always the correct hyphenated
+    # slug if it exists in any known table. The logic below is clean exact-match:
+    #   1. In PhotoSlotPresets -> just switch the dropdown
+    #   2. In GuideAltSuggestions -> auto-register + switch (no wizard needed)
+    #   3. Has draft data -> Build-PresetFromDraft -> auto-register + switch
+    #   4. Nothing found -> show warning
+    # =====================================================================
     if ($global:cmbPreset) {
         if (-not $raw) {
             if ($global:cmbPreset.SelectedItem -ne "generic") {
                 $global:cmbPreset.SelectedItem = "generic"
             }
         } elseif ($global:PhotoSlotPresets.Contains($raw)) {
+            # Already registered — just switch
             if ($global:cmbPreset.SelectedItem -ne $raw) {
                 $global:cmbPreset.SelectedItem = $raw
             }
+        } elseif ($raw.Length -ge 3) {
+            # --- AUTO-REGISTER: slug resolved but not yet in PhotoSlotPresets ---
+            $autoEntries = $null
+
+            # Try GuideAltSuggestions (exact match — fuzzy already resolved above)
+            if ($global:GuideAltSuggestions.ContainsKey($raw)) {
+                $autoEntries = @()
+                foreach ($e in $global:GuideAltSuggestions[$raw]) {
+                    $file = ([regex]::Replace($e.slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
+                    $autoEntries += [pscustomobject]@{ slot = $e.slot; file = $file; alt = $e.alt }
+                }
+            }
+
+            # Fallback: derive from draft body
+            if (-not $autoEntries -or $autoEntries.Count -lt 2) {
+                $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+                $destination = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
+                $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
+                if ($draftText -and $destination) {
+                    $derived = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
+                    if ($derived.Count -ge 2) { $autoEntries = $derived }
+                }
+            }
+
+            if ($autoEntries -and $autoEntries.Count -ge 2) {
+                # Register + rebuild dropdown + sync rows
+                $global:PhotoSlotPresets[$raw] = $autoEntries
+                $global:cmbPreset.Items.Clear()
+                foreach ($k in $global:PhotoSlotPresets.Keys) { [void]$global:cmbPreset.Items.Add($k) }
+                $global:cmbPreset.SelectedItem = $raw
+                $global:PhotoSlots = $autoEntries
+                Sync-PhotoSlotRows
+
+                if ($global:lblSlugWarn) {
+                    $global:lblSlugWarn.Text = "Auto-filled $($autoEntries.Count) photo slots for '$raw'."
+                    $global:lblSlugWarn.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+                    $global:lblSlugWarn.Visible = $true
+                }
+            }
         }
-        # else: partial/unknown slug - keep the current preset, user is still typing
     }
 
-    # STALE-PRESET WARNING: if the typed slug isn't a known preset but IS a plausible
-    # complete slug (>=3 chars, kebab-case), flag it visually so the user knows the
-    # sidebar rows and Hero alt still belong to the OLD guide, not what they typed.
-    # Prevents the "why is Chiang Mai data showing for Kanchanaburi?" confusion.
+    # STALE-PRESET WARNING (only if auto-register didn't already set a success message)
     if ($global:lblSlugWarn) {
         if ($raw -and $raw.Length -ge 3 -and -not $global:PhotoSlotPresets.Contains($raw)) {
-            $global:lblSlugWarn.Text = "No preset for '$raw' yet - sidebar shows stale data. Click + New Preset to create it."
+            $global:lblSlugWarn.Text = "No preset for '$raw' - not in defaults or draft."
             $global:lblSlugWarn.ForeColor = [System.Drawing.Color]::Firebrick
             $global:lblSlugWarn.Visible = $true
-        } else {
+        } elseif ($global:lblSlugWarn.ForeColor.ToArgb() -ne [System.Drawing.Color]::FromArgb(30, 122, 145).ToArgb()) {
             $global:lblSlugWarn.Visible = $false
         }
     }
