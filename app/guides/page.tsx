@@ -7,8 +7,18 @@ export const metadata: Metadata = {
   description: "In-depth, locally-written travel guides for Asia's best destinations.",
 };
 
+// Always show these three guides in the first row, in this order.
+const PINNED_SLUGS = ["bangkok", "pattaya", "chiang-mai"];
+
 export default async function GuidesIndexPage() {
-  const guides = await listGuides();
+  const all = await listGuides();
+
+  // Pin the top-row guides first, then append the rest in their normal order.
+  const pinned = PINNED_SLUGS
+    .map((s) => all.find((g) => g.slug === s))
+    .filter((g): g is NonNullable<typeof g> => Boolean(g));
+  const rest = all.filter((g) => !PINNED_SLUGS.includes(g.slug));
+  const guides = [...pinned, ...rest];
 
   return (
     <div className="max-w-5xl mx-auto">

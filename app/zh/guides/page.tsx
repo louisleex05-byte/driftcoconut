@@ -19,8 +19,17 @@ export const metadata: Metadata = {
   },
 };
 
+// Always show these three guides in the first row, in this order.
+const PINNED_SLUGS = ["bangkok", "pattaya", "chiang-mai"];
+
 export default async function GuidesIndexPageZh() {
-  const guides = await listGuides("zh");
+  const all = await listGuides("zh");
+
+  const pinned = PINNED_SLUGS
+    .map((s) => all.find((g) => g.slug === s))
+    .filter((g): g is NonNullable<typeof g> => Boolean(g));
+  const rest = all.filter((g) => !PINNED_SLUGS.includes(g.slug));
+  const guides = [...pinned, ...rest];
 
   return (
     <div className="max-w-5xl mx-auto">
