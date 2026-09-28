@@ -44,6 +44,8 @@ export const metadata: Metadata = {
     "cuelinks-verification": "VERIFY-CL-EMDYHQDD",
     // Pinterest business account - domain claim verification
     "p:domain_verify": "fe0d341e2a2340f0c221ac614574aa92",
+    // Bing Webmaster Tools - HTML meta tag verification
+    "msvalidate.01": "5E684B660F9D69B202815B5BED51CD6E",
   },
   verification: {
     ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
