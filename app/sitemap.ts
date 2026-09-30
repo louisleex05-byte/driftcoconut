@@ -64,6 +64,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
+      alternates: {
+        languages: {
+          en: `${SITE_URL}/about`,
+          "zh-CN": `${SITE_URL}/zh/about`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/zh/about`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
     {
       url: `${SITE_URL}/privacy`,
