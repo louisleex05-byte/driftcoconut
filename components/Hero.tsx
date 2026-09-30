@@ -59,7 +59,7 @@ export default function Hero() {
         {/* Centered content — headline + subhead */}
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-14 sm:pb-10 md:pb-14 px-4">
           <div className="w-full max-w-3xl text-center text-white">
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight drop-shadow-lg">
+            <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight drop-shadow-lg text-balance">
               {t("hero_title")}
             </h1>
             <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-lg drop-shadow-md opacity-95 px-2">

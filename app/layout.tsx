@@ -18,21 +18,22 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://driftcoconut.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "driftcoconut — find your next stay",
+    // Keyword-rich for Google results; the on-page hero carries the brand line.
+    default: "driftcoconut — Asia travel guides & where to stay",
     template: "%s · driftcoconut",
   },
-  description: "Discover and compare hotels worldwide. Drift into your next getaway.",
+  description: "Honest local Asia travel guides and neighborhood advice. Know where to stay, then book through Booking.com.",
   openGraph: {
-    title: "driftcoconut — find your next stay",
-    description: "Discover and compare hotels worldwide. Drift into your next getaway.",
+    title: "driftcoconut — Travel Asia like someone who knows the place.",
+    description: "Honest local Asia travel guides and neighborhood advice. Know where to stay, then book through Booking.com.",
     url: SITE_URL,
     siteName: "driftcoconut",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "driftcoconut — find your next stay",
-    description: "Discover and compare hotels worldwide. Drift into your next getaway.",
+    title: "driftcoconut — Travel Asia like someone who knows the place.",
+    description: "Honest local Asia travel guides and neighborhood advice. Know where to stay, then book through Booking.com.",
   },
   other: {
     ...(process.env.NEXT_PUBLIC_AGODA_VERIFICATION && {

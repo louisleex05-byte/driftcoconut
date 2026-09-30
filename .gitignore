@@ -19,3 +19,11 @@ DESTINATION-GUIDE-FRAMEWORK.md
 
 # guide-workflow app — local config with API key (never commit)
 guide-workflow-config.json
+
+# GA dashboard — OAuth credentials and cached token (never commit)
+ga-credentials.json
+ga-oauth-client.json
+client_secret_*.json
+ga-token.json
+ga-dashboard.html
+ga-insight-cache.json

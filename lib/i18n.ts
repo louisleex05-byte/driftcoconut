@@ -25,11 +25,11 @@ export const dictionary = {
     header_search_aria: "Search destinations",
 
     // Hero
-    // Honest positioning: we're locally-written Asia guides + Booking.com booking convenience,
-    // NOT a metasearch. "Compare thousands" wording was misleading after stripping the strip
-    // down to Booking.com only. Now the subtitle matches what the site actually delivers.
-    hero_title: "Find your next stay",
-    hero_subtitle: "Locally-written Asia travel guides. Book worldwide with Booking.com.",
+    // Positioning: "Travel Asia like someone who knows the place." Locally-written Asia guides
+    // are the product; Booking.com booking is the convenience. NOT a metasearch, and no
+    // "live availability" claim until real (non-mock) hotel data is on.
+    hero_title: "Travel Asia like someone who knows the place.",
+    hero_subtitle: "Honest local guides and neighborhood advice for every destination, then book your stay through Booking.com.",
 
     // Deals section
     deals_eyebrow: "Curated for wanderers",
@@ -156,8 +156,8 @@ export const dictionary = {
     header_search_aria: "ค้นหาจุดหมายปลายทาง",
 
     // Hero
-    hero_title: "ค้นหาที่พักครั้งต่อไป",
-    hero_subtitle: "คู่มือเที่ยวเอเชียโดยคนในพื้นที่ จองที่พักทั่วโลกผ่าน Booking.com",
+    hero_title: "เที่ยวเอเชียแบบคนที่รู้จักที่นั่นดี",
+    hero_subtitle: "คู่มือท้องถิ่นที่ตรงไปตรงมาและคำแนะนำแต่ละย่านในทุกจุดหมาย แล้วจองที่พักผ่าน Booking.com",
 
     // Deals section
     deals_eyebrow: "คัดสรรสำหรับนักเดินทาง",
@@ -282,8 +282,8 @@ export const dictionary = {
     header_search_aria: "搜索目的地",
 
     // Hero
-    hero_title: "发现您的下一个住宿",
-    hero_subtitle: "本地人撰写的亚洲旅行指南 · 通过 Booking.com 预订全球住宿。",
+    hero_title: "像懂行的人一样玩转亚洲",
+    hero_subtitle: "真诚的本地指南和街区攻略，覆盖每个目的地，再通过 Booking.com 预订住宿。",
 
     // Deals section
     deals_eyebrow: "为漫游者精选",

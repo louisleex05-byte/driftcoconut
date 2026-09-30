@@ -6,8 +6,8 @@
 import HomePage from "@/app/page";
 
 export const metadata = {
-  title: "driftcoconut - 找到您的下一站住宿",
-  description: "由本地人撰写的亚洲深度旅行指南 + 实时酒店比价预订。",
+  title: "driftcoconut - 亚洲旅行指南与住宿推荐",
+  description: "真诚的本地亚洲旅行指南和街区攻略，先知道住哪里，再通过 Booking.com 预订。",
   alternates: {
     canonical: "/zh",
     languages: {
