@@ -39,7 +39,7 @@ export default function PartnerStrip() {
 
       <div className="max-w-6xl mx-auto px-4 py-6 relative z-10">
         <div className="text-center text-xs section-eyebrow mb-4">
-          Live inventory from our trusted booking partner
+          Hotels are booked and paid for on Booking.com
         </div>
 
         <div className="flex flex-wrap items-end justify-center gap-x-5 sm:gap-x-8 gap-y-4">
@@ -62,21 +62,24 @@ export default function PartnerStrip() {
           ))}
         </div>
 
-        {/* Trust indicators — all four apply to Booking.com's own guarantees */}
+        {/* Trust indicators — these are Booking.com's own policies (terms vary by property), so the note below attributes them. */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-600">
           <span className="inline-flex items-center gap-1.5">
-            <span className="text-green-600">✓</span> Best price guarantee
+            <span className="text-green-600">✓</span> Booking.com price match
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="text-green-600">✓</span> Free cancellation on most rooms
+            <span className="text-green-600">✓</span> Free cancellation on many rooms
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="text-green-600">✓</span> Secure partner checkout
+            <span className="text-green-600">✓</span> Secure checkout on Booking.com
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="text-green-600">✓</span> No booking fees
+            <span className="text-green-600">✓</span> No booking fees added by us
           </span>
         </div>
+        <p className="mt-2 text-center text-[10px] text-slate-400">
+          Booking.com&apos;s own policies. Conditions vary by property, so check before you book.
+        </p>
       </div>
     </section>
   );

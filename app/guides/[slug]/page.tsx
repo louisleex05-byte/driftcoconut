@@ -114,7 +114,7 @@ export default async function GuidePage({
           {guide.title}
         </h1>
         <p className="text-sm text-slate-500">
-          By {guide.author} · Updated {formatDate(guide.lastUpdated)} · {guide.readingMinutes} min read
+          By <Link href="/about#author" className="hover:text-sea-600 underline underline-offset-2">{guide.author}</Link> · Updated {formatDate(guide.lastUpdated)} · {guide.readingMinutes} min read
         </p>
       </header>
 

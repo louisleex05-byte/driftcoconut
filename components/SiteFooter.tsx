@@ -54,8 +54,9 @@ export default function SiteFooter() {
           <ul className="space-y-1.5 text-slate-500 text-xs">
             <li>Booking.com</li>
             <li>MakeMyTrip · Goibibo</li>
-            <li>Klook · Airalo</li>
-            <li>Welcome Pickups</li>
+            <li>Klook · KKday · Tiqets</li>
+            <li>Airalo · Yesim · Saily</li>
+            <li>Welcome Pickups · Kiwitaxi</li>
           </ul>
         </div>
       </div>

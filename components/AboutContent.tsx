@@ -21,8 +21,20 @@ export default function AboutContent() {
       <h2 className="text-xl font-semibold mt-8">{t("about_what_h2")}</h2>
       <p className="text-slate-600">{t("about_what_body")}</p>
 
+      <h2 id="author" className="text-xl font-semibold mt-8 scroll-mt-24">{t("about_author_h2")}</h2>
+      <p className="text-slate-600">{t("about_author_body")}</p>
+
+      <h2 className="text-xl font-semibold mt-8">{t("about_editorial_h2")}</h2>
+      <p className="text-slate-600">{t("about_editorial_body")}</p>
+
+      <h2 className="text-xl font-semibold mt-8">{t("about_money_h2")}</h2>
+      <p className="text-slate-600">{t("about_money_body")}</p>
+
       <h2 className="text-xl font-semibold mt-8">{t("about_partners_h2")}</h2>
       <p className="text-slate-600">{t("about_partners_body")}</p>
+
+      <h2 className="text-xl font-semibold mt-8">{t("about_status_h2")}</h2>
+      <p className="text-slate-600">{t("about_status_body")}</p>
 
       <h2 className="text-xl font-semibold mt-8">{t("about_contact_h2")}</h2>
       <p className="text-slate-600">

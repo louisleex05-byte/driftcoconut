@@ -16,6 +16,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { AFFILIATE_LINKS, type AffiliateKey } from "@/lib/affiliateLinks";
 import { bookingCJSearch, cjLink } from "@/lib/booking";
+import { plannerProfile } from "@/lib/tripPlannerRules";
 import { useT } from "@/contexts/LanguageProvider";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -185,6 +186,8 @@ export default function TripPlanner({
     });
   };
 
+  const profile = plannerProfile(destination);
+
   const stages = STAGES.map((s) => ({
     ...s,
     tiles: s.id === "before" ? BEFORE_ORDER[urgency] : s.tiles,
@@ -240,12 +243,20 @@ export default function TripPlanner({
 
             {stage.tiles
               // Hide any tile whose affiliate link hasn't been pasted yet (empty string).
+              .filter((id) => !profile.hide?.includes(id))
               .filter((id) => hrefFor(TILES[id].partner, destination) !== "")
               .map((id, ti) => {
               const tile = TILES[id];
               const href = hrefFor(tile.partner, destination);
               const alts = (tile.alts ?? []).filter((a) => AFFILIATE_LINKS[a.partner] !== "");
-              const title = destination && tile.destTitleKey ? fill(t(tile.destTitleKey), destination) : t(tile.titleKey);
+              // Places without their own airport: "Transfer to {dest}" instead of "{dest} airport transfer".
+              const transferTo = id === "transfer" && !!destination && !!profile.transferTo;
+              const title = transferTo
+                ? fill(t("plan_transfer_to_title"), destination)
+                : destination && tile.destTitleKey
+                  ? fill(t(tile.destTitleKey), destination)
+                  : t(tile.titleKey);
+              const subText = transferTo ? t("plan_transfer_to_sub") : t(tile.subKey);
               const doFirst = stage.id === "before" && ti === 0;
               const body = (
                 <>
@@ -260,7 +271,7 @@ export default function TripPlanner({
                   <h4 className={`font-display text-[13px] leading-tight font-semibold ${tile.color} group-hover:text-sea-700 transition-colors`}>
                     {title}
                   </h4>
-                  <p className="text-[11px] leading-snug text-slate-600 mt-0.5">{t(tile.subKey)}</p>
+                  <p className="text-[11px] leading-snug text-slate-600 mt-0.5">{subText}</p>
                   <div className="mt-1.5 text-[11px] font-medium text-sea-700 inline-flex items-center gap-1">
                     {t("essentials_book_now")}
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">

@@ -102,7 +102,7 @@ export default async function GuidePageZh({
           {guide.title}
         </h1>
         <p className="text-sm text-slate-500">
-          作者 {guide.author} · 更新于 {formatDateZh(guide.lastUpdated)} · 阅读时间 {guide.readingMinutes} 分钟
+          作者 <Link href="/about#author" className="hover:text-sea-600 underline underline-offset-2">{guide.author}</Link> · 更新于 {formatDateZh(guide.lastUpdated)} · 阅读时间 {guide.readingMinutes} 分钟
         </p>
       </header>
 

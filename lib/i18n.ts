@@ -123,24 +123,38 @@ export const dictionary = {
     plan_bikes_sub: "Compare local scooter and bike rentals. Check your licence and insurance first",
     plan_gocity_title: "Go City attraction passes",
     plan_gocity_sub: "One pass that covers multiple attractions in a city",
+    plan_transfer_to_title: "Transfer to {dest}",
+    plan_transfer_to_sub: "Pre-book a private ride from your arrival airport, station or pier",
 
     // About page
     about_h1: "About driftcoconut",
     about_intro:
-      "driftcoconut helps travelers discover and compare hotels across Asia and beyond. We aggregate listings, photos, and real guest reviews from trusted booking partners so you can find the right room, in the right neighborhood, at the right price — without opening a dozen tabs.",
-    about_what_h2: "What we do",
+      "driftcoconut is an independent Asia travel guide site. We write practical guides, starting with Thailand and Bali, that tell you which neighborhood to stay in, when to go, what things cost and what to watch out for, so you can choose where to stay with confidence.",
+    about_what_h2: "How the guides are made",
     about_what_body:
-      "We pull live availability and pricing from major hotel booking networks, then present it in a simple, unified search experience. When you find a stay you like, we send you directly to our partner's secure booking page to complete your reservation. We never charge you more than the partner's listed rate — our income comes from a small referral fee paid by the partner, at no cost to you.",
+      "Each guide is written by Mr. Padthai Jaidee, a Bangkok-based writer, and researched from published sources such as ferry operators, tourism authorities, dive and tour operators and weather data. Prices are planning ranges, not live quotes, and every guide shows the date it was last updated. When you are ready to book, our links take you to our partners' own websites, such as Booking.com for hotels, where you complete the booking and payment. We never see or store your payment details.",
+    about_money_h2: "How we earn money",
+    about_money_body:
+      "We earn a commission when you book or buy through some of our links, at no extra cost to you. The guides are written first and the links are added to them afterward. Please treat prices, visa rules and opening hours as a starting point and confirm them with the official source before you travel.",
+    about_author_h2: "Who writes the guides",
+    about_author_body:
+      "Mr. Padthai Jaidee writes the driftcoconut guides from Bangkok. He is a Thai traveler who writes about places he knows and checks prices, schedules and rules against published sources before each update. Questions for the author go to the email address below.",
+    about_editorial_h2: "Our editorial approach",
+    about_editorial_body:
+      "Prices, ferry times and entry fees come from published sources and are given as ranges. Every guide shows its last update date. Where we could not confirm a detail, we try to say so. If you spot a mistake, email us and we will check it and correct the guide.",
     about_partners_h2: "Our partners",
     about_partners_body:
-      "We work with Booking.com for global hotel inventory (2.3M+ properties), plus Klook for tours and experiences, Airalo for local eSIMs, and Welcome Pickups for airport transfers. Every stay is booked directly through Booking.com's verified inventory.",
+      "Hotels: Booking.com (plus MakeMyTrip and Goibibo for readers in India). Tours and tickets: Klook, KKday, Tiqets, Go City and Booking.com Attractions. Flights: Aviasales and Kiwi.com. Transfers and rentals: Welcome Pickups, Kiwitaxi, GetRentacar and BikesBooking. eSIMs and SIMs: Yesim, Airalo, Saily and Drimsim. Insurance and claims: Ekta, AirHelp and Compensair.",
+    about_status_h2: "What is live and what is not",
+    about_status_body:
+      "Hotel search sends you to Booking.com's live results. Any sample listings on our search page are labelled as samples while we build our own hotel data. Guides are updated as prices and rules change, but they can fall behind, so check the update date at the top of each guide.",
     about_contact_h2: "Contact",
-    about_contact_body_prefix: "Questions, feedback, or partnership inquiries? Email ",
+    about_contact_body_prefix: "Questions, corrections or partnership inquiries? Email ",
     about_disclaimer:
-      "driftcoconut is an independent hotel discovery service. Prices and availability are provided by our partners and are subject to change. All bookings and payment are handled by the respective booking partner.",
+      "driftcoconut is an independent travel guide and referral site. Prices and availability come from our partners and change often. All bookings and payments are handled by the partner. We are not a travel agent, airline or insurer.",
 
     // Footer
-    footer_tagline: "Search and compare hotels worldwide.",
+    footer_tagline: "Asia travel guides and where to stay.",
     footer_col_company: "Company",
     footer_col_legal: "Legal",
     footer_col_partners: "Partners",
@@ -152,7 +166,7 @@ export const dictionary = {
     // Booking.com CJ card
     booking_card_eyebrow: "Affiliate partner",
     booking_card_title: "Find your stay on Booking.com",
-    booking_card_body: "2.3M properties · free cancellation on most stays · price match guarantee.",
+    booking_card_body: "2.3M properties · free cancellation on many stays (terms vary) · Booking.com's price match.",
     booking_card_cta: "Search hotels →",
 
     // Guide tips badge (homepage callout)
@@ -179,7 +193,7 @@ export const dictionary = {
     // Lists ONLY active affiliate relationships. Do not add programs before approval;
     // the earlier version listed Expedia and Tripadvisor which we never signed with.
     footer_ftc_disclosure:
-      "driftcoconut participates in affiliate programs with Booking.com, MakeMyTrip, Goibibo, Klook, Airalo, and Welcome Pickups. We may earn a commission when you book through our links, at no cost to you.",
+      "driftcoconut participates in affiliate programs with Booking.com, MakeMyTrip, Goibibo, Klook, KKday, Tiqets, Go City, Airalo, Yesim, Saily, Drimsim, Welcome Pickups, Kiwitaxi, GetRentacar, BikesBooking, Aviasales, Kiwi.com, Ekta, AirHelp and Compensair. We may earn a commission when you book or buy through our links, at no cost to you.",
 
     // Language toggle
     lang_toggle_aria: "Switch language",
@@ -288,24 +302,38 @@ export const dictionary = {
     plan_bikes_sub: "เปรียบเทียบร้านเช่าสกูตเตอร์และจักรยานในพื้นที่ ตรวจสอบใบขับขี่และประกันก่อน",
     plan_gocity_title: "บัตรเข้าชมสถานที่ Go City",
     plan_gocity_sub: "บัตรใบเดียวเข้าชมสถานที่ท่องเที่ยวหลายแห่งในเมือง",
+    plan_transfer_to_title: "รถรับส่งไป {dest}",
+    plan_transfer_to_sub: "จองรถส่วนตัวล่วงหน้าจากสนามบิน สถานี หรือท่าเรือที่คุณไปถึง",
 
     // About page
     about_h1: "เกี่ยวกับ driftcoconut",
     about_intro:
-      "driftcoconut ช่วยนักเดินทางค้นหาและเปรียบเทียบโรงแรมทั่วเอเชียและทั่วโลก เรารวบรวมรายการโรงแรม รูปภาพ และรีวิวจริงจากพาร์ทเนอร์จองที่พักที่น่าเชื่อถือ เพื่อให้คุณค้นพบห้องที่ใช่ ในย่านที่ใช่ ในราคาที่ใช่ — โดยไม่ต้องเปิดหลายสิบแท็บ",
-    about_what_h2: "เราทำอะไร",
+      "driftcoconut คือเว็บไซต์คู่มือท่องเที่ยวเอเชียที่เป็นอิสระ เราเขียนคู่มือที่ใช้ได้จริง เริ่มจากประเทศไทยและบาหลี บอกว่าควรพักย่านไหน ไปช่วงไหนดี ค่าใช้จ่ายเท่าไร และอะไรที่ควรระวัง เพื่อให้คุณเลือกที่พักได้อย่างมั่นใจ",
+    about_what_h2: "คู่มือของเราทำอย่างไร",
     about_what_body:
-      "เราดึงข้อมูลห้องว่างและราคาแบบเรียลไทม์จากเครือข่ายจองโรงแรมชั้นนำ แล้วนำเสนอในหน้าค้นหาที่ใช้งานง่ายเป็นหนึ่งเดียว เมื่อคุณพบที่พักที่ถูกใจ เราจะพาคุณไปจองบนหน้าเว็บของพาร์ทเนอร์โดยตรง เราไม่คิดเงินเพิ่มจากราคาที่พาร์ทเนอร์แสดง — รายได้ของเรามาจากค่าแนะนำเล็กน้อยที่พาร์ทเนอร์จ่ายให้ โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
+      "คู่มือแต่ละเล่มเขียนโดย Mr. Padthai Jaidee นักเขียนที่อยู่ในกรุงเทพฯ และรวบรวมจากแหล่งข้อมูลที่เผยแพร่ เช่น ผู้ให้บริการเรือเฟอร์รี่ หน่วยงานการท่องเที่ยว ร้านดำน้ำและผู้จัดทัวร์ และข้อมูลสภาพอากาศ ราคาเป็นช่วงสำหรับวางแผน ไม่ใช่ราคาสด และทุกคู่มือแสดงวันที่อัปเดตล่าสุด เมื่อคุณพร้อมจอง ลิงก์ของเราจะพาไปยังเว็บไซต์ของพาร์ทเนอร์ เช่น Booking.com สำหรับที่พัก ซึ่งคุณจะจองและชำระเงินที่นั่น เราไม่เห็นและไม่เก็บข้อมูลการชำระเงินของคุณ",
+    about_money_h2: "เรามีรายได้อย่างไร",
+    about_money_body:
+      "เราได้รับค่าคอมมิชชั่นเมื่อคุณจองหรือซื้อผ่านลิงก์บางรายการของเรา โดยคุณไม่ต้องจ่ายเพิ่ม เราเขียนคู่มือก่อน แล้วจึงเพิ่มลิงก์เข้าไปทีหลัง โปรดใช้ราคา กฎวีซ่า และเวลาเปิดทำการเป็นข้อมูลเบื้องต้น และตรวจสอบกับแหล่งข้อมูลทางการก่อนเดินทาง",
+    about_author_h2: "ใครเป็นคนเขียนคู่มือ",
+    about_author_body:
+      "Mr. Padthai Jaidee เขียนคู่มือของ driftcoconut จากกรุงเทพฯ เขาเป็นนักเดินทางชาวไทยที่เขียนเกี่ยวกับสถานที่ที่เขารู้จัก และตรวจสอบราคา ตารางเวลา และกฎระเบียบกับแหล่งข้อมูลที่เผยแพร่ก่อนอัปเดตทุกครั้ง หากมีคำถามถึงผู้เขียน ส่งไปที่อีเมลด้านล่าง",
+    about_editorial_h2: "แนวทางบรรณาธิการของเรา",
+    about_editorial_body:
+      "ราคา ตารางเรือ และค่าเข้าชมมาจากแหล่งข้อมูลที่เผยแพร่ และแสดงเป็นช่วงราคา ทุกคู่มือแสดงวันที่อัปเดตล่าสุด หากเรายืนยันรายละเอียดใดไม่ได้ เราจะพยายามระบุไว้ หากพบข้อผิดพลาด โปรดอีเมลถึงเรา เราจะตรวจสอบและแก้ไขคู่มือ",
     about_partners_h2: "พาร์ทเนอร์ของเรา",
     about_partners_body:
-      "เราทำงานร่วมกับ Booking.com สำหรับที่พักทั่วโลก (โรงแรม 2.3 ล้านแห่ง) พร้อมทั้ง Klook สำหรับทัวร์และประสบการณ์ Airalo สำหรับ eSIM ท้องถิ่น และ Welcome Pickups สำหรับรับส่งสนามบิน การจองที่พักทุกครั้งดำเนินการผ่านคลังสินค้าที่ได้รับการยืนยันของ Booking.com โดยตรง",
+      "ที่พัก: Booking.com (และ MakeMyTrip กับ Goibibo สำหรับผู้อ่านในอินเดีย) ทัวร์และตั๋ว: Klook, KKday, Tiqets, Go City และ Booking.com Attractions เที่ยวบิน: Aviasales และ Kiwi.com รถรับส่งและเช่ารถ: Welcome Pickups, Kiwitaxi, GetRentacar และ BikesBooking eSIM และซิม: Yesim, Airalo, Saily และ Drimsim ประกันและการเคลม: Ekta, AirHelp และ Compensair",
+    about_status_h2: "อะไรใช้งานได้จริงและอะไรยังไม่ใช่",
+    about_status_body:
+      "การค้นหาโรงแรมจะพาคุณไปยังผลการค้นหาสดของ Booking.com รายการตัวอย่างในหน้าค้นหาของเราจะมีป้ายบอกว่าเป็นตัวอย่าง ระหว่างที่เรากำลังสร้างข้อมูลโรงแรมของเราเอง คู่มืออัปเดตเมื่อราคาและกฎเปลี่ยน แต่อาจล้าสมัยได้ โปรดดูวันที่อัปเดตที่ด้านบนของแต่ละคู่มือ",
     about_contact_h2: "ติดต่อเรา",
-    about_contact_body_prefix: "มีคำถาม ข้อเสนอแนะ หรือสนใจร่วมเป็นพาร์ทเนอร์? อีเมล ",
+    about_contact_body_prefix: "มีคำถาม แจ้งแก้ไขข้อมูล หรือสนใจร่วมเป็นพาร์ทเนอร์? อีเมล ",
     about_disclaimer:
-      "driftcoconut เป็นบริการค้นหาโรงแรมอิสระ ราคาและห้องว่างมาจากพาร์ทเนอร์และอาจเปลี่ยนแปลงได้ การจองและชำระเงินทั้งหมดดำเนินการโดยพาร์ทเนอร์แต่ละราย",
+      "driftcoconut เป็นเว็บไซต์คู่มือท่องเที่ยวและแนะนำลูกค้าที่เป็นอิสระ ราคาและความพร้อมให้บริการมาจากพาร์ทเนอร์และเปลี่ยนแปลงบ่อย การจองและการชำระเงินทั้งหมดดำเนินการโดยพาร์ทเนอร์ เราไม่ใช่ตัวแทนท่องเที่ยว สายการบิน หรือบริษัทประกัน",
 
     // Footer
-    footer_tagline: "ค้นหาและเปรียบเทียบโรงแรมทั่วโลก",
+    footer_tagline: "คู่มือท่องเที่ยวเอเชียและที่พักที่แนะนำ",
     footer_col_company: "บริษัท",
     footer_col_legal: "ข้อกำหนด",
     footer_col_partners: "พาร์ทเนอร์",
@@ -317,7 +345,7 @@ export const dictionary = {
     // Booking.com CJ card
     booking_card_eyebrow: "พาร์ทเนอร์ Affiliate",
     booking_card_title: "ค้นหาที่พักบน Booking.com",
-    booking_card_body: "โรงแรม 2.3 ล้านแห่งทั่วโลก · ยกเลิกฟรีเกือบทุกที่พัก · การันตีราคาดีที่สุด",
+    booking_card_body: "โรงแรม 2.3 ล้านแห่งทั่วโลก · ยกเลิกฟรีในหลายที่พัก (เงื่อนไขแตกต่างกัน) · การรับประกันราคาของ Booking.com",
     booking_card_cta: "ค้นหาโรงแรม →",
 
     // Guide tips badge (homepage callout)
@@ -342,7 +370,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut เข้าร่วมโปรแกรม Affiliate กับ Booking.com, MakeMyTrip, Goibibo, Klook, Airalo และ Welcome Pickups เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองผ่านลิงก์ของเรา โดยคุณไม่มีค่าใช้จ่ายเพิ่ม",
+      "driftcoconut เข้าร่วมโปรแกรมพันธมิตรกับ Booking.com, MakeMyTrip, Goibibo, Klook, KKday, Tiqets, Go City, Airalo, Yesim, Saily, Drimsim, Welcome Pickups, Kiwitaxi, GetRentacar, BikesBooking, Aviasales, Kiwi.com, Ekta, AirHelp และ Compensair เราอาจได้รับค่าคอมมิชชั่นเมื่อคุณจองหรือซื้อผ่านลิงก์ของเรา โดยคุณไม่ต้องจ่ายเพิ่ม",
 
     // Language toggle
     lang_toggle_aria: "เปลี่ยนภาษา",
@@ -451,24 +479,38 @@ export const dictionary = {
     plan_bikes_sub: "比较当地踏板车和自行车租赁。请先确认驾照和保险",
     plan_gocity_title: "Go City 景点通票",
     plan_gocity_sub: "一张通票即可游览城市中的多个景点",
+    plan_transfer_to_title: "前往{dest}的接送",
+    plan_transfer_to_sub: "提前预订从抵达的机场、车站或码头出发的专车",
 
     // About page
     about_h1: "关于 driftcoconut",
     about_intro:
-      "driftcoconut 帮助旅行者发现并比较亚洲及全球各地的酒店。我们整合来自可信预订合作伙伴的房源、照片和真实住客评价,让您在无需打开十几个标签页的情况下,找到合适街区、合适价位的合适房间。",
-    about_what_h2: "我们做什么",
+      "driftcoconut 是一个独立的亚洲旅行指南网站。我们撰写实用的指南,从泰国和巴厘岛开始,告诉您住在哪个街区、什么时候去、花费多少以及需要注意什么,帮助您放心地选择住宿。",
+    about_what_h2: "指南是如何制作的",
     about_what_body:
-      "我们从主要酒店预订网络实时获取房态和价格,以简洁统一的搜索体验呈现给您。当您找到心仪的住宿,我们将直接跳转到合作伙伴的安全预订页面完成预订。我们从不高于合作伙伴的公开价格 — 我们的收入来自合作伙伴支付的少量推介费,您无需承担任何额外费用。",
+      "每篇指南由常驻曼谷的作者 Mr. Padthai Jaidee 撰写,并参考已公开的资料来源,例如渡轮运营商、旅游主管部门、潜水和旅游运营商以及天气数据。价格仅为规划参考范围,并非实时报价,每篇指南都会标注最近更新日期。当您准备预订时,我们的链接会带您前往合作伙伴自己的网站(例如用于酒店的 Booking.com),您在那里完成预订和付款。我们不会看到或保存您的付款信息。",
+    about_money_h2: "我们如何赚钱",
+    about_money_body:
+      "当您通过我们的部分链接预订或购买时,我们会获得佣金,您无需额外付费。我们先撰写指南,之后再加入链接。价格、签证规则和营业时间请仅作参考,出行前请向官方渠道核实。",
+    about_author_h2: "谁在撰写指南",
+    about_author_body:
+      "Mr. Padthai Jaidee 在曼谷撰写 driftcoconut 的指南。他是一位泰国旅行者,只写自己熟悉的地方,并在每次更新前对照已公开的资料核实价格、时刻表和规定。如需联系作者,请使用下方邮箱。",
+    about_editorial_h2: "我们的编辑方式",
+    about_editorial_body:
+      "价格、渡轮时间和门票费用来自已公开的资料,并以范围形式给出。每篇指南都标注最近更新日期。对于无法确认的细节,我们会尽量注明。如果您发现错误,请给我们发邮件,我们会核实并更正指南。",
     about_partners_h2: "我们的合作伙伴",
     about_partners_body:
-      "我们与 Booking.com 合作提供全球酒店库存(230 万+ 房源),加上 Klook 用于旅游和体验、Airalo 用于本地 eSIM、Welcome Pickups 用于机场接送。每次预订都直接通过 Booking.com 经过核实的库存完成。",
+      "酒店:Booking.com(印度读者另有 MakeMyTrip 和 Goibibo)。旅游和门票:Klook、KKday、Tiqets、Go City 和 Booking.com Attractions。机票:Aviasales 和 Kiwi.com。接送和租车:Welcome Pickups、Kiwitaxi、GetRentacar 和 BikesBooking。eSIM 和 SIM 卡:Yesim、Airalo、Saily 和 Drimsim。保险和理赔:Ekta、AirHelp 和 Compensair。",
+    about_status_h2: "哪些已上线,哪些还没有",
+    about_status_body:
+      "酒店搜索会带您前往 Booking.com 的实时结果。在我们自建酒店数据期间,搜索页面上的任何示例列表都会标明为示例。指南会随价格和规则变化而更新,但也可能滞后,请查看每篇指南顶部的更新日期。",
     about_contact_h2: "联系我们",
-    about_contact_body_prefix: "如有问题、反馈或合作意向?邮件 ",
+    about_contact_body_prefix: "如有问题、更正或合作意向?邮件 ",
     about_disclaimer:
-      "driftcoconut 是一家独立的酒店发现服务。价格和房态由合作伙伴提供,可能有变动。所有预订和付款均由相应的预订合作伙伴处理。",
+      "driftcoconut 是一个独立的旅行指南和推荐网站。价格和可订情况来自合作伙伴,且经常变化。所有预订和付款均由合作伙伴处理。我们不是旅行社、航空公司或保险公司。",
 
     // Footer
-    footer_tagline: "搜索并比较全球酒店。",
+    footer_tagline: "亚洲旅行指南与住宿推荐。",
     footer_col_company: "公司",
     footer_col_legal: "法律",
     footer_col_partners: "合作伙伴",
@@ -480,7 +522,7 @@ export const dictionary = {
     // Booking.com CJ card
     booking_card_eyebrow: "关联合作伙伴",
     booking_card_title: "在 Booking.com 上找到您的住宿",
-    booking_card_body: "230 万家住宿 · 大部分住宿免费取消 · 价格匹配保证。",
+    booking_card_body: "230 万家住宿 · 许多住宿可免费取消(条款因住宿而异)· Booking.com 价格匹配保证。",
     booking_card_cta: "搜索酒店 →",
 
     // Guide tips badge (homepage callout)
@@ -505,7 +547,7 @@ export const dictionary = {
 
     // Site-wide FTC disclosure (footer)
     footer_ftc_disclosure:
-      "driftcoconut 参与与 Booking.com、MakeMyTrip、Goibibo、Klook、Airalo 和 Welcome Pickups 的关联营销项目。您通过我们的链接预订时,我们可能获得佣金,您无需支付额外费用。",
+      "driftcoconut 参与与 Booking.com、MakeMyTrip、Goibibo、Klook、KKday、Tiqets、Go City、Airalo、Yesim、Saily、Drimsim、Welcome Pickups、Kiwitaxi、GetRentacar、BikesBooking、Aviasales、Kiwi.com、Ekta、AirHelp 和 Compensair 的关联营销项目。您通过我们的链接预订或购买时,我们可能获得佣金,您无需支付额外费用。",
 
     // Language toggle
     lang_toggle_aria: "切换语言",
