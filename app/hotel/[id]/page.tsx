@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PalmLeaf, Shell } from "@/components/Decorations";
-import TravelEssentials from "@/components/TravelEssentials";
+import TripPlanner from "@/components/TripPlanner";
 import BookingCard from "@/components/BookingCard";
 
 type Params = { id: string };
@@ -156,10 +156,7 @@ export default async function HotelDetailPage({
 
       {/* Travel essentials — affiliate cross-sell (Klook, Welcome Pickups, Yesim, Kiwi) */}
       <section className="pt-8 border-t border-sea-100">
-        <TravelEssentials
-          headingKey="essentials_hotel_heading"
-          subheadingKey="essentials_hotel_sub"
-        />
+        <TripPlanner />
       </section>
     </div>
   );

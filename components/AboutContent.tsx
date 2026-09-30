@@ -1,7 +1,7 @@
 "use client";
 
 import { PalmLeaf, Shell, Hibiscus, Boat, StrawHat } from "@/components/Decorations";
-import TravelEssentials from "@/components/TravelEssentials";
+import TripPlanner from "@/components/TripPlanner";
 import { useT } from "@/contexts/LanguageProvider";
 
 export default function AboutContent() {
@@ -33,10 +33,7 @@ export default function AboutContent() {
       <p className="text-xs text-slate-400 mt-12">{t("about_disclaimer")}</p>
 
       <div className="not-prose mt-12 pt-8 border-t border-sea-100">
-        <TravelEssentials
-          headingKey="essentials_about_heading"
-          subheadingKey="essentials_about_sub"
-        />
+        <TripPlanner />
       </div>
     </div>
   );

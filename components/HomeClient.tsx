@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Hero from "@/components/Hero";
 import PartnerStrip from "@/components/PartnerStrip";
 import SearchForm from "@/components/SearchForm";
-import TravelEssentials from "@/components/TravelEssentials";
+import TripPlanner from "@/components/TripPlanner";
 import GuideTipsBadge from "@/components/GuideTipsBadge";
 import FeaturedGuides from "@/components/FeaturedGuides";
 import { Hibiscus, Starfish, PalmLeaf, Boat, StrawHat, Coral, Conch, Shell } from "@/components/Decorations";
@@ -132,7 +132,7 @@ export default function HomeClient({
       </section>
 
       <section className="mt-6 mb-10">
-        <TravelEssentials />
+        <TripPlanner />
       </section>
 
       <PalmLeaf className="hidden lg:block fixed -bottom-20 -right-20 w-72 text-sea-200 opacity-60 rotate-45 pointer-events-none -z-10" />
