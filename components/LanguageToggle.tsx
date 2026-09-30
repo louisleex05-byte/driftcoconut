@@ -4,9 +4,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageProvider";
 import type { Locale } from "@/lib/i18n";
 
-// Paths that have a real /zh/... twin: /, /about, /guides, /guides/<slug>.
+// Paths that have a real /zh/... twin: /, /about, /privacy, /terms, /guides, /guides/<slug>.
 // Add a path here when you create its /zh page.
-const HAS_ZH_ROUTE = /^\/(about|guides(\/[^/]+)?)?\/?$/;
+const HAS_ZH_ROUTE = /^\/(about|privacy|terms|guides(\/[^/]+)?)?\/?$/;
 
 // Toggle between EN / TH / 中文.
 // Chinese has real routed pages under /zh/... — clicking 中文 navigates there

@@ -82,9 +82,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.2,
+      alternates: {
+        languages: {
+          en: `${SITE_URL}/privacy`,
+          "zh-CN": `${SITE_URL}/zh/privacy`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/zh/privacy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
     },
     {
       url: `${SITE_URL}/terms`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
+      alternates: {
+        languages: {
+          en: `${SITE_URL}/terms`,
+          "zh-CN": `${SITE_URL}/zh/terms`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/zh/terms`,
       lastModified: now,
       changeFrequency: "yearly",
       priority: 0.2,

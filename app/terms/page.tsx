@@ -3,6 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Use — driftcoconut",
   description: "Terms for using driftcoconut.",
+  alternates: {
+    canonical: "/terms",
+    languages: {
+      en: "/terms",
+      "zh-CN": "/zh/terms",
+      "x-default": "/terms",
+    },
+  },
 };
 
 export default function TermsPage() {

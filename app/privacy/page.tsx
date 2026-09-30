@@ -3,6 +3,14 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy — driftcoconut",
   description: "How driftcoconut handles your data.",
+  alternates: {
+    canonical: "/privacy",
+    languages: {
+      en: "/privacy",
+      "zh-CN": "/zh/privacy",
+      "x-default": "/privacy",
+    },
+  },
 };
 
 export default function PrivacyPage() {

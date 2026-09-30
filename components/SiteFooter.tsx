@@ -3,11 +3,12 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Wave, Shell, Coral, Conch, Starfish } from "@/components/Decorations";
-import { useT } from "@/contexts/LanguageProvider";
+import { useLanguage, useT } from "@/contexts/LanguageProvider";
 import BookingImpressionPixel from "@/components/BookingImpressionPixel";
 
 export default function SiteFooter() {
   const t = useT();
+  const { locale } = useLanguage();
   const year = new Date().getFullYear();
   return (
     <footer className="relative mt-16 border-t border-sea-100 py-10 bg-white/50 overflow-hidden">
@@ -36,8 +37,8 @@ export default function SiteFooter() {
         <div>
           <div className="font-semibold text-slate-900 mb-2">{t("footer_col_legal")}</div>
           <ul className="space-y-1.5 text-slate-500">
-            <li><Link href="/privacy" className="hover:text-sea-600 transition-colors">{t("footer_link_privacy")}</Link></li>
-            <li><Link href="/terms" className="hover:text-sea-600 transition-colors">{t("footer_link_terms")}</Link></li>
+            <li><Link href={locale === "zh" ? "/zh/privacy" : "/privacy"} className="hover:text-sea-600 transition-colors">{t("footer_link_privacy")}</Link></li>
+            <li><Link href={locale === "zh" ? "/zh/terms" : "/terms"} className="hover:text-sea-600 transition-colors">{t("footer_link_terms")}</Link></li>
           </ul>
         </div>
         <div>
