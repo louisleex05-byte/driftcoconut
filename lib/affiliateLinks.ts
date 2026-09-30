@@ -36,13 +36,17 @@ export const AFFILIATE_LINKS = {
   // Leave as "" until you generate the link in Travelpayouts (Tools → Links →
   // pick the program → copy the tpk.mx short link). The trip planner hides any
   // tile or "Also:" link whose URL is empty, so nothing broken ever shows.
+  // Step 1 (Before you go)
+  saily: "https://saily.tpk.mx/IIgXfbbi", // eSIM (15%) — "Also:" under Yesim, next to Airalo
   // Step 2 (When you land)
-  localrent: "",       // Car / scooter rental (Localrent or EconomyBookings)
-  kiwitaxi: "",        // Private transfers — shown as "Also:" under Welcome Pickups
+  getrentacar: "https://getrentacar.tpk.mx/XoVtDxvf", // Car rental (10%, 90-day cookie)
+  kiwitaxi: "https://kiwitaxi.tpk.mx/33nZFmOH", // Private transfers (9–11%) — "Also:" under Welcome Pickups
+  bikesbooking: "https://bikesbooking.tpk.mx/C3xF3LI4", // Scooter / bike rental (4%) — 4th tile in step 2
   // Step 3 (While you're there)
-  getyourguide: "",    // Tours & activities — shown as "Also:" under Klook
+  kkday: "https://kkday.tpk.mx/mNmsSQ1R", // Asia tours & activities (1–5%) — "Also:" under Klook
+  gocity: "https://gocity.tpk.mx/TPRoyvLg", // Attraction passes (3.4–6%) — 4th tile in step 3
   // Step 4 (If things go wrong)
-  compensair: "",      // Flight compensation — third tile in step 4
+  compensair: "https://compensair.tpk.mx/LphYOfwg", // Flight compensation (fixed €5–12) — third tile in step 4
   claimcompass: "",    // Flight compensation alt — shown as "Also:" under AirHelp
 } as const;
 

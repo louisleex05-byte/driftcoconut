@@ -35,8 +35,8 @@ type Tile = {
   bg: string;
   /** Partner key for tracking + link. "booking" = CJ deep link built from destination. */
   partner: AffiliateKey | "booking" | "bookingAttractions";
-  /** Optional secondary partner shown as a small "Also: …" link. */
-  alt?: { partner: AffiliateKey; label: string };
+  /** Optional secondary partners shown as small "Also: …" links. */
+  alts?: { partner: AffiliateKey; label: string }[];
 };
 
 const TILES: Record<string, Tile> = {
@@ -49,7 +49,7 @@ const TILES: Record<string, Tile> = {
     id: "flights", stage: "before",
     titleKey: "card_aviasales_title", subKey: "card_aviasales_sub",
     emoji: "✈️", color: "text-rose-700", bg: "bg-rose-50", partner: "aviasales",
-    alt: { partner: "kiwi", label: "Kiwi.com" },
+    alts: [{ partner: "kiwi", label: "Kiwi.com" }],
   },
   insurance: {
     id: "insurance", stage: "before",
@@ -60,13 +60,13 @@ const TILES: Record<string, Tile> = {
     id: "esim", stage: "before",
     titleKey: "card_yesim_title", subKey: "card_yesim_sub",
     emoji: "📶", color: "text-emerald-700", bg: "bg-emerald-50", partner: "yesim",
-    alt: { partner: "airalo", label: "Airalo" },
+    alts: [{ partner: "airalo", label: "Airalo" }, { partner: "saily", label: "Saily" }],
   },
   transfer: {
     id: "transfer", stage: "land",
     titleKey: "card_welcomepickups_title", subKey: "card_welcomepickups_sub", destTitleKey: "plan_transfer_dest_title",
     emoji: "🚕", color: "text-sea-700", bg: "bg-sea-50", partner: "welcomePickups",
-    alt: { partner: "kiwitaxi", label: "Kiwitaxi" },
+    alts: [{ partner: "kiwitaxi", label: "Kiwitaxi" }],
   },
   sim: {
     id: "sim", stage: "land",
@@ -76,13 +76,18 @@ const TILES: Record<string, Tile> = {
   cars: {
     id: "cars", stage: "land",
     titleKey: "plan_cars_title", subKey: "plan_cars_sub",
-    emoji: "🚗", color: "text-indigo-700", bg: "bg-indigo-50", partner: "localrent",
+    emoji: "🚗", color: "text-indigo-700", bg: "bg-indigo-50", partner: "getrentacar",
+  },
+  bikes: {
+    id: "bikes", stage: "land",
+    titleKey: "plan_bikes_title", subKey: "plan_bikes_sub",
+    emoji: "🛵", color: "text-lime-700", bg: "bg-lime-50", partner: "bikesbooking",
   },
   tours: {
     id: "tours", stage: "there",
     titleKey: "card_klook_title", subKey: "card_klook_sub", destTitleKey: "plan_tours_dest_title",
     emoji: "🎟️", color: "text-amber-700", bg: "bg-amber-50", partner: "klook",
-    alt: { partner: "getyourguide", label: "GetYourGuide" },
+    alts: [{ partner: "kkday", label: "KKday" }],
   },
   tickets: {
     id: "tickets", stage: "there",
@@ -94,11 +99,16 @@ const TILES: Record<string, Tile> = {
     titleKey: "plan_attractions_title", subKey: "plan_attractions_sub",
     emoji: "🗺️", color: "text-sea-700", bg: "bg-sea-50", partner: "bookingAttractions",
   },
+  gocity: {
+    id: "gocity", stage: "there",
+    titleKey: "plan_gocity_title", subKey: "plan_gocity_sub",
+    emoji: "🏙️", color: "text-cyan-700", bg: "bg-cyan-50", partner: "gocity",
+  },
   delay: {
     id: "delay", stage: "wrong",
     titleKey: "card_airhelp_title", subKey: "card_airhelp_sub",
     emoji: "💸", color: "text-orange-700", bg: "bg-orange-50", partner: "airhelp",
-    alt: { partner: "claimcompass", label: "ClaimCompass" },
+    alts: [{ partner: "claimcompass", label: "ClaimCompass" }],
   },
   claim: {
     id: "claim", stage: "wrong",
@@ -127,8 +137,8 @@ const STAGES: {
   tiles: string[];
 }[] = [
   { id: "before", titleKey: "plan_s1_title", subKey: "plan_s1_sub", tiles: [] /* filled from BEFORE_ORDER */ },
-  { id: "land",   titleKey: "plan_s2_title", subKey: "plan_s2_sub", tiles: ["transfer", "sim", "cars"] },
-  { id: "there",  titleKey: "plan_s3_title", subKey: "plan_s3_sub", tiles: ["tours", "tickets", "attractions"] },
+  { id: "land",   titleKey: "plan_s2_title", subKey: "plan_s2_sub", tiles: ["transfer", "sim", "cars", "bikes"] },
+  { id: "there",  titleKey: "plan_s3_title", subKey: "plan_s3_sub", tiles: ["tours", "tickets", "attractions", "gocity"] },
   { id: "wrong",  titleKey: "plan_s4_title", subKey: "plan_s4_sub", tiles: ["delay", "claim", "compensation"] },
 ];
 
@@ -234,7 +244,7 @@ export default function TripPlanner({
               .map((id, ti) => {
               const tile = TILES[id];
               const href = hrefFor(tile.partner, destination);
-              const altHref = tile.alt ? AFFILIATE_LINKS[tile.alt.partner] : "";
+              const alts = (tile.alts ?? []).filter((a) => AFFILIATE_LINKS[a.partner] !== "");
               const title = destination && tile.destTitleKey ? fill(t(tile.destTitleKey), destination) : t(tile.titleKey);
               const doFirst = stage.id === "before" && ti === 0;
               const body = (
@@ -274,16 +284,24 @@ export default function TripPlanner({
                   >
                     {body}
                   </a>
-                  {tile.alt && altHref !== "" && (
-                    <a
-                      href={altHref}
-                      target="_blank"
-                      rel="noopener sponsored"
-                      onClick={() => track(tile.alt!.partner, stage.id, id)}
-                      className="text-[10px] text-slate-500 hover:text-sea-700 px-1"
-                    >
-                      {t("plan_also")}: <span className="underline underline-offset-2">{tile.alt.label}</span>
-                    </a>
+                  {alts.length > 0 && (
+                    <p className="text-[10px] text-slate-500 px-1">
+                      {t("plan_also")}:{" "}
+                      {alts.map((a, i) => (
+                        <span key={a.partner}>
+                          {i > 0 && ", "}
+                          <a
+                            href={AFFILIATE_LINKS[a.partner]}
+                            target="_blank"
+                            rel="noopener sponsored"
+                            onClick={() => track(a.partner, stage.id, id)}
+                            className="underline underline-offset-2 hover:text-sea-700"
+                          >
+                            {a.label}
+                          </a>
+                        </span>
+                      ))}
+                    </p>
                   )}
                 </div>
               );
