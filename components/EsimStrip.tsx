@@ -1,7 +1,7 @@
 "use client";
 
-// Homepage eSIM strip: Airalo's search box, shown by default between the hotel search
-// and "Where to drift next". The widget script is lazy-loaded when the strip is about
+// Homepage eSIM strip: Airalo's search box, shown by default at the bottom of the
+// homepage, inside the trip planner just above the Quick search row. The widget script is lazy-loaded when the strip is about
 // to scroll into view, so it costs nothing on first paint.
 //
 // Widget = Travelpayouts embed for Airalo (campaign 541, promo 8588). Same source as
@@ -18,7 +18,7 @@ export default function EsimStrip() {
   const widgetLocale = locale === "th" ? "th" : "en";
 
   return (
-    <section aria-label={t("home_esim_title")} className="mb-8 rounded-2xl border border-sea-100 bg-white/70 p-4 sm:p-5">
+    <section aria-label={t("home_esim_title")} className="rounded-2xl border border-sea-100 bg-white/70 p-4 sm:p-5">
       <div className="text-center">
         <div className="text-[10px] uppercase tracking-widest text-sea-600 font-semibold">
           {t("home_esim_eyebrow")}

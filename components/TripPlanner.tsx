@@ -12,7 +12,7 @@
 //   `trip_stage` so per-stage performance shows up in GA and the local dashboard.
 // - Same partners / links as before (AFFILIATE_LINKS, Booking CJ). No new relationships.
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { AFFILIATE_LINKS, type AffiliateKey } from "@/lib/affiliateLinks";
 import { bookingCJSearch, cjLink } from "@/lib/booking";
@@ -199,12 +199,15 @@ export default function TripPlanner({
   destination,
   className = "",
   hideWidgets = [],
+  aboveQuickSearch,
 }: {
   /** City/destination in English, e.g. "Bangkok" or "Koh Samui". Optional. */
   destination?: string;
   className?: string;
   /** Quick-search widget ids to hide here (e.g. ["esim"] when the page already shows one). */
   hideWidgets?: string[];
+  /** Optional block rendered just above the Quick search row (homepage eSIM strip). */
+  aboveQuickSearch?: ReactNode;
 }) {
   const t = useT();
   const pathname = usePathname() ?? "";
@@ -364,8 +367,10 @@ export default function TripPlanner({
         ))}
       </div>
 
+      {aboveQuickSearch && <div className="mt-6">{aboveQuickSearch}</div>}
+
       {/* Quick search: partner search boxes, loaded only when opened */}
-      <div className="mt-6 rounded-xl border border-sea-100 bg-white/70 p-3 sm:p-4">
+      <div className="mt-6rounded-xl border border-sea-100 bg-white/70 p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-sea-800 mr-1">{t("plan_widget_heading")}</span>
           {WIDGETS.filter((w) => !profile.hide?.includes(w.id) && !hideWidgets.includes(w.id)).map((w) => (
