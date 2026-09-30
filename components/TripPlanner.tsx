@@ -17,7 +17,8 @@ import { usePathname } from "next/navigation";
 import { AFFILIATE_LINKS, type AffiliateKey } from "@/lib/affiliateLinks";
 import { bookingCJSearch, cjLink } from "@/lib/booking";
 import { plannerProfile } from "@/lib/tripPlannerRules";
-import { useT } from "@/contexts/LanguageProvider";
+import TpWidget from "@/components/TpWidget";
+import { useLanguage, useT } from "@/contexts/LanguageProvider";
 import type { TranslationKey } from "@/lib/i18n";
 
 type StageId = "before" | "land" | "there" | "wrong";
@@ -123,6 +124,37 @@ const TILES: Record<string, Tile> = {
   },
 };
 
+// Supplier shown on every card so visitors know who they are booking with.
+const BRANDS: Record<string, string> = {
+  hotels: "Booking.com", flights: "Aviasales", insurance: "EKTA", esim: "Yesim",
+  transfer: "Welcome Pickups", sim: "Drimsim",
+  // The car-rental widget below and this tile are both GetRentacar. If you swap the
+  // partner for the car tile, update this label and the widget source together.
+  cars: "GetRentacar", bikes: "BikesBooking",
+  tours: "Klook", tickets: "Tiqets", attractions: "Booking.com", gocity: "Go City",
+  delay: "AirHelp", claim: "EKTA", compensation: "Compensair",
+};
+
+// Quick-search widgets (Travelpayouts embeds). Loaded only when a visitor opens one.
+// Each id matches a tile id, so tile-hiding rules (tripPlannerRules.ts) apply to it too.
+// `locale` is passed through when the widget supports it (English fallback otherwise).
+const TP_BASE = "https://tpemb.com/content?trs=561168&shmarker=763258";
+type WidgetDef = { id: string; brand: string; labelKey: TranslationKey; src: (locale: string) => string; minHeight: number };
+const WIDGETS: WidgetDef[] = [
+  {
+    id: "esim", brand: "Airalo", labelKey: "plan_widget_esim", minHeight: 150,
+    src: (l) => `${TP_BASE}&locale=${l}&powered_by=true&color_button=%235080c5&color_focused=%23f2685f&secondary=%23FFFFFF&dark=%2311100f&light=%23FFFFFF&special=%23C4C4C4&border_radius=5&plain=false&no_labels=true&promo_id=8588&campaign_id=541`,
+  },
+  {
+    id: "transfer", brand: "Welcome Pickups", labelKey: "plan_widget_transfer", minHeight: 420,
+    src: (l) => `${TP_BASE}&locale=${l}&show_header=true&powered_by=true&campaign_id=627&promo_id=8951`,
+  },
+  {
+    id: "cars", brand: "GetRentacar", labelKey: "plan_widget_cars", minHeight: 320,
+    src: (l) => `${TP_BASE}&locale=${l}&powered_by=true&border_radius=5&plain=true&color_background=%23ffffff&color_button=%235080c5&promo_id=5472&campaign_id=57`,
+  },
+];
+
 // Stage 1 is ordered by lead time: the closer the flight, the sooner
 // short-lead items (insurance, eSIM) matter versus long-lead items (flights, hotels).
 const BEFORE_ORDER: Record<Urgency, string[]> = {
@@ -174,6 +206,9 @@ export default function TripPlanner({
   const t = useT();
   const pathname = usePathname() ?? "";
   const [urgency, setUrgency] = useState<Urgency>("month");
+  const [openWidget, setOpenWidget] = useState<string | null>(null);
+  const { locale } = useLanguage();
+  const widgetLocale = locale === "th" ? "th" : "en";
 
   const track = (partner: string, stage: StageId, tileId: string) => {
     window.gtag?.("event", "affiliate_click", {
@@ -265,8 +300,13 @@ export default function TripPlanner({
                       {t("plan_do_first")}
                     </div>
                   )}
-                  <div className={`w-8 h-8 rounded-full ${tile.bg} flex items-center justify-center text-base mb-1.5 flex-shrink-0`}>
-                    {tile.emoji}
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className={`w-8 h-8 rounded-full ${tile.bg} flex items-center justify-center text-base flex-shrink-0`}>
+                      {tile.emoji}
+                    </div>
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 leading-tight">
+                      {BRANDS[id]}
+                    </span>
                   </div>
                   <h4 className={`font-display text-[13px] leading-tight font-semibold ${tile.color} group-hover:text-sea-700 transition-colors`}>
                     {title}
@@ -317,6 +357,37 @@ export default function TripPlanner({
                 </div>
               );
             })}
+          </div>
+        ))}
+      </div>
+
+      {/* Quick search: partner search boxes, loaded only when opened */}
+      <div className="mt-6 rounded-xl border border-sea-100 bg-white/70 p-3 sm:p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-sea-800 mr-1">{t("plan_widget_heading")}</span>
+          {WIDGETS.filter((w) => !profile.hide?.includes(w.id)).map((w) => (
+            <button
+              key={w.id}
+              type="button"
+              aria-expanded={openWidget === w.id}
+              onClick={() => {
+                const next = openWidget === w.id ? null : w.id;
+                setOpenWidget(next);
+                if (next) window.gtag?.("event", "planner_widget_open", { widget: w.id, partner: w.brand, page_path: pathname });
+              }}
+              className={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-colors ${
+                openWidget === w.id
+                  ? "bg-sea-600 text-white border-sea-600"
+                  : "bg-white text-sea-700 border-sea-200 hover:bg-sea-50"
+              }`}
+            >
+              {t(w.labelKey)} <span className="opacity-70">· {w.brand}</span>
+            </button>
+          ))}
+        </div>
+        {WIDGETS.filter((w) => w.id === openWidget && !profile.hide?.includes(w.id)).map((w) => (
+          <div key={w.id + widgetLocale} className="mt-3 max-w-xl mx-auto">
+            <TpWidget src={w.src(widgetLocale)} minHeight={w.minHeight} />
           </div>
         ))}
       </div>

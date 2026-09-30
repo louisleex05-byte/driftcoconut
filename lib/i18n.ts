@@ -125,6 +125,10 @@ export const dictionary = {
     plan_gocity_sub: "One pass that covers multiple attractions in a city",
     plan_transfer_to_title: "Transfer to {dest}",
     plan_transfer_to_sub: "Pre-book a private ride from your arrival airport, station or pier",
+    plan_widget_heading: "Quick search",
+    plan_widget_esim: "Search eSIMs",
+    plan_widget_transfer: "Search a transfer",
+    plan_widget_cars: "Search car rental",
 
     // About page
     about_h1: "About driftcoconut",
@@ -304,6 +308,10 @@ export const dictionary = {
     plan_gocity_sub: "บัตรใบเดียวเข้าชมสถานที่ท่องเที่ยวหลายแห่งในเมือง",
     plan_transfer_to_title: "รถรับส่งไป {dest}",
     plan_transfer_to_sub: "จองรถส่วนตัวล่วงหน้าจากสนามบิน สถานี หรือท่าเรือที่คุณไปถึง",
+    plan_widget_heading: "ค้นหาด่วน",
+    plan_widget_esim: "ค้นหา eSIM",
+    plan_widget_transfer: "ค้นหารถรับส่ง",
+    plan_widget_cars: "ค้นหารถเช่า",
 
     // About page
     about_h1: "เกี่ยวกับ driftcoconut",
@@ -481,6 +489,10 @@ export const dictionary = {
     plan_gocity_sub: "一张通票即可游览城市中的多个景点",
     plan_transfer_to_title: "前往{dest}的接送",
     plan_transfer_to_sub: "提前预订从抵达的机场、车站或码头出发的专车",
+    plan_widget_heading: "快速搜索",
+    plan_widget_esim: "搜索 eSIM",
+    plan_widget_transfer: "搜索接送",
+    plan_widget_cars: "搜索租车",
 
     // About page
     about_h1: "关于 driftcoconut",
