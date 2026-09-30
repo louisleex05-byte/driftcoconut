@@ -29,7 +29,7 @@ export const dictionary = {
     // are the product; Booking.com booking is the convenience. NOT a metasearch, and no
     // "live availability" claim until real (non-mock) hotel data is on.
     hero_title: "Travel Asia like someone who knows the place.",
-    hero_subtitle: "Honest local guides and neighborhood advice for every destination, then book your stay through Booking.com.",
+    hero_subtitle: "Honest local guides, neighborhood advice and hotels you can book in one place.",
 
     // Deals section
     deals_eyebrow: "Curated for wanderers",
@@ -157,7 +157,7 @@ export const dictionary = {
 
     // Hero
     hero_title: "เที่ยวเอเชียแบบคนที่รู้จักที่นั่นดี",
-    hero_subtitle: "คู่มือท้องถิ่นที่ตรงไปตรงมาและคำแนะนำแต่ละย่านในทุกจุดหมาย แล้วจองที่พักผ่าน Booking.com",
+    hero_subtitle: "คู่มือท้องถิ่นที่ตรงไปตรงมา คำแนะนำแต่ละย่าน และโรงแรมที่จองได้ในที่เดียว",
 
     // Deals section
     deals_eyebrow: "คัดสรรสำหรับนักเดินทาง",
@@ -283,7 +283,7 @@ export const dictionary = {
 
     // Hero
     hero_title: "像懂行的人一样玩转亚洲",
-    hero_subtitle: "真诚的本地指南和街区攻略，覆盖每个目的地，再通过 Booking.com 预订住宿。",
+    hero_subtitle: "真诚的本地指南、街区攻略，以及可一站式预订的酒店。",
 
     // Deals section
     deals_eyebrow: "为漫游者精选",
