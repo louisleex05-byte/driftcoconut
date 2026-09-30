@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import PartnerStrip from "@/components/PartnerStrip";
 import SearchForm from "@/components/SearchForm";
 import TripPlanner from "@/components/TripPlanner";
+import EsimStrip from "@/components/EsimStrip";
 import GuideTipsBadge from "@/components/GuideTipsBadge";
 import FeaturedGuides from "@/components/FeaturedGuides";
 import { Hibiscus, Starfish, PalmLeaf, Boat, StrawHat, Coral, Conch, Shell } from "@/components/Decorations";
@@ -64,6 +65,9 @@ export default function HomeClient({
         </div>
         <SearchForm />
       </section>
+
+      {/* ESIM QUICK SEARCH - Airalo widget, shown by default, lazy-loaded on scroll. */}
+      <EsimStrip />
 
       {/* Divider decorations between Search and Drift sections */}
       <div className="relative h-3 flex items-center justify-center mb-4">
@@ -132,7 +136,7 @@ export default function HomeClient({
       </section>
 
       <section className="mt-6 mb-10">
-        <TripPlanner />
+        <TripPlanner hideWidgets={["esim"]} />
       </section>
 
       <PalmLeaf className="hidden lg:block fixed -bottom-20 -right-20 w-72 text-sea-200 opacity-60 rotate-45 pointer-events-none -z-10" />

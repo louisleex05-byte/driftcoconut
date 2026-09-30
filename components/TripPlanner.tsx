@@ -198,10 +198,13 @@ function hrefFor(partner: Tile["partner"], dest?: string): string {
 export default function TripPlanner({
   destination,
   className = "",
+  hideWidgets = [],
 }: {
   /** City/destination in English, e.g. "Bangkok" or "Koh Samui". Optional. */
   destination?: string;
   className?: string;
+  /** Quick-search widget ids to hide here (e.g. ["esim"] when the page already shows one). */
+  hideWidgets?: string[];
 }) {
   const t = useT();
   const pathname = usePathname() ?? "";
@@ -365,7 +368,7 @@ export default function TripPlanner({
       <div className="mt-6 rounded-xl border border-sea-100 bg-white/70 p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-sea-800 mr-1">{t("plan_widget_heading")}</span>
-          {WIDGETS.filter((w) => !profile.hide?.includes(w.id)).map((w) => (
+          {WIDGETS.filter((w) => !profile.hide?.includes(w.id) && !hideWidgets.includes(w.id)).map((w) => (
             <button
               key={w.id}
               type="button"
@@ -385,7 +388,7 @@ export default function TripPlanner({
             </button>
           ))}
         </div>
-        {WIDGETS.filter((w) => w.id === openWidget && !profile.hide?.includes(w.id)).map((w) => (
+        {WIDGETS.filter((w) => w.id === openWidget && !profile.hide?.includes(w.id) && !hideWidgets.includes(w.id)).map((w) => (
           <div key={w.id + widgetLocale} className="mt-3 max-w-xl mx-auto">
             <TpWidget src={w.src(widgetLocale)} minHeight={w.minHeight} />
           </div>

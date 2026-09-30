@@ -129,6 +129,9 @@ export const dictionary = {
     plan_widget_esim: "Search eSIMs",
     plan_widget_transfer: "Search a transfer",
     plan_widget_cars: "Search car rental",
+    home_esim_eyebrow: "Going abroad?",
+    home_esim_title: "Get mobile data before you land",
+    home_esim_sub: "Search Airalo eSIMs for 200+ countries and regions",
 
     // About page
     about_h1: "About driftcoconut",
@@ -312,6 +315,9 @@ export const dictionary = {
     plan_widget_esim: "ค้นหา eSIM",
     plan_widget_transfer: "ค้นหารถรับส่ง",
     plan_widget_cars: "ค้นหารถเช่า",
+    home_esim_eyebrow: "เดินทางต่างประเทศ?",
+    home_esim_title: "เตรียมอินเทอร์เน็ตมือถือก่อนถึงที่หมาย",
+    home_esim_sub: "ค้นหา eSIM ของ Airalo สำหรับกว่า 200 ประเทศและภูมิภาค",
 
     // About page
     about_h1: "เกี่ยวกับ driftcoconut",
@@ -493,6 +499,9 @@ export const dictionary = {
     plan_widget_esim: "搜索 eSIM",
     plan_widget_transfer: "搜索接送",
     plan_widget_cars: "搜索租车",
+    home_esim_eyebrow: "出国旅行?",
+    home_esim_title: "落地前先准备好手机流量",
+    home_esim_sub: "搜索 Airalo 覆盖 200 多个国家和地区的 eSIM",
 
     // About page
     about_h1: "关于 driftcoconut",
