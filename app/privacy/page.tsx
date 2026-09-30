@@ -9,7 +9,7 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto prose prose-slate">
       <h1 className="text-3xl font-bold">Privacy Policy</h1>
-      <p className="text-sm text-slate-500">Last updated: August 2026</p>
+      <p className="text-sm text-slate-500">Last updated: September 2026</p>
 
       <h2 className="text-xl font-semibold mt-8">What we collect</h2>
       <p className="text-slate-600">
@@ -24,6 +24,15 @@ export default function PrivacyPage() {
         We use minimal, functional cookies to remember your recent searches and preferences during
         your visit. We may use aggregated, anonymized analytics (such as Vercel Analytics or Google
         Analytics) to understand overall site usage and improve the search experience.
+      </p>
+      <p className="text-slate-600">
+        Some pages include search boxes supplied by our travel partners, such as the eSIM, airport
+        transfer and car rental search boxes provided through Travelpayouts (with suppliers like
+        Airalo, Welcome Pickups and GetRentacar). When one of these loads, the provider may set its
+        own cookies or similar identifiers in your browser. We do not control those cookies. Clicking
+        a partner link can also set a cookie so the partner can credit us for the referral. Each
+        provider&apos;s use of your data is governed by its own privacy policy. You can block or delete
+        these cookies in your browser settings.
       </p>
 
       <h2 className="text-xl font-semibold mt-8">Third-party bookings</h2>
