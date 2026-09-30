@@ -13,10 +13,9 @@
 // - Same partners / links as before (AFFILIATE_LINKS, Booking CJ). No new relationships.
 
 import { useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AFFILIATE_LINKS, type AffiliateKey } from "@/lib/affiliateLinks";
-import { bookingCJSearch } from "@/lib/booking";
+import { bookingCJSearch, cjLink } from "@/lib/booking";
 import { useT } from "@/contexts/LanguageProvider";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -121,8 +120,10 @@ function fill(text: string, dest?: string): string {
   return dest ? text.replace("{dest}", dest) : text;
 }
 
-function hrefFor(partner: Tile["partner"], dest?: string): string | null {
-  if (partner === "booking") return dest ? bookingCJSearch(dest) : null;
+function hrefFor(partner: Tile["partner"], dest?: string): string {
+  // No destination (homepage/about/hotel pages): still go to Booking.com through the
+  // CJ tracker (its homepage), so the click is always attributed to us.
+  if (partner === "booking") return dest ? bookingCJSearch(dest) : cjLink("https://www.booking.com/");
   return AFFILIATE_LINKS[partner];
 }
 
@@ -137,7 +138,6 @@ export default function TripPlanner({
   const t = useT();
   const pathname = usePathname() ?? "";
   const [urgency, setUrgency] = useState<Urgency>("month");
-  const guidesHref = pathname.startsWith("/zh") ? "/zh/guides" : "/guides";
 
   const track = (partner: string, stage: StageId, tileId: string) => {
     window.gtag?.("event", "affiliate_click", {
@@ -236,23 +236,15 @@ export default function TripPlanner({
 
               return (
                 <div key={id} className="flex flex-col gap-1">
-                  {href ? (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener sponsored"
-                      onClick={() => track(tile.partner, stage.id, id)}
-                      className={cardClass}
-                    >
-                      {body}
-                    </a>
-                  ) : (
-                    // No destination known (e.g. homepage): send hotel intent to the guides
-                    // so the traveler picks a place first, instead of a blank Booking search.
-                    <Link href={guidesHref} className={cardClass}>
-                      {body}
-                    </Link>
-                  )}
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener sponsored"
+                    onClick={() => track(tile.partner, stage.id, id)}
+                    className={cardClass}
+                  >
+                    {body}
+                  </a>
                   {tile.alt && (
                     <a
                       href={AFFILIATE_LINKS[tile.alt.partner]}
