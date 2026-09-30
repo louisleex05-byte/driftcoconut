@@ -113,6 +113,12 @@ export const dictionary = {
     plan_tours_dest_title: "{dest} tours & day trips",
     plan_claim_title: "Insurance assistance",
     plan_claim_sub: "Already covered? Check your policy and start a claim with your insurer.",
+    plan_cars_title: "Rent a car or scooter",
+    plan_cars_sub: "Compare local rental companies and book ahead",
+    plan_attractions_title: "Booking.com Attractions",
+    plan_attractions_sub: "Tickets and tours from the Booking.com you already use",
+    plan_compensation_title: "Flight compensation check",
+    plan_compensation_sub: "Delayed, cancelled or overbooked? See if you're owed compensation",
 
     // About page
     about_h1: "About driftcoconut",
@@ -268,6 +274,12 @@ export const dictionary = {
     plan_tours_dest_title: "ทัวร์และทริปวันเดียว {dest}",
     plan_claim_title: "ความช่วยเหลือด้านประกัน",
     plan_claim_sub: "มีประกันแล้ว? ตรวจสอบกรมธรรม์และเริ่มเคลมกับบริษัทประกันของคุณ",
+    plan_cars_title: "เช่ารถหรือสกูตเตอร์",
+    plan_cars_sub: "เปรียบเทียบบริษัทรถเช่าในพื้นที่และจองล่วงหน้า",
+    plan_attractions_title: "Booking.com Attractions",
+    plan_attractions_sub: "ตั๋วและทัวร์จาก Booking.com ที่คุณใช้อยู่แล้ว",
+    plan_compensation_title: "ตรวจสอบสิทธิ์เงินชดเชยเที่ยวบิน",
+    plan_compensation_sub: "เที่ยวบินล่าช้า ยกเลิก หรือจองเกิน? ดูว่าคุณมีสิทธิ์ได้รับเงินชดเชยหรือไม่",
 
     // About page
     about_h1: "เกี่ยวกับ driftcoconut",
@@ -421,6 +433,12 @@ export const dictionary = {
     plan_tours_dest_title: "{dest}旅游和一日游",
     plan_claim_title: "保险理赔协助",
     plan_claim_sub: "已有保障?查看保单,并向您的保险公司发起理赔。",
+    plan_cars_title: "租车或租踏板车",
+    plan_cars_sub: "比较当地租车公司并提前预订",
+    plan_attractions_title: "Booking.com 景点门票",
+    plan_attractions_sub: "来自您常用的 Booking.com 的门票和旅游产品",
+    plan_compensation_title: "航班赔偿查询",
+    plan_compensation_sub: "航班延误、取消或超售?查看您是否可获赔偿",
 
     // About page
     about_h1: "关于 driftcoconut",

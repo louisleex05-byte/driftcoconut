@@ -31,6 +31,19 @@ export const AFFILIATE_LINKS = {
   drimsim: "https://drimsim.tpk.mx/bVdli8RO",
   // Attraction / museum tickets — alternative to Klook (3.5–8%)
   tiqets: "https://tiqets.tpk.mx/dVQTBNpn",
+
+  // ─── Trip planner slots — PASTE TRACKED LINKS HERE ─────────────
+  // Leave as "" until you generate the link in Travelpayouts (Tools → Links →
+  // pick the program → copy the tpk.mx short link). The trip planner hides any
+  // tile or "Also:" link whose URL is empty, so nothing broken ever shows.
+  // Step 2 (When you land)
+  localrent: "",       // Car / scooter rental (Localrent or EconomyBookings)
+  kiwitaxi: "",        // Private transfers — shown as "Also:" under Welcome Pickups
+  // Step 3 (While you're there)
+  getyourguide: "",    // Tours & activities — shown as "Also:" under Klook
+  // Step 4 (If things go wrong)
+  compensair: "",      // Flight compensation — third tile in step 4
+  claimcompass: "",    // Flight compensation alt — shown as "Also:" under AirHelp
 } as const;
 
 export type AffiliateKey = keyof typeof AFFILIATE_LINKS;

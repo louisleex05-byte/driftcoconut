@@ -34,7 +34,7 @@ type Tile = {
   color: string;
   bg: string;
   /** Partner key for tracking + link. "booking" = CJ deep link built from destination. */
-  partner: AffiliateKey | "booking";
+  partner: AffiliateKey | "booking" | "bookingAttractions";
   /** Optional secondary partner shown as a small "Also: …" link. */
   alt?: { partner: AffiliateKey; label: string };
 };
@@ -66,27 +66,49 @@ const TILES: Record<string, Tile> = {
     id: "transfer", stage: "land",
     titleKey: "card_welcomepickups_title", subKey: "card_welcomepickups_sub", destTitleKey: "plan_transfer_dest_title",
     emoji: "🚕", color: "text-sea-700", bg: "bg-sea-50", partner: "welcomePickups",
+    alt: { partner: "kiwitaxi", label: "Kiwitaxi" },
   },
   sim: {
     id: "sim", stage: "land",
     titleKey: "card_drimsim_title", subKey: "card_drimsim_sub",
     emoji: "📱", color: "text-sky-700", bg: "bg-sky-50", partner: "drimsim",
   },
+  cars: {
+    id: "cars", stage: "land",
+    titleKey: "plan_cars_title", subKey: "plan_cars_sub",
+    emoji: "🚗", color: "text-indigo-700", bg: "bg-indigo-50", partner: "localrent",
+  },
   tours: {
     id: "tours", stage: "there",
     titleKey: "card_klook_title", subKey: "card_klook_sub", destTitleKey: "plan_tours_dest_title",
     emoji: "🎟️", color: "text-amber-700", bg: "bg-amber-50", partner: "klook",
-    alt: { partner: "tiqets", label: "Tiqets" },
+    alt: { partner: "getyourguide", label: "GetYourGuide" },
+  },
+  tickets: {
+    id: "tickets", stage: "there",
+    titleKey: "card_tiqets_title", subKey: "card_tiqets_sub",
+    emoji: "🎫", color: "text-fuchsia-700", bg: "bg-fuchsia-50", partner: "tiqets",
+  },
+  attractions: {
+    id: "attractions", stage: "there",
+    titleKey: "plan_attractions_title", subKey: "plan_attractions_sub",
+    emoji: "🗺️", color: "text-sea-700", bg: "bg-sea-50", partner: "bookingAttractions",
   },
   delay: {
     id: "delay", stage: "wrong",
     titleKey: "card_airhelp_title", subKey: "card_airhelp_sub",
     emoji: "💸", color: "text-orange-700", bg: "bg-orange-50", partner: "airhelp",
+    alt: { partner: "claimcompass", label: "ClaimCompass" },
   },
   claim: {
     id: "claim", stage: "wrong",
     titleKey: "plan_claim_title", subKey: "plan_claim_sub",
     emoji: "🩺", color: "text-teal-700", bg: "bg-teal-50", partner: "ekta",
+  },
+  compensation: {
+    id: "compensation", stage: "wrong",
+    titleKey: "plan_compensation_title", subKey: "plan_compensation_sub",
+    emoji: "📋", color: "text-rose-700", bg: "bg-rose-50", partner: "compensair",
   },
 };
 
@@ -105,9 +127,9 @@ const STAGES: {
   tiles: string[];
 }[] = [
   { id: "before", titleKey: "plan_s1_title", subKey: "plan_s1_sub", tiles: [] /* filled from BEFORE_ORDER */ },
-  { id: "land",   titleKey: "plan_s2_title", subKey: "plan_s2_sub", tiles: ["transfer", "sim"] },
-  { id: "there",  titleKey: "plan_s3_title", subKey: "plan_s3_sub", tiles: ["tours"] },
-  { id: "wrong",  titleKey: "plan_s4_title", subKey: "plan_s4_sub", tiles: ["delay", "claim"] },
+  { id: "land",   titleKey: "plan_s2_title", subKey: "plan_s2_sub", tiles: ["transfer", "sim", "cars"] },
+  { id: "there",  titleKey: "plan_s3_title", subKey: "plan_s3_sub", tiles: ["tours", "tickets", "attractions"] },
+  { id: "wrong",  titleKey: "plan_s4_title", subKey: "plan_s4_sub", tiles: ["delay", "claim", "compensation"] },
 ];
 
 const URGENCY_OPTIONS: { id: Urgency; labelKey: TranslationKey }[] = [
@@ -124,6 +146,9 @@ function hrefFor(partner: Tile["partner"], dest?: string): string {
   // No destination (homepage/about/hotel pages): still go to Booking.com through the
   // CJ tracker (its homepage), so the click is always attributed to us.
   if (partner === "booking") return dest ? bookingCJSearch(dest) : cjLink("https://www.booking.com/");
+  // Booking.com Attractions (approved CJ link ID) — tickets and tours from the Booking you already use.
+  if (partner === "bookingAttractions") return cjLink("https://www.booking.com/attractions/", "attractions");
+  // Empty string = link not pasted yet in lib/affiliateLinks.ts → tile is hidden.
   return AFFILIATE_LINKS[partner];
 }
 
@@ -203,9 +228,13 @@ export default function TripPlanner({
               </div>
             </div>
 
-            {stage.tiles.map((id, ti) => {
+            {stage.tiles
+              // Hide any tile whose affiliate link hasn't been pasted yet (empty string).
+              .filter((id) => hrefFor(TILES[id].partner, destination) !== "")
+              .map((id, ti) => {
               const tile = TILES[id];
               const href = hrefFor(tile.partner, destination);
+              const altHref = tile.alt ? AFFILIATE_LINKS[tile.alt.partner] : "";
               const title = destination && tile.destTitleKey ? fill(t(tile.destTitleKey), destination) : t(tile.titleKey);
               const doFirst = stage.id === "before" && ti === 0;
               const body = (
@@ -245,9 +274,9 @@ export default function TripPlanner({
                   >
                     {body}
                   </a>
-                  {tile.alt && (
+                  {tile.alt && altHref !== "" && (
                     <a
-                      href={AFFILIATE_LINKS[tile.alt.partner]}
+                      href={altHref}
                       target="_blank"
                       rel="noopener sponsored"
                       onClick={() => track(tile.alt!.partner, stage.id, id)}
