@@ -8,6 +8,7 @@ import { getGuide, getGuideSlugs } from "@/lib/guides";
 import AffiliateLink from "@/components/AffiliateLink";
 import GuidePhoto from "@/components/GuidePhoto";
 import TripPlanner from "@/components/TripPlanner";
+import RelatedGuides from "@/components/RelatedGuides";
 
 // Statically generate all guide slugs at build time (Chinese variants).
 // Falls back to English content if `.zh.mdx` doesn't exist for a slug.
@@ -115,6 +116,8 @@ export default async function GuidePageZh({
       <div className="mt-12 pt-8 border-t border-sea-100">
         <TripPlanner destination={guide.destination.split(",")[0].trim()} />
       </div>
+
+      <RelatedGuides slug={slug} locale="zh" />
 
       {/* Footer CTA */}
       <div className="mt-12 pt-8 border-t border-sea-100">

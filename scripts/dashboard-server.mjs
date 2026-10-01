@@ -198,10 +198,16 @@ async function fetchAndBuild({ forceInsight = false } = {}) {
     safe('landing pages', mk({ dims: ['landingPage'], mets: ['sessions', 'engagementRate'], order: 'sessions', limit: 8 })),
     safe('search totals', mk({ mets: ['organicGoogleSearchImpressions', 'organicGoogleSearchClicks', 'organicGoogleSearchClickThroughRate', 'organicGoogleSearchAveragePosition'] })),
     safe('search queries', mk({ dims: ['organicGoogleSearchQuery'], mets: SEO, order: 'organicGoogleSearchImpressions', limit: 10 })),
-    safe('search pages', mk({ dims: ['landingPagePlusQueryString'], mets: SEO, order: 'organicGoogleSearchImpressions', limit: 8 })),
+    safe('search pages', mk({ dims: ['landingPagePlusQueryString'], mets: SEO, order: 'organicGoogleSearchImpressions', limit: 50 })),
   ]);
   const mv = (rep, i) => Number(rep?.rows?.[0]?.metricValues?.[i]?.value || 0);
   const wkOf = rep => ({ users: mv(rep, 0), sessions: mv(rep, 1), views: mv(rep, 2) });
+  // GA4 rejects the Search Console totals query when asked with no dimension ("dimensions and metrics are
+  // incompatible"). The per-landing-page query works, so when totals are missing we add the pages up instead.
+  const seoPageRows = (xSeoP?.rows || []).map(r => ({ imp: Number(r.metricValues[0].value), clicks: Number(r.metricValues[1].value), pos: Number(r.metricValues[2].value) }));
+  const seoSumImp = seoPageRows.reduce((s, r) => s + r.imp, 0);
+  const seoSumClicks = seoPageRows.reduce((s, r) => s + r.clicks, 0);
+  const seoAvgPos = seoSumImp ? seoPageRows.reduce((s, r) => s + r.imp * r.pos, 0) / seoSumImp : 0;
   const more = {
     wk: xWk && xWkPrev ? { cur: wkOf(xWk), prev: wkOf(xWkPrev) } : null,
     daily: (xDaily?.rows || []).map(r => ({ date: r.dimensionValues[0].value, users: Number(r.metricValues[0].value), sessions: Number(r.metricValues[1].value) })),
@@ -213,8 +219,11 @@ async function fetchAndBuild({ forceInsight = false } = {}) {
     channels: (xChannels?.rows || []).map(r => ({ name: r.dimensionValues[0].value, sessions: Number(r.metricValues[0].value), engaged: Number(r.metricValues[1].value) })),
     landing: (xLanding?.rows || []).map(r => ({ page: r.dimensionValues[0].value, sessions: Number(r.metricValues[0].value), rate: Number(r.metricValues[1].value) })),
     seo: {
-      has: !!xSeoTot,
-      impressions: mv(xSeoTot, 0), clicks: mv(xSeoTot, 1), ctr: mv(xSeoTot, 2) * 100, pos: mv(xSeoTot, 3),
+      has: !!xSeoTot || seoPageRows.length > 0,
+      impressions: xSeoTot ? mv(xSeoTot, 0) : seoSumImp,
+      clicks: xSeoTot ? mv(xSeoTot, 1) : seoSumClicks,
+      ctr: xSeoTot ? mv(xSeoTot, 2) * 100 : (seoSumImp ? (seoSumClicks / seoSumImp) * 100 : 0),
+      pos: xSeoTot ? mv(xSeoTot, 3) : seoAvgPos,
       queries: (xSeoQ?.rows || []).map(r => ({ q: r.dimensionValues[0].value, imp: Number(r.metricValues[0].value), clicks: Number(r.metricValues[1].value), pos: Number(r.metricValues[2].value) })),
       pages: (xSeoP?.rows || []).map(r => ({ page: r.dimensionValues[0].value, imp: Number(r.metricValues[0].value), clicks: Number(r.metricValues[1].value), pos: Number(r.metricValues[2].value) })),
     },
@@ -286,11 +295,41 @@ async function fetchAndBuild({ forceInsight = false } = {}) {
 // ==================== AI insight via Gemini ====================
 import crypto from 'node:crypto';
 
+// Facts about the site itself, read from content/guides, so the AI never suggests work that is already done.
+function siteFacts() {
+  try {
+    const dir = path.join(PROJECT_ROOT, 'content', 'guides');
+    const files = fs.readdirSync(dir);
+    const en = files.filter(f => f.endsWith('.mdx') && !f.endsWith('.zh.mdx')).map(f => f.replace(/\.mdx$/, '')).sort();
+    const zh = new Set(files.filter(f => f.endsWith('.zh.mdx')).map(f => f.replace(/\.zh\.mdx$/, '')));
+    const missingZh = en.filter(s => !zh.has(s));
+    let related = false;
+    try { related = fs.existsSync(path.join(PROJECT_ROOT, 'components', 'RelatedGuides.tsx')); } catch {}
+    return {
+      en,
+      zhCount: en.length - missingZh.length,
+      missingZh,
+      related,
+      text: `- Guides published: ${en.length} (${en.join(', ')}).\n` +
+        (missingZh.length === 0
+          ? `- Every guide already has a Chinese (ZH) version. Do NOT suggest translating any guide.\n`
+          : `- Guides WITHOUT a Chinese version: ${missingZh.join(', ')}. All others are already translated.\n`) +
+        (related
+          ? `- Every guide page already ends with a "Keep exploring" related-guides block, and the "Related destinations" sections link to other guides. Do NOT suggest adding generic internal links.\n`
+          : `- Guides do not yet have a related-guides block.\n`) +
+        `- The site already has a trip planner with affiliate widgets (hotels, activities, eSIM, car rental) on every guide.`,
+    };
+  } catch { return { en: [], zhCount: 0, missingZh: [], related: false, text: '(site facts unavailable)' }; }
+}
+
 // Hash the parts of the data that would meaningfully change the insight.
 // Rounds numbers so trivial +1/+2 fluctuations don't invalidate the cache.
 function fingerprintData(d) {
   const round = n => Math.round(n / 5) * 5; // bucket to nearest 5
+  const sf = siteFacts();
   const payload = {
+    pv: 2, // bump when the prompt changes so cached insights regenerate
+    sf: `${sf.en.length}|${sf.zhCount}|${sf.related}`,
     v: round(d.kpi.views),
     s: round(d.kpi.sessions),
     b: Math.round(d.kpi.bouncePct),
@@ -334,6 +373,9 @@ async function generateInsight(d, { force = false } = {}) {
 
   const prompt = `You are a data analyst reviewing weekly Google Analytics for driftcoconut.com — a travel guide site covering Southeast Asia (Bangkok, Chiang Mai, Bali, Phuket, Krabi, etc.), monetized via affiliate links (Booking.com hotels, Klook activities, CueLinks for MakeMyTrip/Goibibo, Airalo eSIM). English + Chinese guides.
 
+SITE FACTS (already true — never suggest doing these):
+${siteFacts().text}
+
 CURRENT ${d.days}-DAY SNAPSHOT:
 - Page views: ${d.kpi.views} (~${(d.kpi.views / d.days).toFixed(0)}/day)
 - Sessions: ${d.kpi.sessions} (${d.earned} earned + ${d.totalSelf} self-traffic)
@@ -361,13 +403,13 @@ ${audLine('Age', d.audience?.age, 'not available — Google Signals off')}
 ${audLine('Gender', d.audience?.gender, 'not available — Google Signals off')}
 (Note: the operator lives in Thailand, so Thailand/Bangkok-area traffic includes some self-traffic.)
 
-Write EXACTLY 3 paragraphs of plain prose (each 2-3 sentences, no bullets, no headings, no markdown). Reference specific numbers.
+Write EXACTLY 3 paragraphs of plain prose (each 2-3 sentences, no bullets, no headings, no markdown). Reference specific numbers. Always write the brand name capitalized as "Driftcoconut" (even if page titles show it in lowercase).
 
 Paragraph 1 — THE SITUATION: What's working, what user behavior tells us. Compare bounce rates. Note which content pulls traffic.
 
 Paragraph 2 — THE AUDIENCE: Who is actually visiting — countries, cities, device mix, new vs returning. Say what that implies for language (EN vs ZH), content topics, and which affiliate offers fit these visitors. Discount Thailand for self-traffic. If age/gender is unavailable, say so briefly.
 
-Paragraph 3 — THE OPPORTUNITY: Use the Google Search, affiliate_click and scroll data where relevant. The single most actionable improvement or notable flaw the operator should tackle THIS WEEK. Be concrete (e.g. "translate X guide to Chinese", "add more internal links to Bangkok"), not generic ("post more"). If you spot a data quality issue (like inflated direct traffic), flag it.`;
+Paragraph 3 — THE OPPORTUNITY: Use the Google Search, affiliate_click and scroll data where relevant. The single most actionable improvement or notable flaw the operator should tackle THIS WEEK. Be concrete and specific to a named page, query or number in the data, not generic ("post more"). Only propose work that is NOT already done according to SITE FACTS. If you spot a data quality issue (like inflated direct traffic), flag it.`;
 
   // Providers tried in order. OpenAI first (if key present), Gemini as fallback.
   const attempts = [];
@@ -531,7 +573,7 @@ function buildMessages(d) {
     const s = M.seo;
     if (!s.impressions) add('info', '🔎', 'Google has not shown your site yet', 'No search impressions were recorded. New sites often take weeks — keep publishing and make sure the sitemap is submitted in Search Console.');
     else add(s.clicks === 0 || s.ctr < 1 ? 'warn' : 'good', '🔎', 'Google is showing you, but few click',
-      `Google showed driftcoconut in search results ${s.impressions} times in ${d.days} days, but only ${s.clicks} ${s.clicks === 1 ? 'person' : 'people'} clicked (${s.ctr.toFixed(1)}%). Your average position is ${s.pos.toFixed(0)} — about page ${Math.max(1, Math.ceil(s.pos / 10))} of Google. Most people never look past page 1 (positions 1–10).`);
+      `Google showed Driftcoconut in search results ${s.impressions} times in ${d.days} days, but only ${s.clicks} ${s.clicks === 1 ? 'person' : 'people'} clicked (${s.ctr.toFixed(1)}%). Your average position is ${s.pos.toFixed(0)} — about page ${Math.max(1, Math.ceil(s.pos / 10))} of Google. Most people never look past page 1 (positions 1–10).`);
     const topP = (s.pages || []).find(x => x.imp > 0 && x.page !== '/');
     const topQ = (s.queries || [])[0];
     if (topP && topP.pos > 10) add('info', '🎯', 'Your biggest Google opportunity',
@@ -718,9 +760,73 @@ function buildHtml(d) {
 </div>
 `;
 
+  // ---- Overall score + improvement areas (added Oct 2026) ----
+  // Six weighted scores (0-10). "Points to gain" per area = weight x (10 - score).
+  const clampN = (x, a, b) => Math.max(a, Math.min(b, x));
+  const f1 = x => x.toFixed(1);
+  const scoreParts = (() => {
+    let avgChg = 0;
+    if (X.wk) {
+      const ch = ['users', 'sessions', 'views'].map(k => pctChange(X.wk.cur[k], X.wk.prev[k])).filter(v => v !== null);
+      avgChg = ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : 0;
+    }
+    const sGrowth = clampN(5 + avgChg / 16, 0, 10);
+    const sEng = X.eng ? clampN((X.eng.rate * 100) / 72 * 10, 0, 10) : 0;
+    const sSearch = S.has && S.impressions
+      ? clampN(0.4 * clampN(S.impressions / 350 * 10, 0, 10) + 0.3 * clampN(S.ctr / 3 * 10, 0, 10) + 0.3 * clampN((60 - S.pos) / 50 * 10, 0, 10), 0, 10)
+      : 0;
+    const sReal = d.kpi.sessions > 0 ? clampN((d.earned / d.kpi.sessions) * 10, 0, 10) : 0;
+    const nrRet = (A.newRet || []).find(r => /return/i.test(r.name)), nrNew = (A.newRet || []).find(r => /^new/i.test(r.name));
+    const nrTot = (nrRet?.users || 0) + (nrNew?.users || 0);
+    const sRet = nrTot ? clampN(((nrRet?.users || 0) / nrTot * 100) / 29 * 10, 0, 10) : 0;
+    const srcSum = Math.max(d.sourceRows.reduce((s, r) => s + r.sess, 0), 1);
+    const sMix = clampN(d.sourceRows.filter(r => r.sess / srcSum >= 0.05).length * 2.5, 0, 10);
+    return [
+      { k: 'Growth', w: 25, s: sGrowth, color: '#0891b2', tip: 'Publish or share more often. This is compared with the week before.' },
+      { k: 'Engagement', w: 20, s: sEng, color: '#7c3aed', tip: 'Add links between guides and more photos so visitors read further.' },
+      { k: 'Google search', w: 20, s: sSearch, color: '#f59e0b', tip: 'Sharpen page titles and add guides to climb Google rankings.' },
+      { k: 'Real visitors', w: 15, s: sReal, color: '#dc2626', tip: 'Exclude your own visits in Google Analytics so the numbers show real people.' },
+      { k: 'Returning visitors', w: 10, s: sRet, color: '#16a34a', tip: 'Give people a reason to come back: an email list or regular social posts.' },
+      { k: 'Traffic mix', w: 10, s: sMix, color: '#ec4899', tip: 'Add another traffic source so you rely less on one channel.' },
+    ].map(p => ({ ...p, gain: (p.w / 100) * (10 - p.s) }));
+  })();
+  const overallScore = scoreParts.reduce((s, p) => s + (p.w / 100) * p.s, 0);
+  const gainTotal = scoreParts.reduce((s, p) => s + p.gain, 0);
+  const scoreLabel = overallScore >= 8.5 ? 'Great' : overallScore >= 7 ? 'Good' : overallScore >= 5 ? 'Fair' : 'Needs work';
+  const gainParts = scoreParts.filter(p => p.gain > 0.005).sort((a, b) => b.gain - a.gain);
+  const donutSvg = (() => {
+    const R = 60, C = 2 * Math.PI * R;
+    if (gainTotal <= 0) return `<svg width="170" height="170" viewBox="0 0 170 170"><circle cx="85" cy="85" r="${R}" fill="none" stroke="#16a34a" stroke-width="28"/></svg>`;
+    let off = 0;
+    const segs = gainParts.map(p => {
+      const len = (p.gain / gainTotal) * C;
+      const el = `<circle cx="85" cy="85" r="${R}" fill="none" stroke="${p.color}" stroke-width="28" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
+      off += len; return el;
+    }).join('');
+    return `<svg width="170" height="170" viewBox="0 0 170 170"><g transform="rotate(-90 85 85)">${segs}</g></svg>`;
+  })();
+  const scoreHtml = `
+<div class="section">
+  <div class="section-title">🏁 Overall Score</div>
+  <div class="section-desc">One number for how the site is doing, from the current numbers and this week vs last week. The chart shows where the missing points are.</div>
+  <div class="os-grid">
+    <div class="card">
+      <div class="os-big"><span class="os-n">${f1(overallScore)}</span><span class="os-o">/10</span><span class="os-badge">${scoreLabel}</span></div>
+      <div class="os-subh"><span>How it adds up</span><span>score · weight</span></div>
+      ${scoreParts.map(p => `<div class="os-row"><span>${esc(p.k)}</span><span><span class="os-s">${f1(p.s)}</span><span class="os-w">${p.w}%</span></span></div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="aud-card" style="border:none;padding:0"><h4>Improvement areas</h4></div>
+      <div class="os-donut">${donutSvg}<div class="os-mid"><b>${f1(gainTotal)}</b><span>points to<br>gain</span></div></div>
+      ${gainParts.map(p => `<div class="os-leg"><div class="os-dot" style="background:${p.color}"></div><div class="os-t">${esc(p.k)}</div><div class="os-p">${gainTotal > 0 ? ((p.gain / gainTotal) * 100).toFixed(0) : 0}%</div><div class="os-d">${esc(p.tip)}</div></div>`).join('')}
+    </div>
+  </div>
+</div>
+`;
+
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>driftcoconut Analytics — ${d.dateLabel}</title>
+<title>Driftcoconut Analytics — ${d.dateLabel}</title>
 <style>
   * { box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; color: #1a2332; line-height: 1.5; margin: 0; padding: 0; background: #f8fafc; min-height: 100vh; }
@@ -827,6 +933,25 @@ function buildHtml(d) {
   .seo-row.h { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.4px; }
   .seo-row .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f2540; font-weight: 500; }
   .seo-row .r { text-align: right; color: #334155; }
+  .os-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .os-big { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .os-n { font-size: 54px; font-weight: 800; color: #0891b2; line-height: 1; }
+  .os-o { font-size: 20px; color: #94a3b8; font-weight: 600; }
+  .os-badge { background: #0891b2; color: #fff; font-weight: 700; font-size: 14px; padding: 4px 12px; border-radius: 6px; }
+  .os-subh { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px; }
+  .os-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 14px; border-top: 1px solid #f1f5f9; }
+  .os-s { font-weight: 800; color: #0f2540; }
+  .os-w { display: inline-block; width: 38px; text-align: right; color: #94a3b8; font-size: 13px; margin-left: 12px; }
+  .os-donut { display: flex; justify-content: center; margin: 6px 0 14px; position: relative; }
+  .os-mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+  .os-mid b { font-size: 30px; color: #0f2540; line-height: 1; }
+  .os-mid span { font-size: 10px; color: #94a3b8; letter-spacing: 0.8px; text-transform: uppercase; text-align: center; margin-top: 4px; }
+  .os-leg { display: grid; grid-template-columns: 14px 1fr auto; gap: 2px 8px; padding: 8px 0; border-top: 1px solid #f1f5f9; }
+  .os-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; }
+  .os-t { font-weight: 700; color: #0f2540; font-size: 14px; }
+  .os-p { font-weight: 800; color: #0f2540; }
+  .os-d { grid-column: 2 / 4; color: #64748b; font-size: 13px; }
+  @media (max-width: 720px) { .os-grid { grid-template-columns: 1fr; } }
   @media (max-width: 720px) { .msg-grid, .wk-grid { grid-template-columns: 1fr; } }
   .quick-links { padding: 16px 32px; background: #f8fafc; border-top: 1px solid #e5e8ee; display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; }
   .quick-links a { color: #0891b2; text-decoration: none; padding: 6px 12px; background: white; border: 1px solid #e5e8ee; border-radius: 6px; font-weight: 500; }
@@ -836,12 +961,12 @@ function buildHtml(d) {
 </head>
 <body>
 <div class="container">
-<h2 class="sr-only">driftcoconut GA dashboard for ${d.dateLabel}</h2>
+<h2 class="sr-only">Driftcoconut GA dashboard for ${d.dateLabel}</h2>
 
 <div class="header">
   <div class="header-row">
     <div>
-      <h1>driftcoconut Analytics — ${d.dateLabel}</h1>
+      <h1>Driftcoconut Analytics — ${d.dateLabel}</h1>
       <div class="sub">Live data from Google Analytics · ${d.pages.length} top pages, ${d.kpi.sessions} sessions across ${d.sourceRows.length} sources</div>
       <div class="gen">Generated: ${d.generatedAt} UTC · Click Update Data for instant fresh pull</div>
     </div>
@@ -895,6 +1020,7 @@ function buildHtml(d) {
   </div>
 </div>
 
+${scoreHtml}
 ${msgHtml}
 ${trendHtml}
 ${seoHtml}
@@ -968,7 +1094,7 @@ ${audienceHtml}
   <a href="https://search.google.com/search-console" target="_blank">Search Console ↗</a>
   <a href="https://vercel.com/dashboard" target="_blank">Vercel Dashboard ↗</a>
   <a href="https://www.cuelinks.com/dashboard" target="_blank">CueLinks Dashboard ↗</a>
-  <a href="https://driftcoconut.com" target="_blank">driftcoconut.com ↗</a>
+  <a href="https://driftcoconut.com" target="_blank">Driftcoconut.com ↗</a>
 </div>
 
 <div style="padding:16px 32px;font-size:11px;color:#94a3b8;font-style:italic;text-align:center;border-top:1px solid #e5e8ee">
