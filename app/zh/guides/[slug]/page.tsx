@@ -112,12 +112,12 @@ export default async function GuidePageZh({
         <MDXRemote source={guide.content} components={mdxComponents} />
       </div>
 
+      <RelatedGuides slug={slug} locale="zh" />
+
       {/* Trip planner: journey-based affiliate block, specialised to this destination */}
       <div className="mt-12 pt-8 border-t border-sea-100">
         <TripPlanner destination={guide.destination.split(",")[0].trim()} />
       </div>
-
-      <RelatedGuides slug={slug} locale="zh" />
 
       {/* Footer CTA */}
       <div className="mt-12 pt-8 border-t border-sea-100">
