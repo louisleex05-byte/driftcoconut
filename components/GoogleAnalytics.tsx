@@ -26,12 +26,20 @@ export default function GoogleAnalytics() {
           s.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
           document.head.appendChild(s);
           window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${gaId}', {
-            anonymize_ip: true,
-            send_page_view: true,
-          });
+          window.gtag = window.gtag || function(){dataLayer.push(arguments);};
+          // Owner device flag: open any page once with ?me=1 to mark this browser as internal
+          // (?me=0 clears it). Hits are tagged traffic_type=internal, which a GA4 data filter excludes.
+          var internal = false;
+          try {
+            var q = new URLSearchParams(location.search).get('me');
+            if (q === '1') localStorage.setItem('dc_internal', '1');
+            if (q === '0') localStorage.removeItem('dc_internal');
+            internal = localStorage.getItem('dc_internal') === '1';
+          } catch (e) {}
+          var cfg = { anonymize_ip: true, send_page_view: true };
+          if (internal) cfg.traffic_type = 'internal';
+          window.gtag('js', new Date());
+          window.gtag('config', '${gaId}', cfg);
           }
         `}
       </Script>
