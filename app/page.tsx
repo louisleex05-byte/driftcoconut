@@ -11,7 +11,7 @@ import HomeClient from "@/components/HomeClient";
 // (client-side, locale-aware) pick the right one at render time — otherwise
 // toggling to Chinese would leave the guide cards themselves stuck in English.
 // Hand-picked homepage guides — put the highest-traffic pages up front.
-const FEATURED_SLUGS = ["koh-phangan", "bangkok", "pattaya"];
+const FEATURED_SLUGS = ["cha-am", "kanchanaburi", "mae-hong-son"];
 
 export default async function HomePage() {
   const [guidesEn, guidesZh] = await Promise.all([listGuides("en"), listGuides("zh")]);
