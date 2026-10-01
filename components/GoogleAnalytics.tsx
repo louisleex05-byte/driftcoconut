@@ -38,6 +38,8 @@ export default function GoogleAnalytics() {
           } catch (e) {}
           var cfg = { anonymize_ip: true, send_page_view: true };
           if (internal) cfg.traffic_type = 'internal';
+          // Open any page with ?debug=1 to make this visit appear in GA DebugView.
+          try { if (new URLSearchParams(location.search).get('debug') === '1') cfg.debug_mode = true; } catch (e) {}
           window.gtag('js', new Date());
           window.gtag('config', '${gaId}', cfg);
           }
