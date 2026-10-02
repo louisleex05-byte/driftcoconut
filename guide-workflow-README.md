@@ -1,141 +1,132 @@
 # guide-workflow — driftcoconut destination guide desktop app
 
-A 3-tab Windows desktop app that automates the driftcoconut destination-guide writing pipeline. Uses the Claude API directly, so you never leave the app to feed prompts into Perplexity/Gemini and paste back.
+This Windows desktop app supports the driftcoconut destination-guide pipeline from research through a locally prepared MDX file. During the GPT transition, the supported default is manual ChatGPT mode: the app builds the prompt, copies it, opens ChatGPT, and accepts the result pasted back into the app.
+
+The existing direct Claude API integration remains temporarily available as a disabled legacy option. Replacing that API implementation is a later phase.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `guide-workflow.bat` | Double-click launcher. Sets up config on first run. |
-| `guide-workflow.ps1` | The actual app (PowerShell + WinForms). |
-| `guide-workflow-config.example.json` | Config template (committed). |
-| `guide-workflow-config.json` | Your local config (gitignored, holds your Claude API key). |
+| `guide-workflow.bat` | Double-click launcher; creates the ignored local config on first run. |
+| `guide-workflow.ps1` | PowerShell and WinForms workflow application. |
+| `guide-workflow-config.example.json` | Safe config template committed to Git. |
+| `guide-workflow-config.json` | Local ignored settings; never commit this file. |
+| `VOICE.md` | Canonical guide voice, structure, sourcing, and phrase rules. |
+| `AGENTS.md` | Repository, validation, Git, and publishing safeguards. |
 
-## First-time setup (2 min)
+## First-time setup
 
-1. **Get a Claude API key** — sign up at [console.anthropic.com](https://console.anthropic.com/settings/keys). Add $10-$20 of credit; a full guide (research + draft) costs ~$0.30.
-2. **Double-click `guide-workflow.bat`** — it will copy the config template to `guide-workflow-config.json` and open it in Notepad.
-3. **Paste your API key** into the `claudeApiKey` field, save, close Notepad.
-4. **Press any key** to launch the app.
-5. **`.gitignore`** — add this line so your config never gets committed:
-   ```
-   guide-workflow-config.json
-   ```
+1. Double-click `guide-workflow.bat`.
+2. The launcher creates `guide-workflow-config.json` if it is missing.
+3. The app opens in manual GPT mode. No API key is required.
+4. Keep `guide-workflow-config.json` local; it is already covered by `.gitignore`.
 
-## The 3 tabs (workflow left-to-right)
+## Workflow
 
-### Tab 1 — Research
+### 1. Research
 
-- Fill **Destination** (e.g. `Chiang Mai`), **Country** (e.g. `Thailand`), **Publish month** (e.g. `September 2026`)
-- The research prompt auto-generates in the middle textbox
-- Click **"Run Claude Research"** — Claude runs the prompt, output fills the bottom textbox (30–90 sec)
-- Or paste an existing Perplexity output into the bottom textbox
-- Click **"Save research.md"** — writes to `guides-drafts/<slug>/research.md`
+1. Enter the destination, country, and intended publication month.
+2. Leave **ChatGPT** selected under **Send to**.
+3. Click **Copy + Open**. The prompt is copied and ChatGPT opens in the browser.
+4. Paste the prompt into ChatGPT, then paste its answer into **Research output**.
+5. Review citations and volatile facts, then save `research.md`.
 
-### Tab 2 — Notes → Draft + Voice
+Perplexity, Gemini, and Claude remain available in the tool dropdown when a second source or comparison is useful.
 
-- Write your **personal notes** in the top textbox (5–15 lines is enough — coffee shops, opinions, insider tips)
-- Click **"Save notes.md"** to persist between sessions
-- Click **"Run Claude Draft"** — Claude gets the research + your notes + the brand-voice prompt, drafts the guide in the bottom textbox (60–120 sec)
-- Or paste from Gemini/Perplexity
-- Click **"SAVE DRAFT"** — writes `draft.md` + `final.md`, runs AI-phrase scan (flags "vibrant tapestry", "must-visit", etc.), reports word count vs 1,900–2,200 target
+### 2. Notes, draft, and voice
 
-### Tab 3 — Photos + Publish
+1. Add personal notes that supply firsthand opinions and local detail.
+2. Save `notes.md` if you want to preserve the notes between sessions.
+3. Leave **ChatGPT** selected and click **Copy + Open** to send the assembled research, notes, and editorial prompt.
+4. Paste the returned guide into **Draft body**.
+5. Review it against `VOICE.md`, then click **SAVE DRAFT**.
 
-- Fill the **metadata fields** (title, description, destination, hero alt)
-- For each of the **8 photo slots**, click **"Pick..."** and select a JPG on your disk
-- Click **"Copy Photos → public/guides/<slug>/"** — copies + renames each to the canonical filename
-- Click **"Assemble final.mdx"** — reads `final.md`, wraps common affiliate anchor phrases (`Browse X hotels on Booking.com`, `book Y on Klook`, etc.) with proper JSX, adds frontmatter, saves to `guides-drafts/<slug>/final.mdx`
-- Click **"Publish → content/guides/<slug>.mdx"** — copies the assembled MDX into the site's published guides folder
+Saving writes `draft.md` and `final.md`, reports the word count, and scans for the banned phrases defined in the workflow and `VOICE.md`.
 
-Then in your normal terminal:
+### 3. Photos and local preparation
+
+1. Review the metadata fields and the destination-specific photo preset.
+2. Select a source image for each photo slot.
+3. Click **Copy Photos** to copy, rename, and compress images under `public/guides/<slug>/`.
+4. Click **Assemble final.mdx** to add frontmatter and photo components, wrap supported plain affiliate phrases, preserve existing affiliate components, and remove legacy arrow prefixes.
+5. Review `guides-drafts/<slug>/final.mdx`.
+6. Click **Prepare** to copy the reviewed MDX into `content/guides/<slug>.mdx`.
+
+Prepare is intentionally local-only. It refuses to run on `main` and never stages, commits, pushes, deploys, or calls IndexNow.
+
+## Review and Git approval
+
+After preparing a guide, review the exact paths that changed and run the required validation:
 
 ```powershell
-git add content/guides public/guides
-git commit -m "Publish <city> guide"
-git push
+git status --short
+git diff -- content/guides/<slug>.mdx components/GuidePhoto.tsx
+npm run build
 ```
 
-Vercel auto-deploys in ~90 seconds.
+Stage only explicit reviewed paths. Do not use `git add -A` or `git add .`. Before every commit, present the changed files, a short summary, validation results, and the proposed commit message; wait for approval. A push requires separate explicit approval and must not target `main` without authorization.
 
-## Files this app touches
+## Working and published paths
 
-| Folder | Purpose |
+| Path | Purpose |
 |---|---|
-| `guides-drafts/<slug>/` | Working files — never committed. Contains `research.md`, `notes.md`, `draft.md`, `final.md`, `final.mdx` |
-| `public/guides/<slug>/` | Published photos (8 files named `hero.jpg`, `when-to-go.jpg`, etc.) — committed |
-| `content/guides/<slug>.mdx` | Published guide, read by `/guides/<slug>` route — committed |
+| `guides-drafts/<slug>/` | Ignored working files: research, notes, drafts, and assembled MDX. |
+| `public/guides/<slug>/` | Prepared destination photos using the preset's canonical filenames. |
+| `content/guides/<slug>.mdx` | Prepared English guide. |
+| `content/guides/<slug>.zh.mdx` | Chinese guide paired with the English guide. |
+| `components/GuidePhoto.tsx` | Maps each guide slug and slot to its image and alt text. |
 
-## Photo slot names (must match GuidePhoto.tsx)
+The guide slug, selected preset, metadata, MDX filename, photo directory, and `GuidePhoto.tsx` entry must agree. Preparation stops when an MDX photo slot has no matching component entry.
 
-The app expects 8 photos named exactly:
-- `hero.jpg`
-- `when-to-go.jpg`
-- `sukhumvit.jpg`
-- `silom.jpg`
-- `riverside.jpg`
-- `old-town.jpg`
-- `activity.jpg`
-- `local-tips.jpg`
+## Affiliate handling
 
-These slot names are shared across all guides (Bangkok, Chiang Mai, etc.). If you want per-guide slot names (e.g., `nimman.jpg` for Chiang Mai), refactor `components/GuidePhoto.tsx` first to accept `{guideSlug, slot}` lookups.
+The assembler preserves complete existing `<AffiliateLink>` components and wraps supported plain-text prompts only outside those components. Supported types include:
 
-## Config options (`guide-workflow-config.json`)
+- Booking.com
+- MakeMyTrip and Goibibo through CueLinks
+- Klook
+- Welcome Pickups
+- Airalo
+- Kiwi
+- Drimsim
 
-| Field | Default | Notes |
+Booking.com, MakeMyTrip, and Goibibo links require a meaningful `query`. Affiliate component lines must not start with `->` or `→`.
+
+## Configuration
+
+Manual GPT mode needs no credentials. These fields remain only for the temporary legacy Claude path:
+
+| Field | Default | Purpose |
 |---|---|---|
-| `claudeApiKey` | *(required)* | Your Anthropic API key. Starts with `sk-ant-`. |
-| `claudeModel` | `claude-sonnet-4-5` | Alternatives: `claude-opus-5` (higher quality, 5x cost), `claude-haiku-4-5` (fast/cheap) |
-| `claudeMaxTokens` | `8000` | Response cap. Raise to 16000 for very long research or draft outputs. |
+| `useClaudeAPI` | `false` | Explicitly enables the legacy direct API controls. |
+| `claudeApiKey` | empty | Local Anthropic API key used only by the legacy path. |
+| `claudeModel` | `claude-sonnet-4-5` | Legacy model setting. |
+| `claudeMaxTokens` | `8000` | Legacy response cap. |
 
-You can also set the env var `ANTHROPIC_API_KEY` instead of using the config file — the app checks env first, then config.
-
-## Cost estimate per guide
-
-Using Sonnet:
-- Research call: ~3K input tokens + ~5K output = ~$0.09
-- Draft call: ~15K input tokens (research + notes + prompt) + ~4K output = ~$0.11
-- **Total per guide: ~$0.20**
-
-$20 of Anthropic credit = ~100 guide iterations.
+The app also reads `ANTHROPIC_API_KEY` for backward compatibility. Never commit credentials.
 
 ## Troubleshooting
 
-**"Claude API key not configured"** — Edit `guide-workflow-config.json` and paste your key.
+**ChatGPT did not receive the prompt** — **Copy + Open** copies the prompt to the clipboard; paste it into the browser with Ctrl+V.
 
-**"Claude API error: 401 Unauthorized"** — Key is wrong or expired. Check at console.anthropic.com.
+**Legacy API button is disabled** — This is expected in manual GPT mode. Leave **Use legacy Claude API** unchecked.
 
-**"Claude API error: rate_limit_error"** — You've hit Anthropic's rate limits (usually only a concern on the free tier). Wait 60 seconds and retry.
+**Prepare refuses to run** — Confirm the repository is on a feature branch, the guide slug matches the selected preset, and every `<GuidePhoto>` slot exists in `GuidePhoto.tsx`.
 
-**App is invisible / tabs blank on Windows 11** — Already handled by the manual Panel+Buttons tab bar (session.md bug #1). If you still see issues, restart PowerShell.
+**App is invisible or tabs are blank on Windows 11** — Restart the app through `guide-workflow.bat`. The workflow uses manual panels instead of `TabControl` for compatibility.
 
-**Drag-drop not working on text boxes** — The app uses RichTextBox which accepts drag but the drop handler wasn't wired for v1. Workaround: use the "Load" buttons, or paste text with Ctrl+V.
+**A draft triggers the AI-phrase warning** — Replace every flagged phrase with a concrete destination-specific detail and review the full checklist in `VOICE.md`.
 
-**`Get-Content: file is being used by another process`** — Close whatever text editor has the file open, then retry.
+## Preserved WinForms behavior
 
-## Session notes provenance
+The workflow retains the compatibility fixes established during the v3 rebuild:
 
-This app is the v3 rebuild described in `session.md` §2, with a Claude API integration added (previously required copying prompts to Perplexity and pasting back). All 6 bug fixes from §3 of session.md are applied:
+1. Manual panel-and-button tabs.
+2. `RichTextBox` text areas.
+3. Event handlers closed with `.GetNewClosure()`.
+4. Shared UI state under `$global:`.
+5. Explicit `DialogResult` comparisons.
+6. Load and paste controls for long text.
 
-1. Manual Panel+Buttons tab bar (TabControl invisible on some W11)
-2. RichTextBox for text areas (not TextBox)
-3. Scriptblocks wrapped in `.GetNewClosure()`
-4. All state uses `$global:` (not `$script:`)
-5. Explicit DialogResult enum comparison
-6. Long-paste reliability (right-click paste + scroll-verify)
-
-## Adding new guides
-
-For each new destination:
-
-1. Open the app
-2. Update the **slug** in the header (e.g., `bali`)
-3. Change **Destination** + **Country** in Tab 1
-4. Follow tabs left-to-right
-5. Metadata + photo slots are pre-filled per guide (edit as needed on Tab 3)
-
-The slug drives all paths — `guides-drafts/bali/`, `public/guides/bali/`, `content/guides/bali.mdx`.
-
----
-
-Built for driftcoconut · v3.1 (Claude API edition) · 2026-09
+Built for driftcoconut · GPT transition architecture · 2026-10

@@ -15,27 +15,20 @@ if not exist "guide-workflow.ps1" (
     exit /b 1
 )
 
-REM Check for config file, prompt user to create if missing
+REM Create the local ignored config on first run. Manual ChatGPT mode is the
+REM default and needs no API key; the config also retains an optional legacy
+REM Claude API section during the transition.
 if not exist "guide-workflow-config.json" (
     if exist "guide-workflow-config.example.json" (
         echo -----------------------------------------------------------
         echo First run: no config file found.
         echo Copying guide-workflow-config.example.json to guide-workflow-config.json
-        echo IMPORTANT: Edit guide-workflow-config.json and add your Claude API key
-        echo before using the "Run Claude" buttons.
+        echo Manual ChatGPT mode is ready; no API key is required.
         echo -----------------------------------------------------------
         copy /Y "guide-workflow-config.example.json" "guide-workflow-config.json" >nul
-        echo.
-        echo Opening config file for you to edit...
-        notepad guide-workflow-config.json
-        echo.
-        echo When you save the config, press any key to launch the app.
-        pause
     ) else (
-        echo WARNING: no config file. Claude API buttons will not work.
-        echo Create guide-workflow-config.json with { "claudeApiKey": "sk-ant-..." }
+        echo WARNING: config template not found. Continuing in manual ChatGPT mode.
         echo.
-        pause
     )
 )
 

@@ -1,19 +1,19 @@
 ﻿# ============================================================================
-# driftcoconut Guide Workflow - v3 + Claude API
+# driftcoconut Guide Workflow - v3 GPT transition
 # ============================================================================
 # 3-tab WinForms desktop app for the destination-guide writing pipeline.
 #
-# Tab 1: Research         -> Claude runs the destination-research prompt
-# Tab 2: Notes + Draft    -> Personal notes + Claude drafts the guide in your voice
-# Tab 3: Photos + Publish -> 8 photo slots + assemble final.mdx + publish
+# Tab 1: Research         -> Copy/open the research prompt in ChatGPT by default
+# Tab 2: Notes + Draft    -> Copy/open the voice-aware draft prompt in ChatGPT
+# Tab 3: Photos + Prepare -> 8 photo slots + assemble and copy final.mdx locally
 #
 # Reads/writes: <ProjectRoot>\guides-drafts\<slug>\
-# Publishes to: <ProjectRoot>\content\guides\<slug>.mdx
+# Prepares in:  <ProjectRoot>\content\guides\<slug>.mdx
 # Copies photos to: <ProjectRoot>\public\guides\<slug>\
 #
-# Claude API: Anthropic Messages API via Invoke-RestMethod
-# Requires:   guide-workflow-config.json with a claudeApiKey field
-#             (see guide-workflow-config.example.json)
+# Manual GPT mode is the default and requires no API key. The existing direct
+# Claude API path remains temporarily available as an explicitly enabled legacy
+# option until the later API replacement phase.
 #
 # Session-notes bug fixes (from H:\ v3 development):
 #  1. Manual Panel+Buttons tab bar (TabControl is invisible on Windows 11)
@@ -40,13 +40,13 @@ if (-not (Test-Path $global:DraftsRoot))    { New-Item -ItemType Directory -Path
 if (-not (Test-Path $global:PublishedRoot)) { New-Item -ItemType Directory -Path $global:PublishedRoot -Force | Out-Null }
 if (-not (Test-Path $global:PhotosRoot))    { New-Item -ItemType Directory -Path $global:PhotosRoot -Force | Out-Null }
 
-# Config: Claude API + model + tokens
+# Config: manual GPT by default; optional legacy Claude API settings
 $configPath              = Join-Path $global:ProjectRoot "guide-workflow-config.json"
 $global:ClaudeApiKey     = $env:ANTHROPIC_API_KEY
 $global:ClaudeModel      = "claude-sonnet-4-5"
 $global:ClaudeMaxTokens  = 8000
-# API toggle: OFF by default (manual mode - copy prompt, paste to Claude/Perplexity/Gemini, paste back).
-# Flip to ON via the header checkbox once you have an Anthropic API key.
+# Legacy API toggle: OFF by default. Manual mode copies prompts to ChatGPT (or
+# another selected research tool) and accepts pasted results.
 $global:UseClaudeAPI     = $false
 
 if (Test-Path $configPath) {
@@ -67,9 +67,9 @@ if (Test-Path $configPath) {
 # Prompt is copied to clipboard; user pastes into the opened site.
 # (None of these accept prompts via URL params for long content.)
 $global:ResearchTools = [ordered]@{
+    "ChatGPT"       = "https://chatgpt.com/"
     "Perplexity"    = "https://www.perplexity.ai/"
     "Gemini"        = "https://gemini.google.com/app"
-    "ChatGPT"       = "https://chat.openai.com/"
     "Claude Cowork" = "https://claude.ai/new"
 }
 
@@ -1784,13 +1784,13 @@ function Set-ActiveTab {
 # MAIN FORM
 # ============================================================================
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "driftcoconut Guide Workflow - Claude edition"
+$form.Text = "driftcoconut Guide Workflow - GPT transition"
 $form.Size = New-Object System.Drawing.Size(980, 870)
 $form.StartPosition = "CenterScreen"
 $form.BackColor = [System.Drawing.Color]::FromArgb(251, 247, 240)  # warm paper
 $form.Font = New-Object System.Drawing.Font("Segoe UI", 9)
 
-# --- HEADER STRIP (destination + slug + Claude status) ---
+# --- HEADER STRIP (destination + slug + workflow mode status) ---
 $header = New-Object System.Windows.Forms.Panel
 $header.Location = New-Object System.Drawing.Point(10, 8)
 $header.Size = New-Object System.Drawing.Size(945, 40)
@@ -1936,32 +1936,31 @@ $global:lblSlugWarn.Text = ""
 $global:lblSlugWarn.Visible = $false
 $header.Controls.Add($global:lblSlugWarn)
 
-# API toggle checkbox - lets user switch between "auto" (call Claude API directly)
-# and "manual" (copy prompts to Claude Cowork / Perplexity / Gemini, paste back).
+# Legacy API toggle. Manual ChatGPT copy/paste is the supported transition path.
 $global:chkUseAPI = New-Object System.Windows.Forms.CheckBox
-$global:chkUseAPI.Text = "Use Claude API"
+$global:chkUseAPI.Text = "Use legacy Claude API"
 $global:chkUseAPI.Location = New-Object System.Drawing.Point(215, 12)
-$global:chkUseAPI.Size = New-Object System.Drawing.Size(120, 20)
+$global:chkUseAPI.Size = New-Object System.Drawing.Size(155, 20)
 $global:chkUseAPI.Checked = $global:UseClaudeAPI
 $header.Controls.Add($global:chkUseAPI)
 
 $global:lblApiStatus = New-Object System.Windows.Forms.Label
-$global:lblApiStatus.Location = New-Object System.Drawing.Point(340, 12)
-$global:lblApiStatus.Size = New-Object System.Drawing.Size(600, 18)
+$global:lblApiStatus.Location = New-Object System.Drawing.Point(375, 12)
+$global:lblApiStatus.Size = New-Object System.Drawing.Size(565, 18)
 $header.Controls.Add($global:lblApiStatus)
 
 # Compute the status label + colour based on toggle + key presence.
 function Update-ApiStatusLabel {
     if ($global:UseClaudeAPI) {
         if ($global:ClaudeApiKey) {
-            $global:lblApiStatus.Text = "AUTO mode: Claude API ready ($($global:ClaudeModel))"
+            $global:lblApiStatus.Text = "LEGACY API mode: Claude ready ($($global:ClaudeModel))"
             $global:lblApiStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
         } else {
-            $global:lblApiStatus.Text = "AUTO mode ON but NO API KEY - edit guide-workflow-config.json"
+            $global:lblApiStatus.Text = "LEGACY API mode ON but no key is configured"
             $global:lblApiStatus.ForeColor = [System.Drawing.Color]::Firebrick
         }
     } else {
-        $global:lblApiStatus.Text = "MANUAL mode: Copy prompt -> paste into Claude Cowork / Perplexity / Gemini -> paste output back"
+        $global:lblApiStatus.Text = "GPT mode: Copy + Open ChatGPT, then paste the result back"
         $global:lblApiStatus.ForeColor = [System.Drawing.Color]::FromArgb(120, 90, 30)
     }
     # Also flip button enable state (set once buttons exist)
@@ -1991,7 +1990,7 @@ $tabBar.BackColor = [System.Drawing.Color]::FromArgb(251, 247, 240)
 
 $global:btnTabResearch = New-TabButton "1. Research" 0
 $global:btnTabDraft    = New-TabButton "2. Notes -> Draft + Voice" 210
-$global:btnTabPublish  = New-TabButton "3. Photos + Publish" 420
+$global:btnTabPublish  = New-TabButton "3. Photos + Prepare" 420
 
 $tabBar.Controls.Add($global:btnTabResearch)
 $tabBar.Controls.Add($global:btnTabDraft)
@@ -2038,7 +2037,7 @@ $txtMonth.Text = "September 2026"
 $txtMonth.Location = New-Object System.Drawing.Point(575, 10); $txtMonth.Size = New-Object System.Drawing.Size(140, 22)
 $global:panelResearch.Controls.Add($txtMonth)
 
-# Button row - tool dropdown + Send button + Copy + Run Claude + Load/Save
+# Button row - tool dropdown + Send button + Copy + legacy API + Load/Save
 $lblTool = New-Object System.Windows.Forms.Label
 $lblTool.Text = "Send to:"; $lblTool.Location = New-Object System.Drawing.Point(10, 50); $lblTool.Size = New-Object System.Drawing.Size(55, 18)
 $global:panelResearch.Controls.Add($lblTool)
@@ -2047,7 +2046,7 @@ $global:cmbResearchTool = New-Object System.Windows.Forms.ComboBox
 $global:cmbResearchTool.Location = New-Object System.Drawing.Point(65, 47); $global:cmbResearchTool.Size = New-Object System.Drawing.Size(110, 22)
 $global:cmbResearchTool.DropDownStyle = 'DropDownList'
 foreach ($k in $global:ResearchTools.Keys) { [void]$global:cmbResearchTool.Items.Add($k) }
-$global:cmbResearchTool.SelectedIndex = 0  # Perplexity default
+$global:cmbResearchTool.SelectedIndex = 0  # ChatGPT default
 $global:panelResearch.Controls.Add($global:cmbResearchTool)
 
 $btnSendResearch = New-Object System.Windows.Forms.Button
@@ -2064,7 +2063,7 @@ $btnCopyResearchPrompt.Location = New-Object System.Drawing.Point(295, 45); $btn
 $global:panelResearch.Controls.Add($btnCopyResearchPrompt)
 
 $global:btnRunClaudeResearch = New-Object System.Windows.Forms.Button
-$global:btnRunClaudeResearch.Text = "Run Claude API"
+$global:btnRunClaudeResearch.Text = "Legacy Claude API"
 $global:btnRunClaudeResearch.Location = New-Object System.Drawing.Point(390, 45); $global:btnRunClaudeResearch.Size = New-Object System.Drawing.Size(120, 28)
 $global:btnRunClaudeResearch.BackColor = [System.Drawing.Color]::FromArgb(120, 90, 30)
 $global:btnRunClaudeResearch.ForeColor = [System.Drawing.Color]::White
@@ -2106,7 +2105,7 @@ $global:panelResearch.Controls.Add($global:txtResearchPrompt)
 
 # Research output
 $lblOutput = New-Object System.Windows.Forms.Label
-$lblOutput.Text = "Research output (paste the result from Perplexity/Gemini/etc. here, or Claude API auto-fills):"
+$lblOutput.Text = "Research output (paste the ChatGPT result here; legacy Claude API can auto-fill):"
 $lblOutput.Location = New-Object System.Drawing.Point(10, 345); $lblOutput.Size = New-Object System.Drawing.Size(700, 18)
 $global:panelResearch.Controls.Add($lblOutput)
 
@@ -2129,7 +2128,7 @@ $btnCopyResearchPrompt.Add_Click({
     $lblResearchStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
 
-# Run Claude Research
+# Run legacy Claude Research
 $global:btnRunClaudeResearch.Add_Click({
     if (-not $global:ClaudeApiKey) {
         [System.Windows.Forms.MessageBox]::Show("Configure Claude API key in guide-workflow-config.json first.", "No API key", 'OK', 'Warning') | Out-Null
@@ -2222,7 +2221,7 @@ $global:cmbDraftTool = New-Object System.Windows.Forms.ComboBox
 $global:cmbDraftTool.Location = New-Object System.Drawing.Point(355, 221); $global:cmbDraftTool.Size = New-Object System.Drawing.Size(110, 22)
 $global:cmbDraftTool.DropDownStyle = 'DropDownList'
 foreach ($k in $global:ResearchTools.Keys) { [void]$global:cmbDraftTool.Items.Add($k) }
-$global:cmbDraftTool.SelectedIndex = 1  # Gemini default for drafting (better long-form)
+$global:cmbDraftTool.SelectedIndex = 0  # ChatGPT default
 $global:panelDraft.Controls.Add($global:cmbDraftTool)
 
 $btnSendDraft = New-Object System.Windows.Forms.Button
@@ -2252,9 +2251,9 @@ $btnSendDraft.Add_Click({
     $global:lblDraftStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
 
-# Second button row - Claude API + Load draft + SAVE DRAFT (moved to y=253 so it doesn't collide with tool row)
+# Second button row - legacy API + Load draft + SAVE DRAFT
 $global:btnRunClaudeDraft = New-Object System.Windows.Forms.Button
-$global:btnRunClaudeDraft.Text = "Run Claude API"
+$global:btnRunClaudeDraft.Text = "Legacy Claude API"
 $global:btnRunClaudeDraft.Location = New-Object System.Drawing.Point(10, 253); $global:btnRunClaudeDraft.Size = New-Object System.Drawing.Size(130, 28)
 $global:btnRunClaudeDraft.BackColor = [System.Drawing.Color]::FromArgb(120, 90, 30)
 $global:btnRunClaudeDraft.ForeColor = [System.Drawing.Color]::White
@@ -2275,7 +2274,7 @@ $btnSaveDraft.FlatStyle = "Flat"
 $global:panelDraft.Controls.Add($btnSaveDraft)
 
 $lblDraftBody = New-Object System.Windows.Forms.Label
-$lblDraftBody.Text = "Draft body (paste result from Perplexity/Gemini/etc. here, or Claude API auto-fills):"
+$lblDraftBody.Text = "Draft body (paste the ChatGPT result here; legacy Claude API can auto-fill):"
 $lblDraftBody.Location = New-Object System.Drawing.Point(10, 290); $lblDraftBody.Size = New-Object System.Drawing.Size(700, 18)
 $global:panelDraft.Controls.Add($lblDraftBody)
 
@@ -2469,7 +2468,7 @@ $btnNewGuide.Add_Click({
         $global:CurrentSlug = $res.slug
     }
     AutoFill-Metadata -Force
-    $global:lblPublishStatus.Text = "Registered '$($res.slug)' with $($res.entries.Count) slots. Written to components/GuidePhoto.tsx. Commit + push GuidePhoto.tsx before publishing so Vercel can find the photos."
+    $global:lblPublishStatus.Text = "Registered '$($res.slug)' with $($res.entries.Count) slots in components/GuidePhoto.tsx. Review the diff and request approval before any commit or push."
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
 $global:panelPublish.Controls.Add($btnNewGuide)
@@ -3027,7 +3026,7 @@ $form.Controls.Add($global:panelPublish)
 # ============================================================================
 # TAB SWITCHING
 # ============================================================================
-# Now that all buttons exist, re-apply the API mode state so Run Claude buttons
+# Now that all buttons exist, re-apply the API mode state so legacy API buttons
 # get their initial enabled/disabled colour correctly.
 Update-ApiStatusLabel
 
