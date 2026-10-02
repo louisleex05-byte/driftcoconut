@@ -1632,6 +1632,111 @@ function Find-AiPhrases {
     return $found
 }
 
+function Convert-PlainAffiliateAnchors {
+    param(
+        [string] $Body,
+        [string] $Destination
+    )
+    if (-not $Body) {
+        return [pscustomobject]@{ Body = $Body; Wrapped = 0; PrefixesRemoved = 0 }
+    }
+
+    # Split around complete AffiliateLink components and transform only the
+    # plain-text segments. Existing valid components are rejoined unchanged.
+    $affiliateComponentPattern = '(<AffiliateLink\b[^>]*>.*?</AffiliateLink>)'
+    $segments = [regex]::Split(
+        $Body,
+        $affiliateComponentPattern,
+        [System.Text.RegularExpressions.RegexOptions]::Singleline
+    )
+    $destinationName = ($Destination -split ',')[0].Trim()
+    $wrapped = [ref] 0
+
+    for ($i = 0; $i -lt $segments.Count; $i++) {
+        if ($segments[$i] -match '^<AffiliateLink\b') { continue }
+
+        $segments[$i] = [regex]::Replace(
+            $segments[$i],
+            'Browse ([A-Z][A-Za-z /-]+) hotels on Booking\.com',
+            {
+                param($m)
+                $wrapped.Value++
+                $area = $m.Groups[1].Value.Trim()
+                $query = if ($destinationName -and $area -notmatch [regex]::Escape($destinationName)) { "$area $destinationName" } else { $area }
+                "<AffiliateLink type=`"booking`" query=`"$query`">Browse $area hotels on Booking.com</AffiliateLink>"
+            }.GetNewClosure(),
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        $segments[$i] = [regex]::Replace(
+            $segments[$i],
+            'India readers:\s*browse ([A-Z][A-Za-z /-]+) hotels on MakeMyTrip',
+            {
+                param($m)
+                $wrapped.Value++
+                $city = $m.Groups[1].Value.Trim()
+                "<AffiliateLink type=`"makemytrip`" query=`"$city`">India readers: browse $city hotels on MakeMyTrip</AffiliateLink>"
+            }.GetNewClosure(),
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        $segments[$i] = [regex]::Replace(
+            $segments[$i],
+            'India readers:\s*browse ([A-Z][A-Za-z /-]+) hotels on Goibibo',
+            {
+                param($m)
+                $wrapped.Value++
+                $city = $m.Groups[1].Value.Trim()
+                "<AffiliateLink type=`"goibibo`" query=`"$city`">India readers: browse $city hotels on Goibibo</AffiliateLink>"
+            }.GetNewClosure(),
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        $segments[$i] = [regex]::Replace(
+            $segments[$i],
+            'book (?:the )?([A-Za-z][A-Za-z -]+?)(?: day)? tour on Klook',
+            {
+                param($m)
+                $wrapped.Value++
+                $activity = $m.Groups[1].Value.Trim()
+                $query = if ($destinationName) { "$activity $destinationName" } else { $activity }
+                "<AffiliateLink type=`"klook`" query=`"$query`">$($m.Value)</AffiliateLink>"
+            }.GetNewClosure(),
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        $segments[$i] = [regex]::Replace(
+            $segments[$i],
+            'book Welcome Pickups',
+            {
+                param($m)
+                $wrapped.Value++
+                '<AffiliateLink type="welcomePickups">book Welcome Pickups</AffiliateLink>'
+            }.GetNewClosure(),
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        $segments[$i] = [regex]::Replace(
+            $segments[$i],
+            'grab (?:an )?Airalo',
+            {
+                param($m)
+                $wrapped.Value++
+                '<AffiliateLink type="airalo">Grab an Airalo</AffiliateLink>'
+            }.GetNewClosure(),
+            [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+    }
+
+    $result = $segments -join ''
+    $prefixPattern = '(?m)^[ \t]*(?:->|→)[ \t]*(?=<AffiliateLink\b)'
+    $prefixesRemoved = [regex]::Matches($result, $prefixPattern).Count
+    if ($prefixesRemoved -gt 0) {
+        $result = [regex]::Replace($result, $prefixPattern, '')
+    }
+
+    return [pscustomobject]@{
+        Body            = $result
+        Wrapped         = $wrapped.Value
+        PrefixesRemoved = $prefixesRemoved
+    }
+}
+
 function New-RichBox {
     param([int]$X, [int]$Y, [int]$W, [int]$H, [string]$Placeholder = "")
     $rtb = New-Object System.Windows.Forms.RichTextBox
@@ -2676,7 +2781,7 @@ $btnAssembleMDX.Location = New-Object System.Drawing.Point(280, $actionY); $btnA
 $global:panelPublish.Controls.Add($btnAssembleMDX)
 
 $btnPublishMDX = New-Object System.Windows.Forms.Button
-$btnPublishMDX.Text = "Publish -> content/guides/<slug>.mdx"
+$btnPublishMDX.Text = "Prepare -> content/guides/<slug>.mdx"
 $btnPublishMDX.Location = New-Object System.Drawing.Point(550, $actionY); $btnPublishMDX.Size = New-Object System.Drawing.Size(260, 32)
 $btnPublishMDX.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 $btnPublishMDX.ForeColor = [System.Drawing.Color]::White
@@ -2802,21 +2907,15 @@ $btnAssembleMDX.Add_Click({
         $global:txtMetaTitle.Text = (ConvertTo-TitleCase $words[0]) + $(if ($words.Length -gt 1) { ' ' + $words[1] } else { '' })
     }
 
-    # Regex-wrap common affiliate anchor phrases with <AffiliateLink> JSX (only if not already wrapped)
-    $wrapCount = 0
-    $wrapRules = @(
-        @{ pattern = 'Browse ([A-Z][A-Za-z /]+) hotels on Booking\.com'; jsx = { param($m) "<AffiliateLink type=""booking"" query=""$($m.Groups[1].Value) $($global:txtMetaDestination.Text.Split(',')[0].Trim())"">Browse $($m.Groups[1].Value) hotels on Booking.com</AffiliateLink>" } },
-        @{ pattern = 'book (?:the )?([A-Za-z ]+?) (?:day )?tour on Klook'; jsx = { param($m) "<AffiliateLink type=""klook"" query=""$($m.Groups[1].Value) $($global:txtMetaDestination.Text.Split(',')[0].Trim())"">book the $($m.Groups[1].Value) tour on Klook</AffiliateLink>" } },
-        @{ pattern = 'book Welcome Pickups'; jsx = { param($m) '<AffiliateLink type="welcomePickups">book Welcome Pickups</AffiliateLink>' } },
-        @{ pattern = 'grab (?:an )?Airalo'; jsx = { param($m) '<AffiliateLink type="airalo">Grab an Airalo</AffiliateLink>' } }
-    )
-
-    foreach ($rule in $wrapRules) {
-        # Skip anything already inside <AffiliateLink> tags
-        $body = [regex]::Replace($body, "(?<!<AffiliateLink[^>]*>[^<]*?)$($rule.pattern)", {
-            param($m) $wrapCount++; & $rule.jsx $m
-        }, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-    }
+    # Wrap plain affiliate anchor phrases without modifying existing valid
+    # AffiliateLink components. This also supports the India-focused CueLinks
+    # partners and removes legacy arrow prefixes before affiliate components.
+    $affiliateResult = Convert-PlainAffiliateAnchors `
+        -Body $body `
+        -Destination $global:txtMetaDestination.Text
+    $body = $affiliateResult.Body
+    $wrapCount = $affiliateResult.Wrapped
+    $affiliatePrefixesRemoved = $affiliateResult.PrefixesRemoved
 
     # Build MDX frontmatter from metadata form
     $slug = $global:CurrentSlug
@@ -2840,24 +2939,36 @@ heroAlt: "$($global:txtMetaHeroAlt.Text)"
     $outPath = Join-Path $dir "final.mdx"
     # UTF-8 no-BOM (Next.js prefers this)
     [System.IO.File]::WriteAllText($outPath, $finalMdx, (New-Object System.Text.UTF8Encoding($false)))
-    $global:lblPublishStatus.Text = "Assembled: $outPath`nAffiliate anchors wrapped: $wrapCount  |  GuidePhoto tags inserted: $guidePhotoInserted  |  Mojibake fixed  |  Title/Destination capitalized. Review, then Publish."
+    $global:lblPublishStatus.Text = "Assembled: $outPath`nAffiliate anchors wrapped: $wrapCount  |  Affiliate arrow prefixes removed: $affiliatePrefixesRemoved  |  GuidePhoto tags inserted: $guidePhotoInserted  |  Mojibake fixed. Review, then Prepare."
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 }.GetNewClosure())
 
-# --- Publish handler ---
+# --- Local prepare handler (never stages, commits, pushes, deploys, or pings) ---
 $btnPublishMDX.Add_Click({
-    # FULL PUBLISH PIPELINE with progress bar:
-    #   [1/5] Copy final.mdx -> content/guides/<slug>.mdx
-    #   [2/5] Stage whitelisted files (never `git add -A` - avoids leaking secrets)
-    #   [3/5] git commit
-    #   [4/5] git push
-    #   [5/5] Print live URL
-    # Errors at any stage halt the pipeline and turn status red.
+    # This button prepares the reviewed guide in the working tree only.
+    # Git staging, commits, pushes, deployment, and IndexNow are deliberately
+    # left to an explicit, separately approved terminal workflow.
     $slug = $global:CurrentSlug
-    $lines = @()
     $global:progressPublish.Value = 0
     $global:progressPublish.Visible = $true
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
+
+    # Production safeguard: never write guide content while checked out on main.
+    $branchOutput = & git -C $global:ProjectRoot branch --show-current 2>&1
+    $branchLine = $branchOutput | Select-Object -First 1
+    $branchName = if ($branchLine) { $branchLine.ToString().Trim() } else { '' }
+    if ($LASTEXITCODE -ne 0 -or -not $branchName) {
+        $global:lblPublishStatus.Text = "[ABORT] Could not determine the current Git branch. Prepare the guide from a reviewed feature branch."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
+    if ($branchName -eq 'main') {
+        $global:lblPublishStatus.Text = "[ABORT] Refusing to prepare guide content on protected branch 'main'. Switch to a reviewed feature branch first."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
 
     # SAFETY GUARD: abort if Guide slug does not match the loaded slot preset.
     # Prevents the disaster where user types slug X but preset/photos/metadata
@@ -2870,7 +2981,7 @@ $btnPublishMDX.Add_Click({
         return
     }
 
-    $global:lblPublishStatus.Text = "Starting publish pipeline for $slug..."
+    $global:lblPublishStatus.Text = "Preparing $slug locally on branch '$branchName'..."
     [System.Windows.Forms.Application]::DoEvents()
 
     # --- Stage 1: copy MDX ---
@@ -2900,107 +3011,15 @@ $btnPublishMDX.Add_Click({
     try {
         Copy-Item -Path $srcMdx -Destination $dstMdx -Force
     } catch {
-        $global:lblPublishStatus.Text = "[1/5 FAIL] Copy MDX: $($_.Exception.Message)"
+        $global:lblPublishStatus.Text = "[FAIL] Copy MDX: $($_.Exception.Message)"
         $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
         $global:progressPublish.Visible = $false
         return
     }
-    $global:progressPublish.Value = 20
-    $lines += "[1/5] MDX copied -> $dstMdx"
-    $global:lblPublishStatus.Text = ($lines -join "`n")
-    [System.Windows.Forms.Application]::DoEvents()
-
-    # --- Stage 2: git add whitelisted files only (never -A) ---
-    Push-Location $global:ProjectRoot
-    try {
-        $addPaths = @(
-            "content/guides/$slug.mdx",
-            "public/guides/$slug",
-            "components/GuidePhoto.tsx"
-        )
-        $addOut = & git add -- $addPaths 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            $global:lblPublishStatus.Text = ($lines + "[2/5 FAIL] git add: $addOut" -join "`n")
-            $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
-            $global:progressPublish.Visible = $false
-            return
-        }
-        $global:progressPublish.Value = 40
-        $lines += "[2/5] Staged: $($addPaths -join ', ')"
-        $global:lblPublishStatus.Text = ($lines -join "`n")
-        [System.Windows.Forms.Application]::DoEvents()
-
-        # --- Stage 3: commit ---
-        # git commit exits 1 if nothing to commit - treat that as OK not failure
-        $commitMsg = "Publish $slug guide"
-        $commitOut = & git commit -m $commitMsg 2>&1
-        $commitCode = $LASTEXITCODE
-        if ($commitCode -ne 0 -and ($commitOut -notmatch 'nothing to commit')) {
-            $global:lblPublishStatus.Text = ($lines + "[3/5 FAIL] git commit: $commitOut" -join "`n")
-            $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
-            $global:progressPublish.Visible = $false
-            return
-        }
-        $global:progressPublish.Value = 60
-        $lines += "[3/5] Committed: `"$commitMsg`""
-        $global:lblPublishStatus.Text = ($lines -join "`n")
-        [System.Windows.Forms.Application]::DoEvents()
-
-        # --- Stage 4: push ---
-        $pushOut = & git push 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            $global:lblPublishStatus.Text = ($lines + "[4/5 FAIL] git push: $pushOut" -join "`n")
-            $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
-            $global:progressPublish.Visible = $false
-            return
-        }
-        $global:progressPublish.Value = 80
-        $lines += "[4/5] Pushed to origin/main. Vercel build starting..."
-        $global:lblPublishStatus.Text = ($lines -join "`n")
-        [System.Windows.Forms.Application]::DoEvents()
-    } finally {
-        Pop-Location
-    }
-
-    # --- Stage 5: done ---
     $global:progressPublish.Value = 100
-    $liveUrl = "https://driftcoconut.com/guides/$slug"
-    $lines += "[5/5] DONE. Vercel deploys in ~90 sec."
-    $lines += "      Live URL: $liveUrl"
-    $global:lblPublishStatus.Text = ($lines -join "`n")
+    $global:lblPublishStatus.Text = "Prepared locally: $dstMdx`nBranch: $branchName`nNothing was staged, committed, pushed, deployed, or submitted to IndexNow. Review the diff, then request explicit approval for each Git step."
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
     [System.Windows.Forms.Application]::DoEvents()
-
-    # --- Stage 6: IndexNow ping (best-effort, never blocks a successful publish) ---
-    # Notifies Bing + Yandex the instant this guide goes live instead of waiting
-    # for their next scheduled sitemap crawl. See lib/indexnow.ts for the
-    # Next.js-side equivalent / docs - this is the PowerShell mirror of it so
-    # Publish doesn't depend on hitting a Node/Next.js route to fire the ping.
-    try {
-        $indexNowKey = "8c49cefe230e24a34dc92e8999c37d54"
-        $indexNowHost = "driftcoconut.com"
-        $urlList = @("https://$indexNowHost/guides/$slug")
-        $zhPath = Join-Path $global:PublishedRoot "$slug.zh.mdx"
-        if (Test-Path $zhPath) { $urlList += "https://$indexNowHost/zh/guides/$slug" }
-
-        $body = @{
-            host        = $indexNowHost
-            key         = $indexNowKey
-            keyLocation = "https://$indexNowHost/$indexNowKey.txt"
-            urlList     = $urlList
-        } | ConvertTo-Json
-
-        $inResp = Invoke-WebRequest -Uri "https://api.indexnow.org/indexnow" -Method Post -Body $body -ContentType "application/json; charset=utf-8" -UseBasicParsing -TimeoutSec 15
-        if ($inResp.StatusCode -eq 200 -or $inResp.StatusCode -eq 202) {
-            $lines += "[6/6] IndexNow: pinged Bing/Yandex for $($urlList.Count) URL(s)."
-        } else {
-            $lines += "[6/6] IndexNow: unexpected status $($inResp.StatusCode) (non-fatal, publish still succeeded)."
-        }
-    } catch {
-        # Never fail the publish over this - just note it and move on.
-        $lines += "[6/6] IndexNow ping failed (non-fatal, publish still succeeded): $($_.Exception.Message)"
-    }
-    $global:lblPublishStatus.Text = ($lines -join "`n")
 }.GetNewClosure())
 
 $form.Controls.Add($global:panelPublish)
