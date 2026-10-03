@@ -221,8 +221,8 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     neighborhood3: { file: "neighborhood3.jpg", alt: "Pranburi Pran Buri town and rail-station area area neighborhood and accommodation options" },
     whenToGo: { file: "when-to-go.jpg", alt: "Pranburi When to go scenic view and travel destination photo" },
     activity: { file: "activity.jpg", alt: "Pranburi Things to do scenic view and travel destination photo" },
-     PakNamPranbeachfron: { file: " pak-nam-pranbeachfron.jpg", alt: "Pranburi Pak Nam Pran beachfront travel destination scene and local atmosphere" },
-     KhaoKalokandsouther: { file: " khao-kalokandsouther.jpg", alt: "Pranburi Khao Kalok and southern Pak Nam Pran travel destination scene and local atmosphere" },
+    samRoiYot: { file: "sam-roi-yot.jpg", alt: "Sam Roi Yot and Dolphin Bay limestone coast south of Pranburi" },
+    coastalActivity: { file: "coastal-activity.jpg", alt: "Kiteboarding and water sports along the Pranburi coast" },
   },
 };
 

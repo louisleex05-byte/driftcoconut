@@ -362,7 +362,8 @@ function Insert-GuidePhotoTags {
         'sukhumvit'    = @('Sukhumvit', 'Asok', 'Phrom Phong')
         'silom'        = @('Silom', 'Sathorn')
         'oldTown'      = @('Old Town', 'Rattanakosin', 'Banglamphu')
-        'activity'     = @('activity')
+        'activity'     = @('Things to do', 'activity')
+        'coastalActivity' = @('Cycle Pak Nam Pran', 'coastal activities', 'Kiteboarding')
         'localTips'    = @('local tips')
         'kata'         = @('Kata', 'Karon')
         'bangTao'      = @('Bang Tao', 'Laguna', 'Kamala', 'Cherngtalay')
@@ -410,6 +411,53 @@ function Insert-GuidePhotoTags {
             }
         }
         return $out
+    }
+
+    # Standard auto-presets use neighborhood1..neighborhood4. Match those by
+    # their ordinal position under "## Where to stay" instead of guessing from
+    # generated alt text. This keeps new guides deterministic even when area
+    # names do not resemble the generic slot keys.
+    $numberedNeighborhoods = @($slots | Where-Object { $_.slot -match '^neighborhood([1-9][0-9]*)$' } | Sort-Object { [int]([regex]::Match($_.slot, '\d+').Value) })
+    foreach ($slot in $numberedNeighborhoods) {
+        if ($Body -match "slot=`"$([regex]::Escape($slot.slot))`"") { continue }
+
+        $ordinal = [int]([regex]::Match($slot.slot, '\d+').Value)
+        $bodyLines = [System.Collections.Generic.List[string]]::new()
+        foreach ($bodyLine in ($Body -split '\r?\n')) { $bodyLines.Add($bodyLine) }
+
+        $whereStart = -1
+        $whereEnd = $bodyLines.Count
+        for ($lineIndex = 0; $lineIndex -lt $bodyLines.Count; $lineIndex++) {
+            if ($bodyLines[$lineIndex] -match '(?i)^##\s+Where to stay\b') {
+                $whereStart = $lineIndex
+                continue
+            }
+            if ($whereStart -ge 0 -and $lineIndex -gt $whereStart -and $bodyLines[$lineIndex] -match '^##\s+') {
+                $whereEnd = $lineIndex
+                break
+            }
+        }
+        if ($whereStart -lt 0) { continue }
+
+        $areaHeaders = @()
+        for ($lineIndex = $whereStart + 1; $lineIndex -lt $whereEnd; $lineIndex++) {
+            if ($bodyLines[$lineIndex] -match '^###\s+') { $areaHeaders += $lineIndex }
+        }
+        if ($areaHeaders.Count -lt $ordinal) { continue }
+
+        $sectionStart = $areaHeaders[$ordinal - 1]
+        $sectionEnd = if ($areaHeaders.Count -gt $ordinal) { $areaHeaders[$ordinal] } else { $whereEnd }
+        $insertAt = $sectionEnd
+        for ($lineIndex = $sectionStart + 1; $lineIndex -lt $sectionEnd; $lineIndex++) {
+            if ($bodyLines[$lineIndex] -match '^\s*<AffiliateLink\b') {
+                $insertAt = $lineIndex
+                break
+            }
+        }
+        $bodyLines.Insert($insertAt, "<GuidePhoto slot=`"$($slot.slot)`" />")
+        $bodyLines.Insert($insertAt, "")
+        $Body = $bodyLines -join "`n"
+        $inserted++
     }
 
     foreach ($slot in $slots) {
@@ -780,15 +828,21 @@ function Build-PresetFromDraft {
     # This guarantees + New Preset NEVER produces REPLACE-ME markers.
     # -----------------------------------------------------------------------
     if ($entries.Count -le 1) {
-        # Collect all H2 and H3 headings with their text
+        # Keep neighborhood slots tied to headings under "Where to stay". The
+        # previous fallback reused arbitrary H3 headings and produced duplicate,
+        # truncated slot names for new guides.
         $h2List = @()
         $h3List = @()
+        $whereToStayH3 = @()
+        $fallbackH2 = ""
         foreach ($line in $lines) {
             if ($line -match '^##\s+([^#].+)$') {
-                $h2List += $matches[1].Trim()
+                $fallbackH2 = $matches[1].Trim()
+                $h2List += $fallbackH2
             } elseif ($line -match '^###\s+(.+)$') {
                 $h3 = $matches[1].Trim() -replace '^\s*(Full-day|Half-day|Multi-day|Morning|Afternoon|Evening|Night)\s*:\s*', ''
                 $h3List += $h3
+                if ($fallbackH2 -match '(?i)^Where to stay\b') { $whereToStayH3 += $h3 }
             }
         }
 
@@ -798,13 +852,15 @@ function Build-PresetFromDraft {
             "neighborhood1" = ""
             "neighborhood2" = ""
             "neighborhood3" = ""
+            "neighborhood4" = ""
             "activity"      = "Things to do"
+            "localTips"     = "Local tips"
         }
-
         # Fill neighborhood slots from ### headings (typically area names under "Where to stay")
         $neighborIdx = 1
-        foreach ($h3 in $h3List) {
-            if ($neighborIdx -gt 3) { break }
+        $usedFallbackHeadings = @{}
+        foreach ($h3 in $whereToStayH3) {
+            if ($neighborIdx -gt 4) { break }
             # Skip generic headings that aren't neighborhood names
             if ($h3 -match '^(Half-day|Full-day|Multi-day|FAQ|Related)') { continue }
             $slotKey = "neighborhood$neighborIdx"
@@ -814,6 +870,7 @@ function Build-PresetFromDraft {
                 $file = "neighborhood$neighborIdx.jpg"
                 $entries += [pscustomobject]@{ slot=$slotKey; file=$file; alt=$alt }
                 $seenSlots[$slotKey] = $true
+                $usedFallbackHeadings[$h3] = $true
                 $neighborIdx++
             }
         }
@@ -834,7 +891,10 @@ function Build-PresetFromDraft {
         $extraIdx = 0
         foreach ($h3 in $h3List) {
             if ($entries.Count -ge 8) { break }
-            $slotName = ($h3 -replace '[^a-zA-Z0-9]', '' -replace '^(\w)', { $_.Value.ToLower() })
+            if ($usedFallbackHeadings.ContainsKey($h3)) { continue }
+            $slotNameRaw = [regex]::Replace($h3, '[^a-zA-Z0-9]', '')
+            if (-not $slotNameRaw) { continue }
+            $slotName = $slotNameRaw.Substring(0, 1).ToLowerInvariant() + $slotNameRaw.Substring(1)
             if ($slotName.Length -lt 3) { continue }
             # Truncate overly long slot names
             if ($slotName.Length -gt 20) { $slotName = $slotName.Substring(0, 20) }
@@ -1107,6 +1167,24 @@ function Test-GuidePhotoCoverage {
         }
     }
     return $missing
+}
+
+# Every non-hero slot selected in the active preset must also be referenced by
+# the prepared MDX. This catches copied photos that would never render.
+function Test-GuidePhotoUsage {
+    param([array]$Slots, [string]$MdxText)
+
+    $referenced = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($m in [regex]::Matches($MdxText, '<GuidePhoto\s+slot="([^"]+)"\s*/?\s*>')) {
+        [void]$referenced.Add($m.Groups[1].Value)
+    }
+
+    $unused = @()
+    foreach ($slot in $Slots) {
+        if ($slot.slot -eq 'hero') { continue }
+        if (-not $referenced.Contains([string]$slot.slot)) { $unused += [string]$slot.slot }
+    }
+    return $unused
 }
 
 # PERMANENT FIX: Append a new guide preset to components/GuidePhoto.tsx from
@@ -2025,7 +2103,7 @@ $tabBar.BackColor = [System.Drawing.Color]::FromArgb(251, 247, 240)
 
 $global:btnTabResearch = New-TabButton "1. Research" 0
 $global:btnTabDraft    = New-TabButton "2. Notes -> Draft + Voice" 210
-$global:btnTabPublish  = New-TabButton "3. Photos + Prepare" 420
+$global:btnTabPublish  = New-TabButton "3. Photos + Prepare locally" 420
 
 $tabBar.Controls.Add($global:btnTabResearch)
 $tabBar.Controls.Add($global:btnTabDraft)
@@ -2815,7 +2893,7 @@ $btnAssembleMDX.Location = New-Object System.Drawing.Point(280, $actionY); $btnA
 $global:panelPublish.Controls.Add($btnAssembleMDX)
 
 $btnPublishMDX = New-Object System.Windows.Forms.Button
-$btnPublishMDX.Text = "Prepare -> content/guides/<slug>.mdx"
+$btnPublishMDX.Text = "Prepare locally (does not publish)"
 $btnPublishMDX.Location = New-Object System.Drawing.Point(550, $actionY); $btnPublishMDX.Size = New-Object System.Drawing.Size(260, 32)
 $btnPublishMDX.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 $btnPublishMDX.ForeColor = [System.Drawing.Color]::White
@@ -3027,15 +3105,31 @@ $btnPublishMDX.Add_Click({
         return
     }
 
-    # SAFETY GUARD (root-cause fix): refuse to publish if any <GuidePhoto slot="..." />
+    # SAFETY GUARD (root-cause fix): refuse to prepare if any <GuidePhoto slot="..." />
     # tag in the final MDX has no matching entry in GuidePhoto.tsx for this slug.
     # This is what let cha-am, sukhothai, and koh-tao ship with silently-missing
     # photos - Publish used to stage GuidePhoto.tsx without ever checking it was
     # actually up to date. Now Publish hard-stops instead of shipping broken photos.
     $mdxTextForCheck = [System.IO.File]::ReadAllText($srcMdx)
+    $editorialMarkers = [regex]::Matches($mdxTextForCheck, '(?im)\[UNCERTAIN\]|\bREPLACE[- ]?ME\b|\bTODO\b|\bTBD\b')
+    if ($editorialMarkers.Count -gt 0) {
+        $markerNames = $editorialMarkers | ForEach-Object { $_.Value.ToUpperInvariant() } | Select-Object -Unique
+        $global:lblPublishStatus.Text = "[ABORT] final.mdx still contains $($editorialMarkers.Count) unresolved editorial marker(s): $($markerNames -join ', '). Resolve them in the draft and run Assemble again. Draft-review markers must never reach the live site."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
     $missingSlots = Test-GuidePhotoCoverage -RepoRoot $global:ProjectRoot -Slug $slug -MdxText $mdxTextForCheck
     if ($missingSlots.Count -gt 0) {
         $global:lblPublishStatus.Text = "[ABORT] $($missingSlots.Count) photo slot(s) in the draft have no entry in GuidePhoto.tsx for '$slug': $($missingSlots -join ', '). Click 'Auto Preset' (or '+ New Guide') on this tab first so every <GuidePhoto> tag resolves to a real photo, then Publish again. Publishing now would ship a guide with missing photos."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
+
+    $unusedSlots = Test-GuidePhotoUsage -Slots $global:PhotoSlots -MdxText $mdxTextForCheck
+    if ($unusedSlots.Count -gt 0) {
+        $global:lblPublishStatus.Text = "[ABORT] $($unusedSlots.Count) selected photo slot(s) are not used in final.mdx: $($unusedSlots -join ', '). Run Assemble again after creating or changing the preset. Prepare is local only and cannot continue with photos that would never render."
         $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
         $global:progressPublish.Visible = $false
         return
@@ -3051,7 +3145,7 @@ $btnPublishMDX.Add_Click({
         return
     }
     $global:progressPublish.Value = 100
-    $global:lblPublishStatus.Text = "Prepared locally: $dstMdx`nBranch: $branchName`nNothing was staged, committed, pushed, deployed, or submitted to IndexNow. Review the diff, then request explicit approval for each Git step."
+    $global:lblPublishStatus.Text = "READY FOR REVIEW - LOCAL ONLY: $dstMdx`nBranch: $branchName`nNEXT: review diff -> approve commit -> approve push -> promote the Vercel preview. Prepare never publishes automatically."
     $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
     [System.Windows.Forms.Application]::DoEvents()
 }.GetNewClosure())
