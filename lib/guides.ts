@@ -29,6 +29,25 @@ export type GuideSummary = GuideFrontmatter & { readingMinutes: number; locale?:
 
 export type GuideFull = GuideSummary & { content: string; hasLocale: GuideLocale[] };
 
+function getReadingMinutes(content: string, locale: GuideLocale): number {
+  if (locale === "zh") {
+    // Chinese prose is not space-delimited. Count CJK characters at an
+    // approximate 400 characters per minute, while retaining a small allowance
+    // for place names, prices, and other Latin-script text.
+    const visibleText = content
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+    const hanCharacters = (visibleText.match(/[\u3400-\u9fff]/g) ?? []).length;
+    const latinWords = visibleText
+      .replace(/[\u3400-\u9fff]/g, " ")
+      .match(/[A-Za-z0-9]+(?:[’'-][A-Za-z0-9]+)*/g)?.length ?? 0;
+    return Math.max(1, Math.round(hanCharacters / 400 + latinWords / 220));
+  }
+
+  const words = content.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}
+
 // Try locale-specific file first, then fall back to English.
 async function readGuideFile(slug: string, locale: GuideLocale = "en"): Promise<GuideFull | null> {
   const filenames = locale === "en" ? [`${slug}.mdx`] : [`${slug}.${locale}.mdx`, `${slug}.mdx`];
@@ -45,8 +64,7 @@ async function readGuideFile(slug: string, locale: GuideLocale = "en"): Promise<
       const raw = await fs.readFile(path.join(GUIDES_DIR, name), "utf8");
       const { data, content } = matter(raw);
       const fm = data as GuideFrontmatter;
-      const words = content.split(/\s+/).filter(Boolean).length;
-      const readingMinutes = Math.max(1, Math.round(words / 220));
+      const readingMinutes = getReadingMinutes(content, locale);
       return { ...fm, content, readingMinutes, locale, hasLocale };
     } catch {
       // fall through to next candidate
