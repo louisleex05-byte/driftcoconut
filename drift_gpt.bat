@@ -24,12 +24,21 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Use one predictable local URL. Do not silently start a second server on a
-REM different port, because browser tabs and bookmarks would point at the wrong app.
-netstat -ano | findstr /C:":%PORT% " | findstr "LISTENING" >nul
+REM Reuse an existing driftcoconut server before checking whether another app
+REM owns the port. This avoids starting a second server on a different URL.
+powershell.exe -NoProfile -Command "try { $response = Invoke-WebRequest -Uri '%URL%' -UseBasicParsing -TimeoutSec 5; if ($response.StatusCode -eq 200 -and $response.Content -match 'driftcoconut') { exit 0 } } catch {}; exit 1"
+if not errorlevel 1 (
+    echo driftcoconut is already running at %URL%
+    echo Opening the existing local site...
+    start "" "%URL%"
+    exit /b 0
+)
+
+REM If another process is listening on the fixed port, stop with a clear error.
+powershell.exe -NoProfile -Command "if (Get-NetTCPConnection -LocalPort %PORT% -State Listen -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }"
 if not errorlevel 1 (
     echo ERROR: http://localhost:%PORT% is already in use.
-    echo Close the existing local server, then run drift_gpt.bat again.
+    echo Another application owns this port. Close it, then run drift_gpt.bat again.
     pause
     exit /b 1
 )
@@ -40,8 +49,9 @@ echo Keep this window open while you browse the local site.
 echo Press Ctrl+C here to stop the server.
 echo.
 
-REM Open the homepage after Next has had a moment to start.
-start "" /b powershell.exe -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process '%URL%'"
+REM Open the homepage after Next has had a moment to start. rundll32 asks
+REM Windows to use the default browser without launching it through PowerShell.
+start "" /b powershell.exe -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; & rundll32.exe url.dll,FileProtocolHandler '%URL%'"
 
 npm run dev -- --hostname %HOST% --port %PORT%
 
