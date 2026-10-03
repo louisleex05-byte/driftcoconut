@@ -149,10 +149,21 @@ function AutoFill-Metadata {
         $descGuess = "A local's $destDisplay guide — where to stay, when to visit, what to eat, and where to book."
     }
 
-    # Hero alt from active photo preset's `hero` slot
+    # Hero alt from the preset that belongs to the current guide slug. Reading
+    # PhotoSlots directly can leak the previously selected guide while a new
+    # slug/preset is still being registered.
     $heroAltGuess = ""
-    if ($global:PhotoSlots -and $global:PhotoSlots.Count -gt 0) {
-        $heroSlot = $global:PhotoSlots | Where-Object { $_.slot -eq "hero" } | Select-Object -First 1
+    $heroSourceSlots = $null
+    if ($slugIsValid) {
+        $heroSourceSlots = $global:PhotoSlotPresets[$currentSlug]
+    } elseif (-not $currentSlug -and $global:cmbPreset -and $global:cmbPreset.SelectedItem -and
+              $global:PhotoSlotPresets.Contains($global:cmbPreset.SelectedItem)) {
+        $heroSourceSlots = $global:PhotoSlotPresets[$global:cmbPreset.SelectedItem]
+    } elseif (-not $currentSlug) {
+        $heroSourceSlots = $global:PhotoSlots
+    }
+    if ($heroSourceSlots -and $heroSourceSlots.Count -gt 0) {
+        $heroSlot = $heroSourceSlots | Where-Object { $_.slot -eq "hero" } | Select-Object -First 1
         if ($heroSlot) { $heroAltGuess = $heroSlot.alt }
     }
     if (-not $heroAltGuess) { $heroAltGuess = "$dest landmark hero image" }
@@ -688,8 +699,13 @@ function Build-PresetFromDraft {
     # Normalise destination for alt-text prose (kebab -> spaced, title case)
     $destDisplay = (Get-Culture).TextInfo.ToTitleCase($Destination.ToLower().Replace('-', ' '))
 
-    # Hero always first, taken from the metadata Hero alt when it's meaningful
-    $heroAltFinal = if ($HeroAlt -and $HeroAlt.Length -ge 25 -and -not (Test-IsPlaceholderAlt -Alt $HeroAlt)) {
+    # Hero always comes first. Reuse metadata only when it clearly belongs to
+    # this destination; otherwise generate a destination-specific value. This
+    # prevents a new guide from inheriting the previous guide's hero alt while
+    # the slug/preset controls are changing (for example Pranburi receiving a
+    # Chiang Mai / Doi Suthep description).
+    $heroAltFinal = if ((Test-HeroAltMatchesDestination -HeroAlt $HeroAlt -Destination $destDisplay) -and
+                        -not (Test-IsPlaceholderAlt -Alt $HeroAlt)) {
         $HeroAlt
     } else {
         "$destDisplay signature landmark and destination hero shot at golden hour"
@@ -966,6 +982,25 @@ function Test-IsPlaceholderAlt {
     }
     # Also: alt text under 20 chars is suspiciously short for real content
     if ($Alt.Trim().Length -lt 20) { return $true }
+    return $false
+}
+
+function Test-HeroAltMatchesDestination {
+    param(
+        [string]$HeroAlt,
+        [string]$Destination
+    )
+    if (-not $HeroAlt -or -not $Destination -or $HeroAlt.Trim().Length -lt 25) { return $false }
+
+    # Use the place portion before a country suffix and ignore short connector
+    # words. Matching any meaningful place token handles names such as Koh Tao,
+    # Mae Hong Son, Chiang Mai, and hyphenated slugs without fuzzy matching.
+    $place = ($Destination -split ',')[0].Trim().ToLower().Replace('-', ' ')
+    $alt = $HeroAlt.ToLower()
+    $tokens = $place -split '[^a-z0-9]+' | Where-Object { $_.Length -ge 3 -and $_ -notin @('koh', 'ko', 'ban') }
+    foreach ($token in $tokens) {
+        if ($alt.Contains($token)) { return $true }
+    }
     return $false
 }
 

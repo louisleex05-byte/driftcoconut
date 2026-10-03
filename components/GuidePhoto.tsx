@@ -214,6 +214,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     sunsetSilhouette:    { file: "sunset-silhouette.jpg",  alt: "Silhouetted seated Buddha statue, temple ruins, and palm tree against a purple and orange sunset sky" },
     oldTownGuesthouse:   { file: "old-town-guesthouse.jpg", alt: "Red teak guesthouse row on a quiet Old Sukhothai street near the Historical Park" },
   },
+  pranburi: {
+    hero: { file: "hero.jpg", alt: "Pranburi coastline with mangroves and limestone ridges along the Gulf of Thailand" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Pranburi Pak Nam Pran beachfront area neighborhood and accommodation options" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Pranburi Khao Kalok and southern Pak Nam Pran area neighborhood and accommodation options" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Pranburi Pran Buri town and rail-station area area neighborhood and accommodation options" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Pranburi When to go scenic view and travel destination photo" },
+    activity: { file: "activity.jpg", alt: "Pranburi Things to do scenic view and travel destination photo" },
+     PakNamPranbeachfron: { file: " pak-nam-pranbeachfron.jpg", alt: "Pranburi Pak Nam Pran beachfront travel destination scene and local atmosphere" },
+     KhaoKalokandsouther: { file: " khao-kalokandsouther.jpg", alt: "Pranburi Khao Kalok and southern Pak Nam Pran travel destination scene and local atmosphere" },
+  },
 };
 
 export default function GuidePhoto({
