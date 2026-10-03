@@ -218,11 +218,17 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     hero: { file: "hero.jpg", alt: "Pranburi coastline with mangroves and limestone ridges along the Gulf of Thailand" },
     neighborhood1: { file: "neighborhood1.jpg", alt: "Pranburi Pak Nam Pran beachfront area neighborhood and accommodation options" },
     neighborhood2: { file: "neighborhood2.jpg", alt: "Pranburi Khao Kalok and southern Pak Nam Pran area neighborhood and accommodation options" },
-    neighborhood3: { file: "neighborhood3.jpg", alt: "Pranburi Pran Buri town and rail-station area area neighborhood and accommodation options" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Pran Buri town and railway-station area" },
+    pranBuriStation2: { file: "pran-buri-station-2.webp", alt: "Red-and-cream platform building at Pran Buri Railway Station" },
+    huaHinStation: { file: "hua-hin-station.jpg", alt: "Historic red-and-cream platform at Hua Hin Railway Station" },
+    pranBuriStation3: { file: "pran-buri-station-3.jpg", alt: "Pran Buri Railway Station entrance beneath a bright blue sky" },
     whenToGo: { file: "when-to-go.jpg", alt: "Pranburi When to go scenic view and travel destination photo" },
     activity: { file: "activity.jpg", alt: "Pranburi Things to do scenic view and travel destination photo" },
     samRoiYot: { file: "sam-roi-yot.jpg", alt: "Sam Roi Yot and Dolphin Bay limestone coast south of Pranburi" },
+    dolphinBaySunset: { file: "dolphin-bay-sunset.jpg", alt: "Sunset over the wetlands and coastal bay south of Pranburi", portrait: true },
     coastalActivity: { file: "coastal-activity.jpg", alt: "Kiteboarding and water sports along the Pranburi coast" },
+    kuiBuriNationalPark: { file: "kui-buri-national-park.jpg", alt: "Wild elephants grazing in Kui Buri National Park, Prachuap Khiri Khan" },
+    phrayaNakhonCave: { file: "phraya-nakhon-cave.jpg", alt: "Kuha Karuhas pavilion illuminated inside Phraya Nakhon Cave" },
   },
 };
 
