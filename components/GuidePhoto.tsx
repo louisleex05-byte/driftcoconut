@@ -39,6 +39,8 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     ubud:         { file: "ubud.jpg",          alt: "Ubud rice terraces and jungle village in Bali" },
     canggu:       { file: "canggu.jpg",        alt: "Surfer at Batu Bolong beach in Canggu, Bali" },
     seminyak:     { file: "seminyak.jpg",      alt: "Seminyak beach club at sunset with cocktails on the sand" },
+    seminyak2:    { file: "seminyak-2.jpg",    alt: "Cocktails served at a Seminyak beach club during sunset" },
+    seminyak3:    { file: "seminyak-3.jpg",    alt: "Cocktail overlooking the beach at sunset in Seminyak", portrait: true },
     uluwatu:      { file: "uluwatu.jpg",       alt: "Uluwatu Temple perched on a cliff over the Indian Ocean at sunset" },
     sanur:        { file: "sanur.jpg",         alt: "Traditional jukung boat launching at Sanur Beach, Bali", portrait: true },
     sanur2:       { file: "sanur-2.jpg",       alt: "Traditional jukung boat moored along Sanur Beach, Bali" },
