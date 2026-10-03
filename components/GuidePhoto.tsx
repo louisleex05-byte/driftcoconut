@@ -7,7 +7,7 @@ import Image from "next/image";
 // To add photos for a new guide: add a new entry keyed by that guide's slug, with
 // slot names matching the <GuidePhoto slot="..." /> tags used in its MDX.
 
-type PhotoEntry = { file: string; alt: string };
+type PhotoEntry = { file: string; alt: string; portrait?: boolean };
 
 const GUIDES: Record<string, Record<string, PhotoEntry>> = {
   bangkok: {
@@ -32,13 +32,17 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     khaoSoi:     { file: "khao-soi.jpg",     alt: "Bowl of Northern Thai khao soi curry noodles in Chiang Mai" },
   },
   bali: {
-    hero:         { file: "hero.jpg",          alt: "Tegallalang rice terraces in the Ubud hills of Bali at sunrise" },
-    whenToGo:     { file: "when-to-go.jpg",    alt: "Balinese Nyepi Ogoh-Ogoh parade before the Day of Silence" },
+    hero:         { file: "hero.jpg",          alt: "Tegallalang rice terraces in the Ubud hills of Bali" },
+    whenToGo:     { file: "when-to-go.jpg",    alt: "Ogoh-ogoh effigy carried before Nyepi in Bali" },
+    ogohOgoh2:    { file: "ogoh-ogoh-2.jpg",   alt: "Illuminated ogoh-ogoh figure during a Balinese Nyepi-eve procession", portrait: true },
+    ogohOgoh3:    { file: "ogoh-ogoh-3.jpg",   alt: "Ogoh-ogoh procession through a Balinese street before Nyepi", portrait: true },
     ubud:         { file: "ubud.jpg",          alt: "Ubud rice terraces and jungle village in Bali" },
     canggu:       { file: "canggu.jpg",        alt: "Surfer at Batu Bolong beach in Canggu, Bali" },
     seminyak:     { file: "seminyak.jpg",      alt: "Seminyak beach club at sunset with cocktails on the sand" },
     uluwatu:      { file: "uluwatu.jpg",       alt: "Uluwatu Temple perched on a cliff over the Indian Ocean at sunset" },
-    sanur:        { file: "sanur.jpg",         alt: "Sanur beach at dawn with traditional Balinese jukung fishing boats" },
+    sanur:        { file: "sanur.jpg",         alt: "Traditional jukung boat launching at Sanur Beach, Bali", portrait: true },
+    sanur2:       { file: "sanur-2.jpg",       alt: "Traditional jukung boat moored along Sanur Beach, Bali" },
+    sanur3:       { file: "sanur-3.jpg",       alt: "Traditional jukung boats and morning visitors on Sanur Beach, Bali", portrait: true },
     nusaPenida:   { file: "nusa-penida.jpg",   alt: "Kelingking Beach T-Rex cliff view on Nusa Penida" },
     cookingClass: { file: "cooking-class.jpg", alt: "Balinese cooking class with fresh market ingredients" },
     warung:       { file: "warung.jpg",        alt: "Traditional Balinese warung serving nasi campur and babi guling" },
@@ -219,13 +223,13 @@ export default function GuidePhoto({
   if (!meta) return null;
   return (
     <figure className="my-8 not-prose">
-      <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl shadow-md">
+      <div className={`relative w-full ${meta.portrait ? "aspect-[3/4]" : "aspect-[4/3]"} overflow-hidden rounded-2xl shadow-md`}>
         <Image
           src={`/guides/${guideSlug}/${meta.file}`}
           alt={meta.alt}
           fill
           sizes="(max-width: 768px) 100vw, 720px"
-          className="object-cover"
+          className={meta.portrait ? "object-contain bg-slate-100" : "object-cover"}
         />
       </div>
       <figcaption className="mt-2 text-xs text-slate-500 italic">{meta.alt}</figcaption>
