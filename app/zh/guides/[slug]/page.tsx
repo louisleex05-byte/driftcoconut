@@ -82,7 +82,7 @@ export default async function GuidePageZh({
 
       {/* Hero image */}
       {guide.hero && (
-        <div className="relative w-full aspect-[21/9] mb-8 rounded-2xl overflow-hidden shadow-lg">
+        <div className="relative w-full aspect-[70/39] sm:aspect-[21/9] mb-8 rounded-2xl overflow-hidden shadow-lg">
           <Image
             src={guide.hero}
             alt={guide.heroAlt ?? guide.title}

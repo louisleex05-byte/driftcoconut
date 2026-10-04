@@ -23,7 +23,7 @@ export default function Hero() {
   return (
     <section className="relative -mt-6 sm:-mt-8 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
       {/* Panoramic image container — 3:1 aspect ratio on desktop, gracefully falls back on mobile */}
-      <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[380px]">
+      <div className="relative aspect-[40/39] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[494px] sm:min-h-0">
         {HERO_PHOTOS.map((photo, i) => (
           <Image
             key={photo.src}
