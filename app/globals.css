@@ -13,19 +13,20 @@ html { font-size: 115%; }
 
 /* ==========================================================================
    TROPICAL FEEL-GOOD ATMOSPHERE
-   Rich cream-and-caramel body gradient with soft radial glows layered
-   behind everything. Warm coral, gold and umber keep the page vivid while
-   dark text and translucent white surfaces preserve clear readability.
+   Sunset-into-lagoon body gradient with soft radial "blob" glows layered
+   behind everything. Warm coral top-left, mint lagoon bottom-right, gold
+   sunlight glow across the middle. Everything sits above at bg-white/xx
+   opacity so page content still feels crisp.
    ========================================================================== */
 body {
   @apply text-slate-800 antialiased;
-  background-color: #E6C99E;
+  background-color: #FEFBF5;
   background-image:
-    radial-gradient(1200px 800px at 15% 5%,   rgba(188, 102, 52, 0.28), transparent 60%),
-    radial-gradient(1000px 900px at 90% 15%,  rgba(213, 153, 54, 0.30), transparent 55%),
-    radial-gradient(1400px 1200px at 85% 90%, rgba(151, 92,  48, 0.22), transparent 60%),
-    radial-gradient(1100px 900px at 10% 85%,  rgba(232, 190, 119, 0.34), transparent 55%),
-    linear-gradient(180deg, #F1DFC1 0%, #E5C594 42%, #D5AF73 100%);
+    radial-gradient(1200px 800px at 15% 5%,   rgba(255, 156, 122, 0.28), transparent 60%),
+    radial-gradient(1000px 900px at 90% 15%,  rgba(255, 197, 71,  0.22), transparent 55%),
+    radial-gradient(1400px 1200px at 85% 90%, rgba(76,  191, 159, 0.22), transparent 60%),
+    radial-gradient(1100px 900px at 10% 85%,  rgba(184, 225, 235, 0.35), transparent 55%),
+    linear-gradient(180deg, #FEFBF5 0%, #FBF7F0 40%, #F0F9FB 100%);
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
