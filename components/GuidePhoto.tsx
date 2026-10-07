@@ -230,6 +230,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     kuiBuriNationalPark: { file: "kui-buri-national-park.jpg", alt: "Wild elephants grazing in Kui Buri National Park, Prachuap Khiri Khan" },
     phrayaNakhonCave: { file: "phraya-nakhon-cave.jpg", alt: "Kuha Karuhas pavilion illuminated inside Phraya Nakhon Cave" },
   },
+  khanom: {
+    hero: { file: "hero.jpg", alt: "Nai Phlao Beach and forested hills on the Khanom coast" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Early light over Khanom's Gulf coast" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "A small fishing boat at the mouth of Khlong Nai Phlao" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "The white-and-gold Khanom City Pillar Shrine" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "A waterside resort in Thong Nian on Khanom's quieter north coast" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Monsoon clouds and rough water on Khanom Beach", portrait: true },
+    activity: { file: "activity.jpg", alt: "Rock pools at Hin Lat in Khlong Nai Phlao" },
+    localTips: { file: "local-tips.jpg", alt: "The temple hall at Wat Kradang-nga in Khanom" },
+  },
 };
 
 export default function GuidePhoto({
