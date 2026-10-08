@@ -240,6 +240,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     activity: { file: "activity.jpg", alt: "Rock pools at Hin Lat in Khlong Nai Phlao" },
     localTips: { file: "local-tips.jpg", alt: "The temple hall at Wat Kradang-nga in Khanom" },
   },
+  "khao-yai": {
+    hero: { file: "hero.jpg", alt: "Mist and grassland viewed from an observation tower in Khao Yai National Park" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Blue local bus serving the Pak Chong approach to Khao Yai" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Green hills and grassland in the Khao Yai region" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Open grassland and park buildings in Khao Yai National Park" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Reservoir and forest edge inside Khao Yai National Park" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Morning mist along a road in the Khao Yai region" },
+    activity: { file: "activity.jpg", alt: "Haew Suwat Waterfall framed by a forest rock arch" },
+    localTips: { file: "local-tips.jpg", alt: "Spicy Thai noodle soup served in the Khao Yai area" },
+  },
 };
 
 export default function GuidePhoto({
