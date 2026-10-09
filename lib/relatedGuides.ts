@@ -10,7 +10,9 @@ export const RELATED: Record<string, string[]> = {
   "chiang-mai": ["chiangrai", "mae-hong-son", "sukhothai"],
   chiangrai: ["chiang-mai", "mae-hong-son", "sukhothai"],
   "hua-hin": ["cha-am", "kanchanaburi", "pattaya"],
+  "khao-yai": ["ayutthaya", "kanchanaburi", "bangkok"],
   kanchanaburi: ["ayutthaya", "hua-hin", "bangkok"],
+  khanom: ["samui", "krabi", "phuket"],
   "koh-chang": ["pattaya", "bangkok", "hua-hin"],
   "koh-lanta": ["krabi", "phuket", "samui"],
   "koh-phangan": ["samui", "koh-tao"],
@@ -19,6 +21,7 @@ export const RELATED: Record<string, string[]> = {
   "mae-hong-son": ["chiang-mai", "chiangrai", "sukhothai"],
   pattaya: ["bangkok", "hua-hin", "koh-chang"],
   phuket: ["krabi", "koh-lanta", "samui"],
+  pranburi: ["hua-hin", "cha-am", "kanchanaburi"],
   samui: ["koh-phangan", "koh-tao", "phuket"],
   sukhothai: ["ayutthaya", "chiang-mai", "chiangrai"],
 };
