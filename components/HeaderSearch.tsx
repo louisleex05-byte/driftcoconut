@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CITIES } from "@/lib/cities";
+import { trackFormSubmit } from "@/lib/analytics";
 import { useT } from "@/contexts/LanguageProvider";
 
 function tomorrow(offset = 0) {
@@ -31,9 +32,26 @@ export default function HeaderSearch() {
         checkOut: tomorrow(2),
         adults: "2",
       });
-      router.push(`/search?${params.toString()}`);
+      const destination = `/search?${params.toString()}`;
+      trackFormSubmit({
+        formId: "header-destination-search",
+        formName: "Header destination search",
+        destination,
+        result: "matched",
+        searchTerm: match.name,
+        submitText: "Search",
+      });
+      router.push(destination);
     } else {
       // No match — scroll to the main search form on homepage
+      trackFormSubmit({
+        formId: "header-destination-search",
+        formName: "Header destination search",
+        destination: "/#search-form",
+        result: "no_match",
+        searchTerm: query,
+        submitText: "Search",
+      });
       if (window.location.pathname === "/") {
         document.getElementById("search-form")?.scrollIntoView({ behavior: "smooth" });
       } else {
@@ -44,6 +62,8 @@ export default function HeaderSearch() {
 
   return (
     <form
+      id="header-destination-search"
+      name="header-destination-search"
       onSubmit={onSubmit}
       className="hidden md:flex flex-1 max-w-xs lg:max-w-sm mx-4"
       role="search"

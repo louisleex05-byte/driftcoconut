@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CITIES } from "@/lib/cities";
+import { trackFormSubmit } from "@/lib/analytics";
 import { bookingCJSearchWithParams } from "@/lib/booking";
 import { useT } from "@/contexts/LanguageProvider";
 
@@ -81,6 +82,14 @@ export default function SearchForm() {
       checkOut,
       adults,
     });
+    trackFormSubmit({
+      formId: "booking-hotel-search",
+      formName: "Booking.com hotel search",
+      destination: "booking.com",
+      result: "external_redirect",
+      searchTerm: city.name,
+      submitText: t("search_submit"),
+    });
     // Open in same tab so mobile users don't lose the search context;
     // no need for _blank since Booking.com is the intended destination.
     window.location.href = href;
@@ -88,6 +97,8 @@ export default function SearchForm() {
 
   return (
     <form
+      id="booking-hotel-search"
+      name="booking-hotel-search"
       onSubmit={onSubmit}
       className="bg-white rounded-xl shadow-sm border border-sea-100 p-4 grid grid-cols-1 md:grid-cols-5 gap-3"
     >
