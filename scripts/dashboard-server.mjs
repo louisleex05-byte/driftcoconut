@@ -180,20 +180,28 @@ async function fetchAndBuild({ forceInsight = false } = {}) {
   };
 
   // ---- Extra reports: trend, engagement, events, channels, landing pages, Google Search ----
-  const mk = ({ dims = [], mets, order, desc = true, limit, range = dateRange }) => ({
+  const mk = ({ dims = [], mets, order, desc = true, limit, range = dateRange, dimensionFilter }) => ({
     dateRanges: [range],
     dimensions: dims.map(name => ({ name })),
     metrics: mets.map(name => ({ name })),
     ...(order === 'date' ? { orderBys: [{ dimension: { dimensionName: 'date' } }] } : order ? { orderBys: [{ metric: { metricName: order }, desc }] } : {}),
     ...(limit ? { limit } : {}),
+    ...(dimensionFilter ? { dimensionFilter } : {}),
   });
   const SEO = ['organicGoogleSearchImpressions', 'organicGoogleSearchClicks', 'organicGoogleSearchAveragePosition'];
-  const [xWk, xWkPrev, xDaily, xEng, xEvents, xChannels, xLanding, xSeoTot, xSeoQ, xSeoP] = await Promise.all([
+  const commercialEventNames = ['affiliate_click', 'form_start', 'form_submit'];
+  const [xWk, xWkPrev, xDaily, xEng, xEvents, xCommercialEvents, xChannels, xLanding, xSeoTot, xSeoQ, xSeoP] = await Promise.all([
     safe('week', mk({ mets: ['activeUsers', 'sessions', 'screenPageViews'], range: { startDate: '6daysAgo', endDate: 'today' } })),
     safe('prev week', mk({ mets: ['activeUsers', 'sessions', 'screenPageViews'], range: { startDate: '13daysAgo', endDate: '7daysAgo' } })),
     safe('daily', mk({ dims: ['date'], mets: ['activeUsers', 'sessions'], order: 'date', limit: 60 })),
     safe('engagement', mk({ mets: ['engagementRate', 'userEngagementDuration', 'activeUsers', 'screenPageViewsPerSession', 'engagedSessions', 'sessions'] })),
     safe('events', mk({ dims: ['eventName'], mets: ['eventCount', 'totalUsers'], order: 'eventCount', limit: 20 })),
+    safe('commercial events', mk({
+      dims: ['eventName'],
+      mets: ['eventCount', 'totalUsers'],
+      order: 'eventCount',
+      dimensionFilter: { filter: { fieldName: 'eventName', inListFilter: { values: commercialEventNames } } },
+    })),
     safe('channels', mk({ dims: ['sessionDefaultChannelGroup'], mets: ['sessions', 'engagedSessions'], order: 'sessions', limit: 8 })),
     safe('landing pages', mk({ dims: ['landingPage'], mets: ['sessions', 'engagementRate'], order: 'sessions', limit: 8 })),
     safe('search totals', mk({ mets: ['organicGoogleSearchImpressions', 'organicGoogleSearchClicks', 'organicGoogleSearchClickThroughRate', 'organicGoogleSearchAveragePosition'] })),
@@ -208,6 +216,16 @@ async function fetchAndBuild({ forceInsight = false } = {}) {
   const seoSumImp = seoPageRows.reduce((s, r) => s + r.imp, 0);
   const seoSumClicks = seoPageRows.reduce((s, r) => s + r.clicks, 0);
   const seoAvgPos = seoSumImp ? seoPageRows.reduce((s, r) => s + r.imp * r.pos, 0) / seoSumImp : 0;
+  const eventRows = rep => (rep?.rows || []).map(r => ({
+    name: r.dimensionValues[0].value,
+    count: Number(r.metricValues[0].value),
+    users: Number(r.metricValues[1].value),
+  }));
+  // The general event list is intentionally capped for display. Merge a
+  // separate filtered report so low-volume revenue/form events cannot be
+  // mistaken for zero merely because they fell outside GA's top 20 events.
+  const eventMap = new Map(eventRows(xEvents).map(event => [event.name, event]));
+  for (const event of eventRows(xCommercialEvents)) eventMap.set(event.name, event);
   const more = {
     wk: xWk && xWkPrev ? { cur: wkOf(xWk), prev: wkOf(xWkPrev) } : null,
     daily: (xDaily?.rows || []).map(r => ({ date: r.dimensionValues[0].value, users: Number(r.metricValues[0].value), sessions: Number(r.metricValues[1].value) })),
@@ -215,7 +233,7 @@ async function fetchAndBuild({ forceInsight = false } = {}) {
       rate: mv(xEng, 0), avgTimeSec: mv(xEng, 1) / Math.max(mv(xEng, 2), 1),
       pagesPerSession: mv(xEng, 3), engagedSessions: mv(xEng, 4), sessions: mv(xEng, 5),
     } : null,
-    events: (xEvents?.rows || []).map(r => ({ name: r.dimensionValues[0].value, count: Number(r.metricValues[0].value), users: Number(r.metricValues[1].value) })),
+    events: [...eventMap.values()],
     channels: (xChannels?.rows || []).map(r => ({ name: r.dimensionValues[0].value, sessions: Number(r.metricValues[0].value), engaged: Number(r.metricValues[1].value) })),
     landing: (xLanding?.rows || []).map(r => ({ page: r.dimensionValues[0].value, sessions: Number(r.metricValues[0].value), rate: Number(r.metricValues[1].value) })),
     seo: {
