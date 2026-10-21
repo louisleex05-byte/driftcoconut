@@ -5,6 +5,14 @@ import GuideCard from "@/components/GuideCard";
 export const metadata: Metadata = {
   title: "Destination guides",
   description: "In-depth, locally-written travel guides for Asia's best destinations.",
+  alternates: {
+    canonical: "/guides",
+    languages: {
+      en: "/guides",
+      "zh-CN": "/zh/guides",
+      "x-default": "/guides",
+    },
+  },
 };
 
 // Always show these three guides in the first row, in this order.

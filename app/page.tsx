@@ -1,5 +1,17 @@
 import { listGuides } from "@/lib/guides";
 import HomeClient from "@/components/HomeClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/",
+      "zh-CN": "/zh",
+      "x-default": "/",
+    },
+  },
+};
 
 // Server component so listGuides() (fs-based) can run at request/build time.
 // All interactive/translated UI lives in HomeClient; we just hand it real
