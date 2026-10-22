@@ -263,6 +263,19 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     pakChongFood: { file: "pak-chong-food.jpg", alt: "Grilled food stall at Pak Chong Night Market" },
     elephantSafety: { file: "elephant-safety.jpg", alt: "Wild elephant walking along a forest road in Khao Yai National Park" },
   },
+  nan: {
+    hero: { file: "hero.jpg", alt: "Standing Buddha at Wat Phra That Khao Noi overlooking Nan at sunset" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Wat Phumin illuminated by warm sunset light in Nan's historic centre" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Boutique accommodation in the Nai Wiang area of Nan" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Nan Provincial Bus Terminal on the southwestern side of town" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Nan De Panna Riverside Homestay east of the Nan River" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Garden and guest accommodation at Nan Seasons Boutique Resort" },
+    activity: { file: "activity.jpg", alt: "Mountain bends on Route 1256 between Pua and Bo Kluea in Nan province" },
+    localTips: { file: "local-tips.jpg", alt: "Mountain and cloud views from Doi Samer Dao in Nan province" },
+    villaMahaphrom: { file: "villa-mahaphrom-hotel.jpg", alt: "Tree-shaded exterior of Villa Mahaphrom Hotel in Nan" },
+    watSuanTan: { file: "wat-suan-tan.jpg", alt: "Red-and-gold temple hall at Wat Suan Tan in Nan" },
+    doiSamerDaoSunrise: { file: "doi-samer-dao-sunrise.jpg", alt: "Sunrise over layered mountains and mist at Doi Samer Dao" },
+  },
 };
 
 export default function GuidePhoto({
