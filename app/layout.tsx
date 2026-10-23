@@ -5,6 +5,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CueLinksScript from "@/components/CueLinksScript";
+import BackgroundMusic from "@/components/BackgroundMusic";
 import "./globals.css";
 
 // Travelpayouts Drive script — loaded via env var so it's easy to toggle.
@@ -67,6 +68,7 @@ export default function RootLayout({
           <SiteHeader />
           <main className="max-w-screen-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">{children}</main>
           <SiteFooter />
+          <BackgroundMusic />
         </LanguageProvider>
 
         <Script

@@ -19,6 +19,7 @@ export const RELATED: Record<string, string[]> = {
   "koh-tao": ["koh-phangan", "samui"],
   krabi: ["phuket", "koh-lanta", "samui"],
   "mae-hong-son": ["chiang-mai", "chiangrai", "sukhothai"],
+  nan: ["chiang-mai", "mae-hong-son", "kanchanaburi"],
   pattaya: ["bangkok", "hua-hin", "koh-chang"],
   phuket: ["krabi", "koh-lanta", "samui"],
   pranburi: ["hua-hin", "cha-am", "kanchanaburi"],
