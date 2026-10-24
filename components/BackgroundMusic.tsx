@@ -3,9 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageProvider";
 
-const ENABLED_KEY = "driftcoconut.music.enabled";
-const TIME_KEY = "driftcoconut.music.time";
-
 const copy = {
   en: {
     play: "Play music",
@@ -42,25 +39,16 @@ export default function BackgroundMusic() {
     if (!audio) return;
 
     audio.volume = 0.14;
-
-    try {
-      const enabled = window.localStorage.getItem(ENABLED_KEY) !== "false";
-      wantsMusicRef.current = enabled;
-      setWantsMusic(enabled);
-
-      const savedTime = Number(window.sessionStorage.getItem(TIME_KEY));
-      if (Number.isFinite(savedTime) && savedTime > 0) {
-        audio.currentTime = savedTime;
-      }
-    } catch {
-      // Storage may be unavailable in private browsing; the control still works.
-    }
+    audio.currentTime = 0;
+    wantsMusicRef.current = true;
+    setWantsMusic(true);
 
     const syncPlayingState = () => setIsPlaying(!audio.paused);
+    const interactionEvents = ["pointerdown", "pointerup", "touchstart", "click", "keydown"] as const;
     const playWhenAllowed = () => {
       if (!wantsMusicRef.current || !audio.paused) return;
       void audio.play().catch(() => {
-        // Browsers can require another direct gesture before starting audio.
+        // The first direct visitor gesture retries playback below.
       });
     };
     const unlockOnFirstInteraction = (event: Event) => {
@@ -68,31 +56,36 @@ export default function BackgroundMusic() {
       if (target instanceof Element && target.closest("[data-music-control]")) return;
       playWhenAllowed();
     };
-    const savePosition = () => {
-      try {
-        window.sessionStorage.setItem(TIME_KEY, String(audio.currentTime || 0));
-      } catch {
-        // Navigation should continue normally when storage is unavailable.
-      }
+    const removeInteractionListeners = () => {
+      interactionEvents.forEach((eventName) => {
+        document.removeEventListener(eventName, unlockOnFirstInteraction, true);
+      });
+    };
+    const handlePlay = () => {
+      syncPlayingState();
+      removeInteractionListeners();
     };
 
-    audio.addEventListener("play", syncPlayingState);
+    audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", syncPlayingState);
-    document.addEventListener("pointerdown", unlockOnFirstInteraction, {
-      once: true,
-      passive: true,
+    audio.addEventListener("canplay", playWhenAllowed, { once: true });
+    interactionEvents.forEach((eventName) => {
+      document.addEventListener(eventName, unlockOnFirstInteraction, {
+        capture: true,
+        passive: eventName !== "keydown",
+      });
     });
-    document.addEventListener("keydown", unlockOnFirstInteraction, { once: true });
-    window.addEventListener("pagehide", savePosition);
+    window.addEventListener("pageshow", playWhenAllowed);
 
     syncPlayingState();
+    playWhenAllowed();
 
     return () => {
-      audio.removeEventListener("play", syncPlayingState);
+      audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", syncPlayingState);
-      document.removeEventListener("pointerdown", unlockOnFirstInteraction);
-      document.removeEventListener("keydown", unlockOnFirstInteraction);
-      window.removeEventListener("pagehide", savePosition);
+      audio.removeEventListener("canplay", playWhenAllowed);
+      removeInteractionListeners();
+      window.removeEventListener("pageshow", playWhenAllowed);
     };
   }, []);
 
@@ -113,12 +106,6 @@ export default function BackgroundMusic() {
         setIsPlaying(false);
       }
     }
-
-    try {
-      window.localStorage.setItem(ENABLED_KEY, String(wantsMusicRef.current));
-    } catch {
-      // The current-session toggle still works when storage is unavailable.
-    }
   };
 
   const labels = copy[locale];
@@ -126,7 +113,7 @@ export default function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/melody.mp3" preload="metadata" loop playsInline />
+      <audio ref={audioRef} src="/audio/melody.mp3" preload="auto" autoPlay loop playsInline />
       <button
         type="button"
         className="drift-music-control"
