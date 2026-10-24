@@ -217,6 +217,27 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     watSuanTan: { file: "wat-suan-tan.jpg", alt: "Red-and-gold temple hall at Wat Suan Tan in Nan" },
     doiSamerDaoSunrise: { file: "doi-samer-dao-sunrise.jpg", alt: "Sunrise over layered mountains and mist at Doi Samer Dao" },
   },
+  "khao-kho": {
+    hero: { file: "hero.jpg", alt: "Wind turbines across the Khao Kho hills at golden hour" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Curved-roof guest villas at Kiri Pura Resort in Khaem Son" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Wat Pha Sorn Kaew and hillside accommodation above a sea of mist" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Red post boxes at the Khao Kho Post Office viewpoint" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Sea-of-mist terrace at Mhork Buri Resort in Khao Kho" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Sunrise over the mist-filled valleys of Khao Kho" },
+    activity: { file: "activity.jpg", alt: "Forest footbridge approaching Sri Dit Waterfall" },
+    localTips: { file: "local-tips.jpg", alt: "A winding mountain road through Khao Kho's flower fields" },
+    lushMountains: { file: "lush-green-mountains.jpg", alt: "Green Khao Kho mountain ridges after rain" },
+    flowerFields: { file: "flower-fields.jpg", alt: "Purple flower fields on the cultivated slopes of Khao Kho" },
+    campSonCabins: { file: "camp-son-cabins.jpg", alt: "Camp Son cabins overlooking a valley filled with morning mist" },
+    dreamerVillas: { file: "dreamer-resort-villas.jpg", alt: "Pod-shaped villas at The Dreamer Resort Khao Kho" },
+    hotelViewpointBalcony: { file: "hotel-viewpoint-balcony.jpg", alt: "A Khao Kho hotel balcony looking across a sea of mist" },
+    sirinatiBanThungSamo: { file: "sirinati-ban-thung-samo.jpg", alt: "Sirinati Ban Thung Samo hotel amid the Khao Kho countryside" },
+    nueaMekRoom: { file: "nuea-mek-family-room.jpg", alt: "Dome-shaped guest room at Nuea Mek Family Khao Kho" },
+    watPhaSornKaew: { file: "wat-pha-sorn-kaew.jpg", alt: "The five white Buddhas and mosaic terraces of Wat Pha Sorn Kaew" },
+    watPhaSornKaewSunrise: { file: "wat-pha-sorn-kaew-sunrise.jpg", alt: "Wat Pha Sorn Kaew illuminated by sunrise over the mountains" },
+    mountainCafe: { file: "mountain-cafe-terrace.jpg", alt: "Bamboo café terrace facing the green mountains of Khao Kho" },
+    seaOfMistViewpoint: { file: "sea-of-mist-viewpoint.jpg", alt: "Visitors watching sunrise above the Khao Kho sea of mist" },
+  },
 };
 
 export default function GuidePhoto({

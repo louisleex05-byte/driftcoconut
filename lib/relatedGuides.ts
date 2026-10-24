@@ -10,6 +10,7 @@ export const RELATED: Record<string, string[]> = {
   "chiang-mai": ["chiangrai", "mae-hong-son", "sukhothai"],
   chiangrai: ["chiang-mai", "mae-hong-son", "sukhothai"],
   "hua-hin": ["cha-am", "kanchanaburi", "pattaya"],
+  "khao-kho": ["sukhothai", "nan", "khao-yai"],
   kanchanaburi: ["ayutthaya", "hua-hin", "bangkok"],
   "koh-chang": ["pattaya", "bangkok", "hua-hin"],
   "koh-lanta": ["krabi", "phuket", "samui"],
