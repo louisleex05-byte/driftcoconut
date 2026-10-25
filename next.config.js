@@ -15,6 +15,8 @@ const nextConfig = {
       // Renamed the slug on 2026-09-25; 301 so any inbound links keep working.
       { source: "/guides/pai", destination: "/guides/mae-hong-son", permanent: true },
       { source: "/zh/guides/pai", destination: "/zh/guides/mae-hong-son", permanent: true },
+      { source: "/guides/khao-sok-&-chew-lan-lake", destination: "/guides/khao-sok-cheow-lan-lake", permanent: true },
+      { source: "/zh/guides/khao-sok-&-chew-lan-lake", destination: "/zh/guides/khao-sok-cheow-lan-lake", permanent: true },
     ];
   },
 };

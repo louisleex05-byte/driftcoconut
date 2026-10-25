@@ -297,7 +297,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     mountainCafe: { file: "mountain-cafe-terrace.jpg", alt: "Bamboo café terrace facing the green mountains of Khao Kho" },
     seaOfMistViewpoint: { file: "sea-of-mist-viewpoint.jpg", alt: "Visitors watching sunrise above the Khao Kho sea of mist" },
   },
-  "khao-sok-&-chew-lan-lake": {
+  "khao-sok-cheow-lan-lake": {
     hero: { file: "hero.jpg", alt: "Aerial sunrise over the islands and limestone ridges of Cheow Lan Lake" },
     whenToGo: { file: "when-to-go.jpg", alt: "Rainy-season mist settling over the Khao Sok rainforest" },
     activity: { file: "activity.jpg", alt: "Limestone formations inside Pakarang Cave" },
