@@ -19,6 +19,7 @@ export const dictionary = {
   en: {
     // Header + nav
     nav_deals: "Deals",
+    nav_essentials: "Essentials",
     nav_about: "About",
     nav_search_aria: "Search",
     header_search_placeholder: "Where to? Try Bali or Tokyo...",
@@ -61,6 +62,10 @@ export const dictionary = {
     essentials_book_now: "Book now",
     essentials_disclosure:
       "Affiliate disclosure: driftcoconut may earn a small commission when you book through these partners, at no extra cost to you.",
+    shop_essentials_eyebrow: "Packed for Thailand",
+    shop_essentials_title: "Travel gear we've checked",
+    shop_essentials_sub: "Practical power, packing, and water-ready picks reviewed for smoother trips.",
+    shop_essentials_cta: "Browse travel essentials",
 
     // Card titles
     card_klook_title: "Book tours & experiences",
@@ -209,6 +214,7 @@ export const dictionary = {
   th: {
     // Header + nav
     nav_deals: "ดีล",
+    nav_essentials: "ของใช้เดินทาง",
     nav_about: "เกี่ยวกับเรา",
     nav_search_aria: "ค้นหา",
     header_search_placeholder: "จะไปไหนดี? ลองพิมพ์ บาหลี หรือ โตเกียว...",
@@ -248,6 +254,10 @@ export const dictionary = {
     essentials_book_now: "จองเลย",
     essentials_disclosure:
       "การเปิดเผย: driftcoconut อาจได้รับค่าคอมมิชชั่นเล็กน้อยเมื่อคุณจองผ่านพาร์ทเนอร์เหล่านี้ โดยคุณไม่ต้องจ่ายเพิ่มใดๆ",
+    shop_essentials_eyebrow: "เตรียมพร้อมเที่ยวไทย",
+    shop_essentials_title: "อุปกรณ์เดินทางที่เราตรวจสอบแล้ว",
+    shop_essentials_sub: "ตัวเลือกสำหรับชาร์จไฟ จัดกระเป๋า และป้องกันของใช้เมื่อต้องเจอน้ำ เพื่อให้เดินทางได้ราบรื่นขึ้น",
+    shop_essentials_cta: "ดูของใช้จำเป็น",
 
     // Card titles
     card_klook_title: "จองทัวร์และประสบการณ์",
@@ -393,6 +403,7 @@ export const dictionary = {
   zh: {
     // Header + nav
     nav_deals: "优惠",
+    nav_essentials: "旅行装备",
     nav_about: "关于我们",
     nav_search_aria: "搜索",
     header_search_placeholder: "去哪儿?试试巴厘岛或东京...",
@@ -432,6 +443,10 @@ export const dictionary = {
     essentials_book_now: "立即预订",
     essentials_disclosure:
       "关联披露:driftcoconut 可能会在您通过这些合作伙伴预订时赚取少量佣金,您无需支付额外费用。",
+    shop_essentials_eyebrow: "泰国旅行准备",
+    shop_essentials_title: "我们核查过的旅行装备",
+    shop_essentials_sub: "实用的充电、收纳和防水用品，让旅程更顺畅。",
+    shop_essentials_cta: "浏览旅行必备",
 
     // Card titles
     card_klook_title: "预订旅游和体验",
