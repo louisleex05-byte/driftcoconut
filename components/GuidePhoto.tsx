@@ -131,6 +131,38 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     kohLarn:    { file: "koh-larn.jpg",    alt: "Coral Island Koh Larn white sand beach and turquoise water day trip from Pattaya" },
     nongNooch:  { file: "nong-nooch.jpg",  alt: "Nong Nooch Tropical Botanical Garden with topiary and orchid houses" },
     fishMarket: { file: "fish-market.jpg", alt: "Naklua Fish Market grilled seafood and local Thai stalls at dawn" },
+    bigBuddha: {
+      file: "big-buddha.jpg",
+      alt: "Golden Big Buddha statue at Wat Phra Yai on Pratumnak Hill in Pattaya",
+      credit: { author: "Milei.vencel", source: "https://commons.wikimedia.org/wiki/File:Big_Buddha_in_Pattaya.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" },
+    },
+    baliHaiPier: {
+      file: "bali-hai-pier.jpg",
+      alt: "Passenger boats and ferries at Bali Hai Pier in Pattaya",
+      credit: { author: "calflier001", source: "https://commons.wikimedia.org/wiki/File:PATTAYA_PIER_THAILAND_JAN_2012_(6984729685).jpg", license: "CC BY-SA 2.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0/" },
+    },
+    songthaew: {
+      file: "songthaew.jpg",
+      alt: "Blue songthaew baht bus serving local routes in Pattaya",
+      credit: { author: "Ilya Plekhanov", source: "https://commons.wikimedia.org/wiki/File:Songthaew_in_Pattaya_26.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" },
+    },
+    fireworks: {
+      file: "fireworks.jpg",
+      alt: "Fireworks illuminating the Pattaya beachfront during the international festival",
+      wide: true,
+      credit: { author: "pockethifi", source: "https://commons.wikimedia.org/wiki/File:Fireworks_at_pattaya_28nov2020_20201128191445_08.jpg", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" },
+    },
+    ramayanaWaterPark: {
+      file: "ramayana-water-park.jpg",
+      alt: "Aerial overview of Ramayana Water Park near Pattaya",
+      wide: true,
+      credit: { author: "Ramayana Water Park", source: "https://commons.wikimedia.org/wiki/File:RWP-Overview.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" },
+    },
+    beachRoad: {
+      file: "beach-road.jpg",
+      alt: "Pattaya Beach and Beach Road lined with palms and city hotels",
+      credit: { author: "Vyacheslav Argenberg", source: "https://commons.wikimedia.org/wiki/File:Pattaya_Beach,_Beach_Road,_Thailand.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" },
+    },
   },
   ayutthaya: {
     hero:              { file: "hero.jpg",                alt: "Wat Mahathat sandstone Buddha head entwined in banyan tree roots at Ayutthaya Historical Park" },
