@@ -38,7 +38,8 @@ export default function BackgroundMusic() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0.14;
+    // The track is also attenuated in the file for browsers that ignore audio.volume.
+    audio.volume = 0.8;
     audio.currentTime = 0;
     wantsMusicRef.current = true;
     setWantsMusic(true);
@@ -113,7 +114,7 @@ export default function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/melody.mp3" preload="auto" autoPlay loop playsInline />
+      <audio ref={audioRef} src="/audio/nara-demo-zh.mp3" preload="auto" autoPlay loop playsInline />
       <button
         type="button"
         className="drift-music-control"
