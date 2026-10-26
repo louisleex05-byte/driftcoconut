@@ -22,7 +22,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     sukhumvit: { file: "sukhumvit.jpg",  alt: "BTS Skytrain running above Sukhumvit Road in Bangkok" },
     silom:     { file: "silom.jpg",      alt: "Rooftop bar overlooking Bangkok's Silom skyline at sunset" },
     riverside: { file: "riverside.jpg",  alt: "Longtail boat on the Chao Phraya River at dusk, Bangkok" },
-    oldTown:   { file: "old-town.jpg",   alt: "Reclining Buddha statue at Wat Pho temple, Bangkok" },
+    oldTown:   { file: "wat-pho-reclining-buddha-hall.jpg", alt: "Illustrative wide view of the reclining Buddha hall at Wat Pho", wide: true },
     activity:  { file: "activity.jpg",   alt: "Wat Arun temple silhouetted against sunset across the Chao Phraya" },
     localTips: { file: "local-tips.jpg", alt: "Street food vendor cooking pad thai at a Bangkok night market" },
     ariCafe: { file: "ari-cafe.jpg", alt: "Warmly lit café interior in Bangkok's Ari neighborhood", credit: { author: "bckfwd", source: "https://unsplash.com/photos/lighted-chandelier-inside-cafe-ifkd981FUdM", license: "Unsplash License", licenseUrl: "https://unsplash.com/license" } },
@@ -34,7 +34,7 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     rainyStreet: { file: "rainy-street.jpg", alt: "Wet Bangkok street with reflections and umbrellas during a rain shower", credit: { author: "Chainwit", source: "https://commons.wikimedia.org/wiki/File:Bangkok_-_Phahurat_in_the_rain_(2024)_-_img_10.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
     boatNoodles: { file: "boat-noodles.jpg", alt: "Bowl of Bangkok-style boat noodles at a local table", portrait: true, credit: { author: "Emppowering", source: "https://commons.wikimedia.org/wiki/File:Bowl_of_boat_noodles.jpg", license: "CC0", licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/" } },
     watPhoDetail: { file: "wat-pho-reclining-buddha-detail.jpg", alt: "Illustrative close view of the reclining Buddha at Wat Pho" },
-    watPhoHall: { file: "wat-pho-reclining-buddha-hall.jpg", alt: "Illustrative wide view of the reclining Buddha hall at Wat Pho", wide: true },
+    watPhoChedi: { file: "old-town.jpg", alt: "Temple hall and white chedi in Bangkok's Old Town", portrait: true },
   },
   "chiang-mai": {
     hero:        { file: "hero.jpg",         alt: "Doi Suthep golden temple overlooking Chiang Mai city at sunset" },
