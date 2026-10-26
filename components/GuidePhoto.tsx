@@ -337,6 +337,27 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     mistyMorningBoat: { file: "misty-morning-boat.jpg", alt: "A long-tail boat facing mist-covered hills at dawn" },
     sunriseBeamsBoat: { file: "sunrise-beams-boat.jpg", alt: "Sunlight reaching a boat between Cheow Lan Lake's limestone walls" },
   },
+  "phang-nga-khao-lak": {
+    hero: { file: "hero.jpg", alt: "Ko Tapu rising from Phang Nga Bay" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Beachfront walkway at Khaolak Laguna Resort" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Aerial view of Bang Niang Beach" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "La Vela Khao Lak resort" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "The Little Shore Khao Lak resort" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Kayaking through a sea cave in Phang Nga Bay" },
+    activity: { file: "activity.jpg", alt: "Forest walk to Ton Chong Fa Waterfall" },
+    localTips: { file: "local-tips.jpg", alt: "Bang Niang Market at sunset" },
+    freshMarket: { file: "fresh-market.jpg", alt: "Produce stalls at Bang Niang fresh market" },
+    similanSnorkeling: { file: "similan-snorkeling.jpg", alt: "Snorkelers in clear water off the Similan Islands" },
+    stormyBeach: { file: "stormy-beach.jpg", alt: "Storm clouds gathering over Khao Lak beach" },
+    sametNangshe: { file: "samet-nangshe-viewpoint.jpg", alt: "Phang Nga Bay seen from Samet Nangshe Viewpoint" },
+    grandMercureBangsak: { file: "grand-mercure-bangsak-boardwalk.jpg", alt: "Boardwalk toward the beach at Grand Mercure Khao Lak Bangsak" },
+    gracelandBangsak: { file: "graceland-bangsak-aerial.jpg", alt: "Aerial view of Graceland Khaolak Beach Resort and the shore" },
+    chongfahBangNiang: { file: "chongfah-bang-niang.jpg", alt: "Beachfront path at Chongfah Beach Resort" },
+    ramadaBangNiang: { file: "ramada-bang-niang.jpg", alt: "Aerial view of Ramada Khao Lak and the beach" },
+    palmBeachNangThong: { file: "palm-beach-nang-thong.jpg", alt: "Palm-lined Nang Thong beachfront at Khao Lak Palm Beach Resort" },
+    bhandariNangThong: { file: "bhandari-nang-thong.jpg", alt: "Aerial view of Khaolak Bhandari Resort near Nang Thong Beach" },
+    coastSunset: { file: "coast-sunset.jpg", alt: "Sun setting over the Khao Lak coast" },
+  },
 };
 
 export default function GuidePhoto({
