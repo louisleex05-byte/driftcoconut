@@ -7,6 +7,7 @@ const nextConfig = {
       { protocol: "https", hostname: "**.trvl-media.com" },
       { protocol: "https", hostname: "**.bstatic.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "cf.shopee.co.th" },
     ],
   },
   async redirects() {

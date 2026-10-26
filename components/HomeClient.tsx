@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import PartnerStrip from "@/components/PartnerStrip";
 import SearchForm from "@/components/SearchForm";
 import TripPlanner from "@/components/TripPlanner";
+import ShopeeEssentialsCallout from "@/components/ShopeeEssentialsCallout";
 import EsimStrip from "@/components/EsimStrip";
 import GuideTipsBadge from "@/components/GuideTipsBadge";
 import FeaturedGuides from "@/components/FeaturedGuides";
@@ -131,6 +132,8 @@ export default function HomeClient({
           </div>
         </div>
       </section>
+
+      <ShopeeEssentialsCallout />
 
       <section className="mt-6 mb-10">
         <TripPlanner hideWidgets={["esim"]} aboveQuickSearch={<EsimStrip />} />
