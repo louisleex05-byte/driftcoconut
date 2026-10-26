@@ -7,7 +7,13 @@ import Image from "next/image";
 // To add photos for a new guide: add a new entry keyed by that guide's slug, with
 // slot names matching the <GuidePhoto slot="..." /> tags used in its MDX.
 
-type PhotoEntry = { file: string; alt: string; portrait?: boolean };
+type PhotoEntry = {
+  file: string;
+  alt: string;
+  portrait?: boolean;
+  wide?: boolean;
+  credit?: { author: string; source: string; license?: string; licenseUrl?: string };
+};
 
 const GUIDES: Record<string, Record<string, PhotoEntry>> = {
   bangkok: {
@@ -19,6 +25,16 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     oldTown:   { file: "old-town.jpg",   alt: "Reclining Buddha statue at Wat Pho temple, Bangkok" },
     activity:  { file: "activity.jpg",   alt: "Wat Arun temple silhouetted against sunset across the Chao Phraya" },
     localTips: { file: "local-tips.jpg", alt: "Street food vendor cooking pad thai at a Bangkok night market" },
+    ariCafe: { file: "ari-cafe.jpg", alt: "Warmly lit café interior in Bangkok's Ari neighborhood", credit: { author: "bckfwd", source: "https://unsplash.com/photos/lighted-chandelier-inside-cafe-ifkd981FUdM", license: "Unsplash License", licenseUrl: "https://unsplash.com/license" } },
+    yaowaratFood: { file: "yaowarat-food.jpg", alt: "Night food stall and pedestrians on Yaowarat Road", portrait: true, credit: { author: "Kaden Taylor", source: "https://unsplash.com/photos/nighttime-street-food-vendors-in-bangkok-k8dwH-poJ2c", license: "Unsplash License", licenseUrl: "https://unsplash.com/license" } },
+    chatuchakAisle: { file: "chatuchak-aisle.jpg", alt: "Shoppers browsing a colorful covered aisle at Chatuchak Weekend Market", credit: { author: "Mussi Katz", source: "https://commons.wikimedia.org/wiki/File:Colorful_covered_alley_lined_with_clothing_and_souvenir_stalls_at_Chatuchak_Weekend_Market,_Bangkok.jpg", license: "CC0", licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/" } },
+    thonburiCanal: { file: "thonburi-canal.jpg", alt: "Small boat beside houses along a quiet Thonburi canal", credit: { author: "David Broad", source: "https://commons.wikimedia.org/wiki/File:Bangkok_canals_Khlongs_in_the_Thon_Buri_district_-_panoramio_(8).jpg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
+    grandPalaceCourtyard: { file: "grand-palace-courtyard.jpg", alt: "Visitors crossing a courtyard of Bangkok's Grand Palace", wide: true, credit: { author: "ErwinMeier", source: "https://commons.wikimedia.org/wiki/File:Bangkok_Gro%C3%9Fer_Palast_01.jpg", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/" } },
+    expressBoatPier: { file: "express-boat-pier.jpg", alt: "Chao Phraya Express boat boarding at Sathorn Pier", credit: { author: "David McKelvey", source: "https://commons.wikimedia.org/wiki/File:Chao_Phraya_Express_Boat_Service,_Sathorn_Pier,_Bangkok_(6906973718).jpg", license: "CC BY 2.0", licenseUrl: "https://creativecommons.org/licenses/by/2.0/" } },
+    rainyStreet: { file: "rainy-street.jpg", alt: "Wet Bangkok street with reflections and umbrellas during a rain shower", credit: { author: "Chainwit", source: "https://commons.wikimedia.org/wiki/File:Bangkok_-_Phahurat_in_the_rain_(2024)_-_img_10.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
+    boatNoodles: { file: "boat-noodles.jpg", alt: "Bowl of Bangkok-style boat noodles at a local table", portrait: true, credit: { author: "Emppowering", source: "https://commons.wikimedia.org/wiki/File:Bowl_of_boat_noodles.jpg", license: "CC0", licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/" } },
+    watPhoDetail: { file: "wat-pho-reclining-buddha-detail.jpg", alt: "Illustrative close view of the reclining Buddha at Wat Pho" },
+    watPhoHall: { file: "wat-pho-reclining-buddha-hall.jpg", alt: "Illustrative wide view of the reclining Buddha hall at Wat Pho", wide: true },
   },
   "chiang-mai": {
     hero:        { file: "hero.jpg",         alt: "Doi Suthep golden temple overlooking Chiang Mai city at sunset" },
@@ -326,9 +342,11 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
 export default function GuidePhoto({
   slot,
   guideSlug = "bangkok",
+  caption,
 }: {
   slot: string;
   guideSlug?: string;
+  caption?: string;
 }) {
   const guide = GUIDES[guideSlug];
   if (!guide) return null; // No entry for this guide — render nothing, never fall back to another guide's photos
@@ -336,16 +354,27 @@ export default function GuidePhoto({
   if (!meta) return null;
   return (
     <figure className="my-8 not-prose">
-      <div className={`relative w-full ${meta.portrait ? "aspect-[3/4]" : "aspect-[4/3]"} overflow-hidden rounded-2xl shadow-md`}>
+      <div className={`relative w-full ${meta.portrait ? "aspect-[3/4]" : meta.wide ? "aspect-[2/1]" : "aspect-[4/3]"} overflow-hidden rounded-2xl shadow-md`}>
         <Image
           src={`/guides/${guideSlug}/${meta.file}`}
-          alt={meta.alt}
+          alt={caption ?? meta.alt}
           fill
           sizes="(max-width: 768px) 100vw, 720px"
           className={meta.portrait ? "object-contain bg-slate-100" : "object-cover"}
         />
       </div>
-      <figcaption className="mt-2 text-xs text-slate-500 italic">{meta.alt}</figcaption>
+      <figcaption className="mt-2 text-xs text-slate-500 italic">
+        {caption ?? meta.alt}
+        {meta.credit && (
+          <span className="ml-1 not-italic">
+            — <a href={meta.credit.source} target="_blank" rel="noopener noreferrer" className="underline">{meta.credit.author}</a>
+            {meta.credit.license && meta.credit.licenseUrl && (
+              <> · <a href={meta.credit.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline">{meta.credit.license}</a></>
+            )}
+            {meta.credit.license?.startsWith("CC BY") && " · resized"}
+          </span>
+        )}
+      </figcaption>
     </figure>
   );
 }

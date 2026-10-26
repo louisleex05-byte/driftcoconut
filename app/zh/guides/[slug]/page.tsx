@@ -60,8 +60,8 @@ export default async function GuidePageZh({
 }) {
   const { slug } = await params;
   const guide = await getGuide(slug, "zh");
-  const BoundGuidePhoto = (props: { slot: string }) => (
-    <GuidePhoto slot={props.slot} guideSlug={slug} />
+  const BoundGuidePhoto = (props: { slot: string; caption?: string }) => (
+    <GuidePhoto slot={props.slot} guideSlug={slug} caption={props.caption} />
   );
   const mdxComponents = {
     AffiliateLink,
