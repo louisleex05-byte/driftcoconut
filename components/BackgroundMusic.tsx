@@ -114,7 +114,7 @@ export default function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/nara-demo-zh.mp3" preload="auto" autoPlay loop playsInline />
+      <audio ref={audioRef} src="/audio/background-music.mp3" preload="auto" autoPlay loop playsInline />
       <button
         type="button"
         className="drift-music-control"
