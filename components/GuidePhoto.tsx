@@ -449,6 +449,11 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     whenToGo: { file: "when-to-go.jpg", alt: "Palm-lined Samila Beach road in the Songkhla coastal district" },
     activity: { file: "activity.jpg", alt: "Panoramic Songkhla coastline from the Khao Tang Kuan viewpoint" },
     localTips: { file: "local-tips.jpg", alt: "Vendors serving food from boats at Khlong Hae Floating Market" },
+    downtownEvening: { file: "hat-yai-downtown-evening.webp", alt: "Illustrative view of a Hat Yai downtown street and shops in evening light" },
+    marketStreetEvening: { file: "hat-yai-market-street-evening.webp", alt: "Illustrative view of shophouses and street traffic in Hat Yai at sunset" },
+    buddhaSunrise: { file: "hat-yai-buddha-sunrise.webp", alt: "Illustrative golden Buddha viewpoint above Hat Yai at sunrise" },
+    nangNgamShophouses: { file: "nang-ngam-shophouses.jpg", alt: "Historic wooden shophouses along Nang Ngam Road in Songkhla" },
+    monkhamRoom: { file: "monkham-village-room.jpeg", alt: "Twin room at MonKham Village Hatyai" },
     songkhlaLakeVillage: {
       file: "songkhla-lake-village.jpg",
       alt: "Fishing huts and lift nets at Hua Khao village on Songkhla Lake",
