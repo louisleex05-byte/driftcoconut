@@ -440,6 +440,25 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     bhandariNangThong: { file: "bhandari-nang-thong.jpg", alt: "Aerial view of Khaolak Bhandari Resort near Nang Thong Beach" },
     coastSunset: { file: "coast-sunset.jpg", alt: "Sun setting over the Khao Lak coast" },
   },
+  "hatyai-songkhla": {
+    hero: { file: "hero.jpg", alt: "Golden Mermaid statue on the rocks at Samila Beach with the Gulf of Thailand behind" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Lee Gardens Plaza and tuk-tuk traffic in downtown Hat Yai" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Academic buildings and landscaped grounds at Prince of Songkla University Hat Yai" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Tuk-tuk beside historic shophouses on Nakhon Nai Road in Songkhla Old Town" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Coastal road and palms along the Samila Beachfront" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Palm-lined Samila Beach road in the Songkhla coastal district" },
+    activity: { file: "activity.jpg", alt: "Panoramic Songkhla coastline from the Khao Tang Kuan viewpoint" },
+    localTips: { file: "local-tips.jpg", alt: "Vendors serving food from boats at Khlong Hae Floating Market" },
+    songkhlaLakeVillage: {
+      file: "songkhla-lake-village.jpg",
+      alt: "Fishing huts and lift nets at Hua Khao village on Songkhla Lake",
+      wide: true,
+      credit: {
+        author: "Oliver Raw",
+        source: "https://www.scmp.com/postmag/travel/article/3352770/songkhlas-hidden-charm-town-poised-put-southern-thailand-tourist-map",
+      },
+    },
+  },
 };
 
 export default function GuidePhoto({
