@@ -367,6 +367,12 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     villaMahaphrom: { file: "villa-mahaphrom-hotel.jpg", alt: "Tree-shaded exterior of Villa Mahaphrom Hotel in Nan" },
     watSuanTan: { file: "wat-suan-tan.jpg", alt: "Red-and-gold temple hall at Wat Suan Tan in Nan" },
     doiSamerDaoSunrise: { file: "doi-samer-dao-sunrise.jpg", alt: "Sunrise over layered mountains and mist at Doi Samer Dao" },
+    watChaeHaeng: { file: "wat-phra-that-chae-haeng.jpg", alt: "Golden chedi at Wat Phra That Chae Haeng east of Nan city" },
+    phuminMural: { file: "phumin-mural.jpg", alt: "Historic painted mural inside Wat Phumin", credit: { author: "Ellnik", source: "https://commons.wikimedia.org/wiki/File:Peinture_murale_Wat_Phumin,_Nan.JPG", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" } },
+    nanMuseum: { file: "nan-museum.jpg", alt: "Former palace building of Nan National Museum", credit: { author: "K.Phothiwijit", source: "https://commons.wikimedia.org/wiki/File:Nan_National_Museum_2014.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" } },
+    puaCountryside: { file: "pua-countryside.jpg", alt: "Rice fields and misty hills in the Pua countryside", credit: { author: "Takeaway", source: "https://commons.wikimedia.org/wiki/File:2013_Pua_countryside.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" } },
+    doiPhuKha: { file: "doi-phu-kha.jpg", alt: "Forested peaks of Doi Phu Kha National Park", credit: { author: "Takeaway", source: "https://commons.wikimedia.org/wiki/File:Doi_Pu_Kha_top.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" } },
+    saoDinNaNoi: { file: "sao-din-na-noi.jpg", alt: "Eroded earth formations at Sao Din Na Noi", credit: { author: "KOSIN SUKHUM", source: "https://commons.wikimedia.org/wiki/File:Sao_Din_Na_Noi_(Hom_Chom)_and_Kok_Sua.jpg", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/" } },
   },
   "khao-kho": {
     hero: { file: "hero.jpg", alt: "Wind turbines across the Khao Kho hills at golden hour" },
