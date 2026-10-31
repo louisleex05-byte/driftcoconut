@@ -11,12 +11,15 @@ export default async function RelatedGuides({
   slug: string;
   locale: "en" | "zh";
 }) {
-  const wanted = RELATED[slug] ?? [];
-  if (wanted.length === 0) return null;
-
   const all = await listGuides(locale);
   const bySlug = new Map(all.map((g) => [g.slug, g]));
+  const wanted = RELATED[slug] ?? [];
   const guides = wanted.map((s) => bySlug.get(s)).filter((g): g is NonNullable<typeof g> => !!g);
+  if (guides.length === 0) {
+    const country = bySlug.get(slug)?.destination.split(",").at(-1)?.trim();
+    const fallback = all.find((g) => g.slug !== slug && country && g.destination.endsWith(country));
+    if (fallback) guides.push(fallback);
+  }
   if (guides.length === 0) return null;
 
   const prefix = locale === "zh" ? "/zh" : "";
@@ -24,7 +27,7 @@ export default async function RelatedGuides({
   return (
     <section className="mt-12 pt-8 border-t border-sea-100" aria-labelledby="keep-exploring">
       <h2 id="keep-exploring" className="font-display text-xl font-semibold text-sea-800 mb-5">
-        {locale === "zh" ? "继续探索" : "Keep exploring"}
+        {locale === "zh" ? "下一站去哪里？" : "Where to next?"}
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {guides.map((g) => (
@@ -45,6 +48,7 @@ export default async function RelatedGuides({
               </div>
             )}
             <div className="p-4">
+              {g === guides[0] && <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-coral-600">{locale === "zh" ? "推荐下一站" : "Next destination"}</p>}
               <p className="text-xs uppercase tracking-wide text-sea-500 mb-1">{g.destination}</p>
               <p className="font-display text-base font-semibold text-sea-800 leading-snug">
                 {g.title}

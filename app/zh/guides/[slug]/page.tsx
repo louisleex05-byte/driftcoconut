@@ -9,6 +9,7 @@ import AffiliateLink from "@/components/AffiliateLink";
 import GuidePhoto from "@/components/GuidePhoto";
 import TripPlanner from "@/components/TripPlanner";
 import RelatedGuides from "@/components/RelatedGuides";
+import GuideQuickLinks from "@/components/GuideQuickLinks";
 
 // Statically generate all guide slugs at build time (Chinese variants).
 // Falls back to English content if `.zh.mdx` doesn't exist for a slug.
@@ -107,12 +108,12 @@ export default async function GuidePageZh({
         </p>
       </header>
 
+      <GuideQuickLinks destination={guide.destination} locale="zh" />
+
       {/* Guide body */}
       <div className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-sea-800 prose-a:text-sea-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-h2:mt-10 prose-h2:mb-4 prose-h3:mt-6 prose-h3:mb-2">
         <MDXRemote source={guide.content} components={mdxComponents} />
       </div>
-
-      <RelatedGuides slug={slug} locale="zh" />
 
       {/* Trip planner: journey-based affiliate block, specialised to this destination */}
       <div className="mt-12 pt-8 border-t border-sea-100">
@@ -140,6 +141,7 @@ export default async function GuidePageZh({
           <Link href="/zh/guides" className="hover:text-sea-600">← 全部目的地指南</Link>
         </p>
       </div>
+      <RelatedGuides slug={slug} locale="zh" />
     </article>
   );
 }

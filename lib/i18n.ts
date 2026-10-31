@@ -31,6 +31,8 @@ export const dictionary = {
     // "live availability" claim until real (non-mock) hotel data is on.
     hero_title: "Travel Asia like someone who knows the place.",
     hero_subtitle: "Honest local guides, neighborhood advice and hotels you can book in one place.",
+    hero_guides_cta: "Explore destination guides",
+    hero_hotels_cta: "Search hotels",
 
     // Deals section
     deals_eyebrow: "Curated for wanderers",
@@ -223,6 +225,8 @@ export const dictionary = {
     // Hero
     hero_title: "เที่ยวเอเชียแบบคนที่รู้จักที่นั่นดี",
     hero_subtitle: "คู่มือท้องถิ่นที่ตรงไปตรงมา คำแนะนำแต่ละย่าน และโรงแรมที่จองได้ในที่เดียว",
+    hero_guides_cta: "ดูคู่มือท่องเที่ยว",
+    hero_hotels_cta: "ค้นหาโรงแรม",
 
     // Deals section
     deals_eyebrow: "คัดสรรสำหรับนักเดินทาง",
@@ -412,6 +416,8 @@ export const dictionary = {
     // Hero
     hero_title: "像懂行的人一样玩转亚洲",
     hero_subtitle: "真诚的本地指南、街区攻略，以及可一站式预订的酒店。",
+    hero_guides_cta: "浏览目的地指南",
+    hero_hotels_cta: "搜索酒店",
 
     // Deals section
     deals_eyebrow: "为漫游者精选",
