@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
-import { useT } from "@/contexts/LanguageProvider";
+import { useLanguage } from "@/contexts/LanguageProvider";
 
 const ROTATE_MS = 3000;
 
 export default function Hero() {
-  const t = useT();
+  const { locale, t } = useLanguage();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -65,6 +66,20 @@ export default function Hero() {
             <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-lg drop-shadow-md opacity-95 px-2">
               {t("hero_subtitle")}
             </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <Link
+                href={locale === "zh" ? "/zh/guides" : "/guides"}
+                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-sea-800 shadow-md transition-colors hover:bg-sea-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                {t("hero_guides_cta")}
+              </Link>
+              <a
+                href="#search-form"
+                className="rounded-full border border-white/80 bg-slate-900/35 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-slate-900/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                {t("hero_hotels_cta")}
+              </a>
+            </div>
           </div>
         </div>
 
