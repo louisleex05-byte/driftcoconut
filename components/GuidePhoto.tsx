@@ -7,7 +7,13 @@ import Image from "next/image";
 // To add photos for a new guide: add a new entry keyed by that guide's slug, with
 // slot names matching the <GuidePhoto slot="..." /> tags used in its MDX.
 
-type PhotoEntry = { file: string; alt: string; portrait?: boolean };
+type PhotoEntry = {
+  file: string;
+  alt: string;
+  portrait?: boolean;
+  wide?: boolean;
+  credit?: { author: string; source: string; license?: string; licenseUrl?: string };
+};
 
 const GUIDES: Record<string, Record<string, PhotoEntry>> = {
   bangkok: {
@@ -248,14 +254,134 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     mountainCafe: { file: "mountain-cafe-terrace.jpg", alt: "Bamboo café terrace facing the green mountains of Khao Kho" },
     seaOfMistViewpoint: { file: "sea-of-mist-viewpoint.jpg", alt: "Visitors watching sunrise above the Khao Kho sea of mist" },
   },
+  "hatyai-songkhla": {
+    hero: { file: "hero.jpg", alt: "Golden Mermaid statue on the rocks at Samila Beach with the Gulf of Thailand behind" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Lee Gardens Plaza and tuk-tuk traffic in downtown Hat Yai" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Academic buildings and landscaped grounds at Prince of Songkla University Hat Yai" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Tuk-tuk beside historic shophouses on Nakhon Nai Road in Songkhla Old Town" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Coastal road and palms along the Samila Beachfront" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Palm-lined Samila Beach road in the Songkhla coastal district" },
+    activity: { file: "activity.jpg", alt: "Panoramic Songkhla coastline from the Khao Tang Kuan viewpoint" },
+    localTips: { file: "local-tips.jpg", alt: "Vendors serving food from boats at Khlong Hae Floating Market" },
+    downtownEvening: { file: "hat-yai-downtown-evening.webp", alt: "Illustrative view of a Hat Yai downtown street and shops in evening light" },
+    marketStreetEvening: { file: "hat-yai-market-street-evening.webp", alt: "Illustrative view of shophouses and street traffic in Hat Yai at sunset" },
+    buddhaSunrise: { file: "hat-yai-buddha-sunrise.webp", alt: "Illustrative golden Buddha viewpoint above Hat Yai at sunrise" },
+    nangNgamShophouses: { file: "nang-ngam-shophouses.jpg", alt: "Historic wooden shophouses along Nang Ngam Road in Songkhla" },
+    monkhamRoom: { file: "monkham-village-room.jpeg", alt: "Twin room at MonKham Village Hatyai" },
+    songkhlaLakeVillage: {
+      file: "songkhla-lake-village.jpg",
+      alt: "Fishing huts and lift nets at Hua Khao village on Songkhla Lake",
+      wide: true,
+      credit: {
+        author: "Oliver Raw",
+        source: "https://www.scmp.com/postmag/travel/article/3352770/songkhlas-hidden-charm-town-poised-put-southern-thailand-tourist-map",
+      },
+    },
+  },
+  khanom: {
+    hero: { file: "hero.jpg", alt: "Nai Phlao Beach and forested hills on the Khanom coast" },
+    woodenResortCottages: { file: "wooden-resort-cottages.jpg", alt: "Traditional wooden resort cottages" },
+    nadanResortAerial: { file: "nadan-resort-aerial.jpg", alt: "Aerial view of a beachfront resort" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Early light over Khanom's Gulf coast" },
+    naiPhlaoResort: { file: "nai-phlao-resort.jpg", alt: "Palm-lined beachfront resort beneath green hills" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "A small fishing boat at the mouth of Khlong Nai Phlao" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "The white-and-gold Khanom City Pillar Shrine" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "A waterside resort in Thong Nian on Khanom's quieter north coast" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Monsoon clouds and rough water on Khanom Beach", portrait: true },
+    activity: { file: "activity.jpg", alt: "Rock pools at Hin Lat in Khlong Nai Phlao" },
+    coastalParamotor: { file: "coastal-paramotor.jpg", alt: "Powered paraglider above coastal water", portrait: true },
+    khanomCoast: { file: "khanom-coast.jpg", alt: "Palm-lined Gulf coastline with longtail boats" },
+    thongYeeLongtail: { file: "thong-yee-longtail.jpg", alt: "Longtail boat beside a rocky Gulf cove" },
+    localTips: { file: "local-tips.jpg", alt: "The temple hall at Wat Kradang-nga in Khanom" },
+  },
+  "khao-sok-cheow-lan-lake": {
+    hero: { file: "hero.jpg", alt: "Aerial sunrise over the islands and limestone ridges of Cheow Lan Lake" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Rainy-season mist settling over the Khao Sok rainforest" },
+    activity: { file: "activity.jpg", alt: "Limestone formations inside Pakarang Cave" },
+    localTips: { file: "local-tips.jpg", alt: "Floating raft houses on Cheow Lan Lake at sunrise" },
+    landmark: { file: "landmark.jpg", alt: "Khao Sam Kloe limestone pillars rising from Cheow Lan Lake" },
+    localFood: { file: "local-food.jpg", alt: "A street-food stall at Khao Sok Market" },
+    transport: { file: "transport.jpg", alt: "Long-tail boats at the Cheow Lan Lake pier" },
+    sunset: { file: "sunset.jpg", alt: "Golden sunbeams falling across Cheow Lan Lake's karsts" },
+    fieryKarstsBoat: { file: "fiery-karsts-boat.jpg", alt: "A long-tail boat framed by limestone cliffs beneath a vivid sky" },
+    boatFacingSunset: { file: "boat-facing-sunset.jpg", alt: "View from a long-tail boat facing the sunset on Cheow Lan Lake" },
+    motorbikeRoad: { file: "khao-sok-road-motorbike.jpg", alt: "A motorbike beside the road through Khao Sok's limestone landscape" },
+    sharedMinivan: { file: "shared-minivan-transfer.jpg", alt: "Passengers boarding a shared minivan in Surat Thani" },
+    grilledFish: { file: "surat-thani-grilled-fish.jpg", alt: "Grilled fish on display at a Surat Thani street stall" },
+    khanomJeen: { file: "southern-khanom-jeen.jpg", alt: "Southern khanom jeen rice noodles served with several curries" },
+    watThamPhanthurat: { file: "wat-tham-phanthurat.jpg", alt: "Wat Tham Phanthurat against Khao Sok's limestone hills" },
+    villageStreet: { file: "khao-sok-village-street.jpg", alt: "The main road through Khao Sok Village" },
+    raftHouseBoats: { file: "raft-houses-and-boats.jpg", alt: "Long-tail boats moored beside floating houses on Cheow Lan Lake" },
+    boatThroughKarsts: { file: "boat-through-karsts.jpg", alt: "View from a long-tail boat passing limestone karsts on Cheow Lan Lake" },
+    clearBlueSkyLake: { file: "clear-blue-sky-lake.jpg", alt: "A clear blue sky above Cheow Lan Lake's green water and limestone cliffs" },
+    kayakingRaftHouses: { file: "kayaking-raft-houses.jpg", alt: "Kayakers paddling beside floating bungalows" },
+    mistyMorningBoat: { file: "misty-morning-boat.jpg", alt: "A long-tail boat facing mist-covered hills at dawn" },
+    sunriseBeamsBoat: { file: "sunrise-beams-boat.jpg", alt: "Sunlight reaching a boat between Cheow Lan Lake's limestone walls" },
+  },
+  "khao-yai": {
+    hero: { file: "hero.jpg", alt: "Mist and grassland viewed from an observation tower in Khao Yai National Park" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Blue local bus serving the Pak Chong approach to Khao Yai" },
+    pakChongMarket: { file: "pak-chong-market.jpg", alt: "Pak Chong town and night market at dusk" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Green hills and grassland in the Khao Yai region" },
+    regionalAccommodation: { file: "regional-accommodation.jpg", alt: "Modern accommodation building in the Khao Yai region at sunset" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Open grassland and park buildings in Khao Yai National Park" },
+    mountainResort: { file: "mountain-resort.jpg", alt: "Mountain resort landscape in the Khao Yai region" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Reservoir and forest edge inside Khao Yai National Park" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Morning mist along a road in the Khao Yai region" },
+    phaDiaoDai: { file: "pha-diao-dai.jpg", alt: "Pha Diao Dai viewpoint sign above the forested Khao Yai valley" },
+    activity: { file: "activity.jpg", alt: "Haew Suwat Waterfall framed by a forest rock arch" },
+    haewNarok: { file: "haew-narok.jpg", alt: "Haew Narok Waterfall viewed from the signed park lookout" },
+    localTips: { file: "local-tips.jpg", alt: "Spicy Thai noodle soup served in the Khao Yai area" },
+    pakChongFood: { file: "pak-chong-food.jpg", alt: "Grilled food stall at Pak Chong Night Market" },
+    elephantSafety: { file: "elephant-safety.jpg", alt: "Wild elephant walking along a forest road in Khao Yai National Park" },
+  },
+  "phang-nga-khao-lak": {
+    hero: { file: "hero.jpg", alt: "Ko Tapu rising from Phang Nga Bay" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Beachfront walkway at Khaolak Laguna Resort" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Aerial view of Bang Niang Beach" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "La Vela Khao Lak resort" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "The Little Shore Khao Lak resort" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Kayaking through a sea cave in Phang Nga Bay" },
+    activity: { file: "activity.jpg", alt: "Forest walk to Ton Chong Fa Waterfall" },
+    localTips: { file: "local-tips.jpg", alt: "Bang Niang Market at sunset" },
+    freshMarket: { file: "fresh-market.jpg", alt: "Produce stalls at Bang Niang fresh market" },
+    similanSnorkeling: { file: "similan-snorkeling.jpg", alt: "Snorkelers in clear water off the Similan Islands" },
+    stormyBeach: { file: "stormy-beach.jpg", alt: "Storm clouds gathering over Khao Lak beach" },
+    sametNangshe: { file: "samet-nangshe-viewpoint.jpg", alt: "Phang Nga Bay seen from Samet Nangshe Viewpoint" },
+    grandMercureBangsak: { file: "grand-mercure-bangsak-boardwalk.jpg", alt: "Boardwalk toward the beach at Grand Mercure Khao Lak Bangsak" },
+    gracelandBangsak: { file: "graceland-bangsak-aerial.jpg", alt: "Aerial view of Graceland Khaolak Beach Resort and the shore" },
+    chongfahBangNiang: { file: "chongfah-bang-niang.jpg", alt: "Beachfront path at Chongfah Beach Resort" },
+    ramadaBangNiang: { file: "ramada-bang-niang.jpg", alt: "Aerial view of Ramada Khao Lak and the beach" },
+    palmBeachNangThong: { file: "palm-beach-nang-thong.jpg", alt: "Palm-lined Nang Thong beachfront at Khao Lak Palm Beach Resort" },
+    bhandariNangThong: { file: "bhandari-nang-thong.jpg", alt: "Aerial view of Khaolak Bhandari Resort near Nang Thong Beach" },
+    coastSunset: { file: "coast-sunset.jpg", alt: "Sun setting over the Khao Lak coast" },
+  },
+  pranburi: {
+    hero: { file: "hero.jpg", alt: "Pranburi coastline with mangroves and limestone ridges along the Gulf of Thailand" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Pranburi Pak Nam Pran beachfront area neighborhood and accommodation options" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Pranburi Khao Kalok and southern Pak Nam Pran area neighborhood and accommodation options" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Pran Buri town and railway-station area" },
+    pranBuriStation2: { file: "pran-buri-station-2.webp", alt: "Red-and-cream platform building at Pran Buri Railway Station" },
+    huaHinStation: { file: "hua-hin-station.jpg", alt: "Historic red-and-cream platform at Hua Hin Railway Station" },
+    pranBuriStation3: { file: "pran-buri-station-3.jpg", alt: "Pran Buri Railway Station entrance beneath a bright blue sky" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Pranburi When to go scenic view and travel destination photo" },
+    activity: { file: "activity.jpg", alt: "Pranburi Things to do scenic view and travel destination photo" },
+    samRoiYot: { file: "sam-roi-yot.jpg", alt: "Sam Roi Yot and Dolphin Bay limestone coast south of Pranburi" },
+    dolphinBaySunset: { file: "dolphin-bay-sunset.jpg", alt: "Sunset over the wetlands and coastal bay south of Pranburi", portrait: true },
+    coastalActivity: { file: "coastal-activity.jpg", alt: "Kiteboarding and water sports along the Pranburi coast" },
+    kuiBuriNationalPark: { file: "kui-buri-national-park.jpg", alt: "Wild elephants grazing in Kui Buri National Park, Prachuap Khiri Khan" },
+    phrayaNakhonCave: { file: "phraya-nakhon-cave.jpg", alt: "Kuha Karuhas pavilion illuminated inside Phraya Nakhon Cave" },
+  },
 };
 
 export default function GuidePhoto({
   slot,
   guideSlug = "bangkok",
+  caption,
 }: {
   slot: string;
   guideSlug?: string;
+  caption?: string;
 }) {
   const guide = GUIDES[guideSlug];
   if (!guide) return null; // No entry for this guide — render nothing, never fall back to another guide's photos
@@ -263,16 +389,27 @@ export default function GuidePhoto({
   if (!meta) return null;
   return (
     <figure className="my-8 not-prose">
-      <div className={`relative w-full ${meta.portrait ? "aspect-[3/4]" : "aspect-[4/3]"} overflow-hidden rounded-2xl shadow-md`}>
+      <div className={`relative w-full ${meta.portrait ? "aspect-[3/4]" : meta.wide ? "aspect-[2/1]" : "aspect-[4/3]"} overflow-hidden rounded-2xl shadow-md`}>
         <Image
           src={`/guides/${guideSlug}/${meta.file}`}
-          alt={meta.alt}
+          alt={caption ?? meta.alt}
           fill
           sizes="(max-width: 768px) 100vw, 720px"
           className={meta.portrait ? "object-contain bg-slate-100" : "object-cover"}
         />
       </div>
-      <figcaption className="mt-2 text-xs text-slate-500 italic">{meta.alt}</figcaption>
+      <figcaption className="mt-2 text-xs text-slate-500 italic">
+        {caption ?? meta.alt}
+        {meta.credit && (
+          <span className="ml-1 not-italic">
+            — <a href={meta.credit.source} target="_blank" rel="noopener noreferrer" className="underline">{meta.credit.author}</a>
+            {meta.credit.license && meta.credit.licenseUrl && (
+              <> · <a href={meta.credit.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline">{meta.credit.license}</a></>
+            )}
+            {meta.credit.license?.startsWith("CC BY") && " · resized"}
+          </span>
+        )}
+      </figcaption>
     </figure>
   );
 }
