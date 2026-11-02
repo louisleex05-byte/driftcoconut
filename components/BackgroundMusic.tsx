@@ -38,7 +38,8 @@ export default function BackgroundMusic() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.volume = 0.14;
+    // The replacement file is already attenuated to a background level.
+    audio.volume = 0.8;
     audio.currentTime = 0;
     wantsMusicRef.current = true;
     setWantsMusic(true);
