@@ -23,8 +23,8 @@ export default function Hero() {
 
   return (
     <section className="relative -mt-6 sm:-mt-8 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
-      {/* Give mobile slides room for the image and keep desktop panoramic. */}
-      <div className="relative aspect-[3/4] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[550px] sm:min-h-[380px]">
+      {/* Show more of each rotating photo on wide screens while keeping mobile proportions. */}
+      <div className="relative aspect-[3/4] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[12/5] w-full min-h-[550px] sm:min-h-[380px] lg:min-h-[520px]">
         {HERO_PHOTOS.map((photo, i) => (
           <Image
             key={photo.src}
