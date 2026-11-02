@@ -23,8 +23,8 @@ export default function Hero() {
 
   return (
     <section className="relative -mt-6 sm:-mt-8 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
-      {/* Mobile hero is 20% taller; desktop keeps its panoramic proportions. */}
-      <div className="relative aspect-[10/9] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[456px] sm:min-h-[380px]">
+      {/* Give mobile slides room for the image and keep desktop panoramic. */}
+      <div className="relative aspect-[3/4] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[3/1] w-full min-h-[550px] sm:min-h-[380px]">
         {HERO_PHOTOS.map((photo, i) => (
           <Image
             key={photo.src}
@@ -66,16 +66,16 @@ export default function Hero() {
             <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-lg drop-shadow-md opacity-95 px-2">
               {t("hero_subtitle")}
             </p>
-            <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <div className="mt-4 flex flex-nowrap justify-center gap-2 sm:mt-5 sm:flex-wrap sm:gap-3">
               <Link
                 href={locale === "zh" ? "/zh/guides" : "/guides"}
-                className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-sea-800 shadow-md transition-colors hover:bg-sea-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="rounded-full bg-white/90 px-3 py-1.5 text-[10px] min-[360px]:text-xs sm:bg-white sm:px-5 sm:py-2.5 sm:text-sm font-semibold text-sea-800 shadow-md transition-colors hover:bg-sea-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 {t("hero_guides_cta")}
               </Link>
               <a
                 href="#search-form"
-                className="rounded-full border border-white/80 bg-slate-900/35 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-slate-900/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="rounded-full border border-white/70 bg-slate-900/25 px-3 py-1.5 text-[10px] min-[360px]:text-xs sm:border-white/80 sm:bg-slate-900/35 sm:px-5 sm:py-2.5 sm:text-sm font-semibold text-white shadow-md transition-colors hover:bg-slate-900/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 {t("hero_hotels_cta")}
               </a>
