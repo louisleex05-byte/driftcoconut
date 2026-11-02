@@ -464,6 +464,20 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
       },
     },
   },
+  "koh-lipe-satun": {
+    hero: { file: "hero.jpg", alt: "White sand and turquoise water on Koh Lipe" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Longtail boats along Pattaya Beach at dawn" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Shaded seating at a Koh Lipe beachfront resort", wide: true },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Longtail boat off Koh Lipe at dusk" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Fishing boats on the Pak Bara shoreline in Satun" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Sunset over the Pak Nam coast in Satun", wide: true },
+    activity: { file: "activity.jpg", alt: "Clownfish in an anemone near Koh Lipe" },
+    localTips: { file: "local-tips.jpg", alt: "Moonlit rocky beach on Koh Lipe", wide: true },
+    walkingStreet: { file: "walking-street.jpg", alt: "Walking Street on Koh Lipe", portrait: true },
+    lagoon: { file: "tropical-lagoon.jpg", alt: "Turquoise water between islands near Koh Lipe", wide: true },
+    adangView: { file: "koh-adang-view.jpg", alt: "Koh Lipe seen from a viewpoint on Koh Adang", wide: true },
+    pakBaraPier: { file: "pak-bara-pier.jpg", alt: "Passenger building at Pak Bara Ferry Pier" },
+  },
 };
 
 export default function GuidePhoto({
