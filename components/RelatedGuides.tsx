@@ -3,7 +3,7 @@ import Image from "next/image";
 import { listGuides } from "@/lib/guides";
 import { RELATED } from "@/lib/relatedGuides";
 
-/** "Keep exploring" block: links a guide to its natural next-stop guides. */
+/** Photo cards shown beneath each guide's related-destinations section. */
 export default async function RelatedGuides({
   slug,
   locale,
@@ -27,10 +27,7 @@ export default async function RelatedGuides({
   const prefix = locale === "zh" ? "/zh" : "";
 
   return (
-    <section className="mt-12 pt-8 border-t border-sea-100" aria-labelledby="keep-exploring">
-      <h2 id="keep-exploring" className="font-display text-xl font-semibold text-sea-800 mb-5">
-        {locale === "zh" ? "下一站去哪里？" : "Where to next?"}
-      </h2>
+    <section id="related-destination-cards" className="mt-6" aria-label={locale === "zh" ? "相关目的地指南" : "Related destination guides"}>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {guides.map((g) => (
           <Link
