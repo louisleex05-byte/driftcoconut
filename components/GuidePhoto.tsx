@@ -478,6 +478,22 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     adangView: { file: "koh-adang-view.jpg", alt: "Koh Lipe seen from a viewpoint on Koh Adang", wide: true },
     pakBaraPier: { file: "pak-bara-pier.jpg", alt: "Passenger building at Pak Bara Ferry Pier" },
   },
+  "koh-kood-trat": {
+    hero: { file: "hero.jpg", alt: "Ao Noi beach and turquoise water on Koh Kood" },
+    whenToGo: { file: "when-to-go.jpg", alt: "Fishing boats on the Gulf of Thailand near Koh Kood", wide: true, credit: { author: "Vyacheslav Argenberg", source: "https://commons.wikimedia.org/wiki/File:Koh_Kut,_Thailand,_Gulf_of_Thailand.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
+    klongChaoRiver: { file: "klong-chao-river.jpg", alt: "Khlong Chao river and mangroves on Koh Kood", wide: true },
+    bangBaoBeach: { file: "bang-bao-beach.jpg", alt: "Bang Bao Beach and jetty on Koh Kood", wide: true },
+    bangBaoPier: { file: "bang-bao-pier.jpg", alt: "Small jetty and boats in Bang Bao Bay", wide: true, credit: { author: "Vyacheslav Argenberg", source: "https://commons.wikimedia.org/wiki/File:Koh_Kut,_Thailand,_Bang_Bao_Pier.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
+    northBeach: { file: "north-beach.jpg", alt: "Beach at Soneva Kiri on Koh Kood", wide: true, credit: { author: "josef knecht", source: "https://commons.wikimedia.org/wiki/File:Ko_Kut,_Thailand,_Soneva_Kiri,_Beach_-_panoramio.jpg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
+    sandBank: { file: "sand-bank.jpg", alt: "Curving sand bank and boat off Koh Kood", wide: true, credit: { author: "Vyacheslav Argenberg", source: "https://commons.wikimedia.org/wiki/File:Koh_Kut,_Thailand,_Sand_bank.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
+    waterfall: { file: "waterfall.jpg", alt: "Khlong Chao Waterfall on Koh Kood", wide: true, credit: { author: "Stéphane Bidouze", source: "https://commons.wikimedia.org/wiki/File:Khlong_Chao_Waterfall.jpg", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/" } },
+    forestPool: { file: "forest-pool.jpg", alt: "Forest pool and waterfall on Koh Kood", wide: true },
+    aoYai: { file: "ao-yai.jpg", alt: "Stilt houses at Ao Yai fishing village", wide: true, credit: { author: "CosMapi", source: "https://commons.wikimedia.org/wiki/File:Ao-Yai-Fishing-village-Koh-kood.jpg", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/" } },
+    seafood: { file: "seafood.jpg", alt: "Seafood meal on Koh Kood", wide: true, credit: { author: "Vyacheslav Argenberg", source: "https://commons.wikimedia.org/wiki/File:Koh_Kut,_Thailand,_Thai_seafood.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
+    marineLife: { file: "marine-life.jpg", alt: "Nudibranch photographed underwater near Koh Kood", credit: { author: "Matthew Proud", source: "https://commons.wikimedia.org/wiki/File:A_Cheesecake_Nudibranch_(133036871).jpeg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
+    aoSalad: { file: "ao-salad.jpg", alt: "Ao Salad fishing village on Koh Kood", wide: true, credit: { author: "josef knecht", source: "https://commons.wikimedia.org/wiki/File:Ko_Kut,_Ban-Aosalad_-_panoramio_(5).jpg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
+    jungleBridge: { file: "jungle-bridge.jpg", alt: "Wooden bridge on a forest road on Koh Kood", portrait: true, credit: { author: "josef knecht", source: "https://commons.wikimedia.org/wiki/File:Ko_Kut,_Jungle-Bridge_-_panoramio.jpg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
+  },
 };
 
 export default function GuidePhoto({
