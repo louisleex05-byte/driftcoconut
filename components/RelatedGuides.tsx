@@ -15,10 +15,12 @@ export default async function RelatedGuides({
   const bySlug = new Map(all.map((g) => [g.slug, g]));
   const wanted = RELATED[slug] ?? [];
   const guides = wanted.map((s) => bySlug.get(s)).filter((g): g is NonNullable<typeof g> => !!g);
-  if (guides.length === 0) {
-    const country = bySlug.get(slug)?.destination.split(",").at(-1)?.trim();
-    const fallback = all.find((g) => g.slug !== slug && country && g.destination.endsWith(country));
-    if (fallback) guides.push(fallback);
+  const country = bySlug.get(slug)?.destination.split(",").at(-1)?.trim();
+  for (const guide of all) {
+    if (guides.length >= 3) break;
+    if (guide.slug !== slug && !guides.some((g) => g.slug === guide.slug) && country && guide.destination.endsWith(country)) {
+      guides.push(guide);
+    }
   }
   if (guides.length === 0) return null;
 
