@@ -166,7 +166,7 @@ function AutoFill-Metadata {
         $heroSlot = $heroSourceSlots | Where-Object { $_.slot -eq "hero" } | Select-Object -First 1
         if ($heroSlot) { $heroAltGuess = $heroSlot.alt }
     }
-    if (-not $heroAltGuess) { $heroAltGuess = "$dest landmark hero image" }
+    if (Test-IsPlaceholderAlt -Alt $heroAltGuess) { $heroAltGuess = "" }
 
     # Fill only if empty (unless Force)
     if ($Force -or -not $global:txtMetaTitle.Text)       { $global:txtMetaTitle.Text = $titleGuess }
@@ -730,16 +730,40 @@ $global:AutoImportedPresetCount = Import-PresetsFromGuidePhoto -RepoRoot $PSScri
 # AUTO-PRESET FROM DRAFT - derive slots from the MDX/markdown draft body
 # ===========================================================================
 # Scans the current draft for <GuidePhoto slot="..." /> tags and pulls context
-# from the nearest heading above each tag. Combined with the destination name
-# and the hero alt from the metadata section, this produces a ready-to-register
-# preset without going through the wizard. Ship-ready alt texts every time.
+# from named headings, nearby prose, or an explicit alt attribute. It refuses
+# prompt templates and missing subjects instead of inventing photo labels.
+function Test-IsGuideDraftBody {
+    param([string]$Text)
+    if ([string]::IsNullOrWhiteSpace($Text)) { return $false }
+    # The Notes tab can still contain the prompt sent to GPT. Its template
+    # headings must not be mistaken for a completed destination guide.
+    if ($Text -match '(?i)\bNow draft the guide\b|\bSTRUCTURE \(must follow exactly\)|\bYou are drafting a destination guide\b') {
+        return $false
+    }
+    $sections = [regex]::Matches($Text, '(?m)^##\s+[^#\r\n]+').Count
+    return $sections -ge 2 -and $Text.Length -ge 350
+}
+
+function Get-SpecificPhotoSubject {
+    param([string]$Text)
+    $subject = $Text -replace '\[([^\]]+)\]\([^\)]+\)', '$1' -replace '<[^>]+>', '' -replace '[*_`]', ''
+    $subject = $subject -replace '^\s*(?:\d+\.|[-•])\s*', '' -replace '\s+\[[^\]]+\]\s*$', ''
+    $subject = ($subject -split '[.!?;]')[0].Trim(' ', ':', '-', '–', '—')
+    if ($subject.Length -gt 90) { $subject = $subject.Substring(0, 90).TrimEnd() }
+    if ($subject.Length -lt 5 -or $subject -match '(?i)^(half.day|full.day|multi.day)(?:\s+excursions?)?$|^(?i:when to go|where to stay|things to do|local tips|quick facts|getting around|faq|related destinations|morning|afternoon|evening|night)$') {
+        return ""
+    }
+    if ($subject -match '^\[' -or $subject -match '(?i)\b(?:photo|image|placeholder|destination scene|travel guide)\b') { return "" }
+    return $subject
+}
+
 function Build-PresetFromDraft {
     param(
         [string]$DraftText,
         [string]$Destination,
         [string]$HeroAlt
     )
-    if (-not $DraftText -or -not $Destination) { return @() }
+    if (-not (Test-IsGuideDraftBody -Text $DraftText) -or -not $Destination) { return @() }
 
     $entries = @()
     $seenSlots = @{}
@@ -747,8 +771,8 @@ function Build-PresetFromDraft {
     # Normalise destination for alt-text prose (kebab -> spaced, title case)
     $destDisplay = (Get-Culture).TextInfo.ToTitleCase($Destination.ToLower().Replace('-', ' '))
 
-    # Hero always comes first. Reuse metadata only when it clearly belongs to
-    # this destination; otherwise generate a destination-specific value. This
+    # Reuse hero metadata only when it clearly belongs to this destination.
+    # Otherwise derive a named subject from the body. This
     # prevents a new guide from inheriting the previous guide's hero alt while
     # the slug/preset controls are changing (for example Pranburi receiving a
     # Chiang Mai / Doi Suthep description).
@@ -756,10 +780,8 @@ function Build-PresetFromDraft {
                         -not (Test-IsPlaceholderAlt -Alt $HeroAlt)) {
         $HeroAlt
     } else {
-        "$destDisplay signature landmark and destination hero shot at golden hour"
+        ""
     }
-    $entries += [pscustomobject]@{ slot="hero"; file="hero.jpg"; alt=$heroAltFinal }
-    $seenSlots["hero"] = $true
 
     $lines = $DraftText -split "`r?`n"
     $currentH2 = ""
@@ -780,41 +802,43 @@ function Build-PresetFromDraft {
         }
         # Match BOTH <GuidePhoto slot="xxx" /> AND <!-- PHOTO SLOT: xxx --> patterns
         $slot = $null
-        if ($line -match '<GuidePhoto\s+slot="([^"]+)"\s*/?\s*>') {
+        if ($line -match '<GuidePhoto\b[^>]*\bslot="([^"]+)"[^>]*>') {
             $slot = $matches[1]
         } elseif ($line -match '<!--\s*PHOTO\s+SLOT:\s*(\S+)\s*-->') {
             $slot = $matches[1]
         }
         if ($slot -and -not $seenSlots.ContainsKey($slot)) {
-            # Pick the deepest heading in scope
-            $context = if ($currentH3) { $currentH3 } elseif ($currentH2) { $currentH2 } else { "" }
+            # Prefer a named subheading; a generic section title alone is not
+            # a useful image search query.
+            $context = if ($currentH3) { Get-SpecificPhotoSubject $currentH3 } else { "" }
             # Also grab the first non-blank paragraph line above the tag for extra detail
             $prevLine = ""
             for ($k = $i - 1; $k -ge [Math]::Max(0, $i - 6); $k--) {
                 $L = $lines[$k].Trim()
                 if ($L -and -not $L.StartsWith('#') -and -not $L.StartsWith('<') -and -not $L.StartsWith('-') -and -not $L.StartsWith('*')) {
-                    # Take up to first 60 chars of the paragraph, no markdown syntax
-                    $clean = $L -replace '\[([^\]]+)\]\([^\)]+\)', '$1' -replace '[*_`]', ''
-                    if ($clean.Length -gt 60) { $clean = $clean.Substring(0, 57).TrimEnd() + "..." }
-                    $prevLine = $clean
+                    $prevLine = Get-SpecificPhotoSubject $L
                     break
                 }
             }
 
-            # Compose alt: Destination + heading + brief prose context
-            $altParts = @($destDisplay)
-            if ($context) { $altParts += $context }
-            if ($prevLine -and $prevLine.Length -gt 20) { $altParts += $prevLine }
-            $alt = ($altParts -join " - ") -replace '\s+', ' '
-            $alt = $alt.Trim()
-
-            # Guarantee it passes the Layer 2 placeholder detector (>= 25 chars, no template)
-            if ($alt.Length -lt 25) {
-                $alt = "$destDisplay $slot signature destination scene photo landmark"
+            $explicitAlt = ""
+            if ($line -match '\balt="([^"]+)"') { $explicitAlt = Get-SpecificPhotoSubject $matches[1] }
+            # A named slot can identify its own subject when the same words
+            # appear near the tag. Generic slots must match the current section.
+            $slotSubject = ""
+            if ($slot -notmatch '^(?i:hero|whenToGo|activity|localTips|neighborhood\d+|landmark|localFood|transport|sunset)$') {
+                $slotWords = [regex]::Replace($slot, '([a-z])([A-Z])', '$1 $2') -replace '[-_]', ' '
+                $nearby = ($lines[[Math]::Max(0, $i - 12)..[Math]::Min($lines.Count - 1, $i + 12)] -join ' ')
+                if ($nearby -match [regex]::Escape($slotWords)) { $slotSubject = $slotWords }
             }
-            if (Test-IsPlaceholderAlt -Alt $alt) {
-                $alt = "$destDisplay $context signature destination photo scene"
-            }
+            $sectionFits = ($slot -match '^neighborhood\d+$' -and $currentH2 -match '(?i)^Where to stay') -or
+                           ($slot -eq 'activity' -and $currentH2 -match '(?i)^Things to do') -or
+                           ($slot -eq 'whenToGo' -and $currentH2 -match '(?i)^When to go') -or
+                           ($slot -eq 'localTips' -and $currentH2 -match '(?i)^Local tips')
+            $proseHasPlace = $prevLine -match '(?i)\b(?:Wat|Khao|Koh|Ko|Ban|Baan|Ao|Doi|Phu|Mae|Nong|Chiang|beach|bay|river|temple|market|museum|island|waterfall|village|Songkran)\b'
+            $subject = if ($explicitAlt) { $explicitAlt } elseif ($slotSubject) { $slotSubject } elseif ($context -and $sectionFits) { $context } elseif ($prevLine -and $proseHasPlace -and ($sectionFits -or $slot -notmatch '^(?i:whenToGo|localTips|activity)$')) { $prevLine } else { "" }
+            if (-not $subject) { continue }
+            $alt = "$subject, $destDisplay"
 
             $file = ([regex]::Replace($slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
             $entries += [pscustomobject]@{ slot=$slot; file=$file; alt=$alt }
@@ -823,103 +847,63 @@ function Build-PresetFromDraft {
     }
 
     # -----------------------------------------------------------------------
-    # FALLBACK: if the draft has no <GuidePhoto> or <!-- PHOTO SLOT --> tags,
-    # auto-generate a standard 8-slot preset from the draft's ## / ### headings.
-    # This guarantees + New Preset NEVER produces REPLACE-ME markers.
+    # FALLBACK: a guide without photo tags can still suggest subjects from
+    # named accommodation headings and numbered activities. Do not pad to
+    # eight with invented landmarks, food, transport or sunsets.
     # -----------------------------------------------------------------------
-    if ($entries.Count -le 1) {
+    if ($entries.Count -eq 0 -and $DraftText -notmatch '<GuidePhoto\b|<!--\s*PHOTO\s+SLOT:') {
         # Keep neighborhood slots tied to headings under "Where to stay". The
         # previous fallback reused arbitrary H3 headings and produced duplicate,
         # truncated slot names for new guides.
-        $h2List = @()
-        $h3List = @()
+        $activities = @()
         $whereToStayH3 = @()
         $fallbackH2 = ""
         foreach ($line in $lines) {
             if ($line -match '^##\s+([^#].+)$') {
                 $fallbackH2 = $matches[1].Trim()
-                $h2List += $fallbackH2
             } elseif ($line -match '^###\s+(.+)$') {
-                $h3 = $matches[1].Trim() -replace '^\s*(Full-day|Half-day|Multi-day|Morning|Afternoon|Evening|Night)\s*:\s*', ''
-                $h3List += $h3
-                if ($fallbackH2 -match '(?i)^Where to stay\b') { $whereToStayH3 += $h3 }
+                $h3 = Get-SpecificPhotoSubject $matches[1].Trim()
+                if ($h3 -and $fallbackH2 -match '(?i)^Where to stay\b') { $whereToStayH3 += $h3 }
+                if ($h3 -and $fallbackH2 -match '(?i)^Things to do\b') { $activities += $h3 }
+            } elseif ($fallbackH2 -match '(?i)^Things to do\b' -and $line -match '^\s*\d+\.\s+(.+)$') {
+                $activity = Get-SpecificPhotoSubject $matches[1]
+                if ($activity) { $activities += $activity }
             }
         }
-
-        # Standard slots derived from headings
-        $slotMap = [ordered]@{
-            "whenToGo"      = "When to go"
-            "neighborhood1" = ""
-            "neighborhood2" = ""
-            "neighborhood3" = ""
-            "neighborhood4" = ""
-            "activity"      = "Things to do"
-            "localTips"     = "Local tips"
+        $activities = @($activities | Select-Object -Unique)
+        if (-not $heroAltFinal -and $activities.Count -gt 0) {
+            $heroAltFinal = "$($activities[0]), $destDisplay"
         }
-        # Fill neighborhood slots from ### headings (typically area names under "Where to stay")
+        if (-not $heroAltFinal -and $whereToStayH3.Count -gt 0) {
+            $heroAltFinal = "$($whereToStayH3[0]), $destDisplay"
+        }
+
         $neighborIdx = 1
-        $usedFallbackHeadings = @{}
         foreach ($h3 in $whereToStayH3) {
             if ($neighborIdx -gt 4) { break }
-            # Skip generic headings that aren't neighborhood names
-            if ($h3 -match '^(Half-day|Full-day|Multi-day|FAQ|Related)') { continue }
             $slotKey = "neighborhood$neighborIdx"
             if (-not $seenSlots.ContainsKey($slotKey)) {
-                $alt = "$destDisplay $h3 area neighborhood and accommodation options"
-                if ($alt.Length -lt 25) { $alt = "$destDisplay $h3 destination area photo landmark scene" }
                 $file = "neighborhood$neighborIdx.jpg"
-                $entries += [pscustomobject]@{ slot=$slotKey; file=$file; alt=$alt }
+                $entries += [pscustomobject]@{ slot=$slotKey; file=$file; alt="$h3, $destDisplay" }
                 $seenSlots[$slotKey] = $true
-                $usedFallbackHeadings[$h3] = $true
                 $neighborIdx++
             }
         }
-
-        # Fill remaining standard slots
-        foreach ($slotKey in $slotMap.Keys) {
-            if ($seenSlots.ContainsKey($slotKey)) { continue }
-            $context = $slotMap[$slotKey]
-            if (-not $context) { continue }
-            $alt = "$destDisplay $context scenic view and travel destination photo"
-            if ($alt.Length -lt 25) { $alt = "$destDisplay $slotKey signature destination scene photo landmark" }
-            $file = ([regex]::Replace($slotKey, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
-            $entries += [pscustomobject]@{ slot=$slotKey; file=$file; alt=$alt }
-            $seenSlots[$slotKey] = $true
-        }
-
-        # Fill remaining slots from unused H3 headings to reach 8 total
-        $extraIdx = 0
-        foreach ($h3 in $h3List) {
+        $activityIdx = 1
+        foreach ($subject in $activities) {
             if ($entries.Count -ge 8) { break }
-            if ($usedFallbackHeadings.ContainsKey($h3)) { continue }
-            $slotNameRaw = [regex]::Replace($h3, '[^a-zA-Z0-9]', '')
-            if (-not $slotNameRaw) { continue }
-            $slotName = $slotNameRaw.Substring(0, 1).ToLowerInvariant() + $slotNameRaw.Substring(1)
-            if ($slotName.Length -lt 3) { continue }
-            # Truncate overly long slot names
-            if ($slotName.Length -gt 20) { $slotName = $slotName.Substring(0, 20) }
-            if ($seenSlots.ContainsKey($slotName)) { continue }
-            $alt = "$destDisplay $h3 travel destination scene and local atmosphere"
-            $file = ([regex]::Replace($slotName, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
-            $entries += [pscustomobject]@{ slot=$slotName; file=$file; alt=$alt }
-            $seenSlots[$slotName] = $true
-            $extraIdx++
+            if ($heroAltFinal -eq "$subject, $destDisplay") { continue }
+            $slotKey = if ($activityIdx -eq 1) { 'activity' } else { "activity$activityIdx" }
+            $entries += [pscustomobject]@{ slot=$slotKey; file="$slotKey.jpg"; alt="$subject, $destDisplay" }
+            $activityIdx++
         }
+    }
 
-        # If still under 8, pad with generic but descriptive slots
-        $padSlots = @(
-            @{ slot="landmark";  alt="$destDisplay iconic landmark and historical architecture photo" },
-            @{ slot="localFood"; alt="$destDisplay local street food market and regional cuisine dishes" },
-            @{ slot="transport"; alt="$destDisplay local transport and getting around the destination" },
-            @{ slot="sunset";    alt="$destDisplay scenic sunset view over the destination landscape" }
-        )
-        foreach ($p in $padSlots) {
-            if ($entries.Count -ge 8) { break }
-            if ($seenSlots.ContainsKey($p.slot)) { continue }
-            $file = ([regex]::Replace($p.slot, '([a-z])([A-Z])', '$1-$2')).ToLower() + '.jpg'
-            $entries += [pscustomobject]@{ slot=$p.slot; file=$file; alt=$p.alt }
-            $seenSlots[$p.slot] = $true
-        }
+    if (-not $heroAltFinal -and $entries.Count -gt 0) {
+        $heroAltFinal = $entries[0].alt
+    }
+    if ($heroAltFinal) {
+        $entries = @([pscustomobject]@{ slot='hero'; file='hero.jpg'; alt=$heroAltFinal }) + @($entries)
     }
 
     return $entries
@@ -1029,6 +1013,13 @@ $global:PlaceholderAltPatterns = @(
     '^Second neighborhood',
     '^Signature (activity|local food)',
     '^REPLACE[- ]?ME',
+    '\blandmark hero image\b',
+    '\bsignature destination (?:photo|scene)\b',
+    '\bscenic view and travel destination photo\b',
+    '\biconic landmark and historical architecture photo\b',
+    '\blocal street food market and regional cuisine dishes\b',
+    '\blocal transport and getting around the destination\b',
+    '\bscenic sunset view over the destination landscape\b',
     '\bmain destination shot\b',
     '\bfestival, weather, or key event\b',
     '\bdescription$'
@@ -2610,14 +2601,23 @@ $btnAutoPreset.Add_Click({
         [System.Windows.Forms.MessageBox]::Show("Set the Destination on Tab 1 first.", "Missing destination", 'OK', 'Warning') | Out-Null
         return
     }
-    if (-not $draftText) {
-        [System.Windows.Forms.MessageBox]::Show("No draft body found on Tab 2. Auto Preset derives slots from <GuidePhoto> tags in your draft.", "Missing draft", 'OK', 'Warning') | Out-Null
+    if (-not (Test-IsGuideDraftBody -Text $draftText)) {
+        [System.Windows.Forms.MessageBox]::Show("Tab 2 needs the finished guide prose. It currently has no usable guide body (a GPT prompt or notes cannot supply real photo subjects). Paste the drafted guide with named places, then run Auto Preset again.", "Finished draft needed", 'OK', 'Warning') | Out-Null
         return
     }
 
     $entries = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
     if ($entries.Count -lt 2) {
-        [System.Windows.Forms.MessageBox]::Show("Draft has no <GuidePhoto slot=`"...`" /> tags. Add them to your draft body first, or use + New Preset.", "No slots found", 'OK', 'Warning') | Out-Null
+        [System.Windows.Forms.MessageBox]::Show("No specific photo subjects found. Add named place headings or numbered Things to do entries, or add <GuidePhoto slot=`"...`" alt=`"specific place`" /> beside the relevant prose.", "No grounded photo labels", 'OK', 'Warning') | Out-Null
+        return
+    }
+    $draftSlots = [regex]::Matches($draftText, '<GuidePhoto\b[^>]*\bslot="([^"]+)"|<!--\s*PHOTO\s+SLOT:\s*(\S+)\s*-->')
+    $missingSuggestions = @($draftSlots | ForEach-Object {
+        $name = if ($_.Groups[1].Success) { $_.Groups[1].Value } else { $_.Groups[2].Value }
+        if ($name -ne 'hero' -and -not ($entries | Where-Object { $_.slot -eq $name })) { $name }
+    } | Select-Object -Unique)
+    if ($missingSuggestions.Count -gt 0) {
+        [System.Windows.Forms.MessageBox]::Show("These photo slots still need a named subject or explicit alt next to the tag: $($missingSuggestions -join ', '). Auto Preset will not register incomplete labels.", "Photo subjects needed", 'OK', 'Warning') | Out-Null
         return
     }
 
@@ -2777,7 +2777,8 @@ function Sync-PhotoSlotRows {
 
         # Truncate alt text for inline preview - keeps rows readable at a glance
         # while the full alt shows in the tooltip on hover.
-        $altPreview = $slot.alt
+        $needsSubject = Test-IsPlaceholderAlt -Alt $slot.alt
+        $altPreview = if ($needsSubject) { "Add named place in Tab 2" } else { $slot.alt }
         if ($altPreview.Length -gt 40) { $altPreview = $altPreview.Substring(0, 37).TrimEnd() + "..." }
 
         $lblSlot = New-Object System.Windows.Forms.Label
@@ -2788,7 +2789,7 @@ function Sync-PhotoSlotRows {
         $lblSlot.Tag = "photorow:$($slot.slot)"
         $global:panelPublish.Controls.Add($lblSlot)
         $global:PhotoLabels[$slot.slot] = $lblSlot
-        $global:PhotoRowTooltip.SetToolTip($lblSlot, "Search query for this slot:`n`n$($slot.alt)")
+        $global:PhotoRowTooltip.SetToolTip($lblSlot, $(if ($needsSubject) { "Add a named place in the draft and click Auto Preset." } else { "Search query for this slot:`n`n$($slot.alt)" }))
 
         # Alt-text preview label - shows a truncated version of what Search will use
         $lblAltPreview = New-Object System.Windows.Forms.Label
@@ -2799,7 +2800,7 @@ function Sync-PhotoSlotRows {
         $lblAltPreview.ForeColor = [System.Drawing.Color]::FromArgb(110, 130, 145)
         $lblAltPreview.Tag = "photorow:$($slot.slot)"
         $global:panelPublish.Controls.Add($lblAltPreview)
-        $global:PhotoRowTooltip.SetToolTip($lblAltPreview, "Full alt text (used as Search query):`n`n$($slot.alt)")
+        $global:PhotoRowTooltip.SetToolTip($lblAltPreview, $(if ($needsSubject) { "No specific place is available yet. Paste the finished draft into Tab 2, then click Auto Preset." } else { "Full alt text (used as Search query):`n`n$($slot.alt)" }))
 
         $txtPath = New-Object System.Windows.Forms.TextBox
         $txtPath.Location = New-Object System.Drawing.Point(170, $y)
@@ -2807,13 +2808,14 @@ function Sync-PhotoSlotRows {
         $txtPath.Tag = "photorow:$($slot.slot)"
         $global:panelPublish.Controls.Add($txtPath)
         $global:PhotoRows[$slot.slot] = $txtPath
-        $global:PhotoAlts[$slot.slot] = $slot.alt
+        $global:PhotoAlts[$slot.slot] = if ($needsSubject) { "" } else { $slot.alt }
 
         $btnSearch = New-Object System.Windows.Forms.Button
         $btnSearch.Text = "Search"
         $btnSearch.Location = New-Object System.Drawing.Point(650, ($y - 1))
         $btnSearch.Size = New-Object System.Drawing.Size(70, 24)
         $btnSearch.Tag = "photorow:$($slot.slot)"
+        $btnSearch.Enabled = -not $needsSubject
         $slotKey = $slot.slot  # capture for closure
         $btnSearch.Add_Click({
             $source = $global:cmbPhotoSource.SelectedItem
@@ -2848,6 +2850,7 @@ function Sync-PhotoSlotRows {
         $btnCopyAlt.Location = New-Object System.Drawing.Point(795, ($y - 1))
         $btnCopyAlt.Size = New-Object System.Drawing.Size(70, 24)
         $btnCopyAlt.Tag = "photorow:$($slot.slot)"
+        $btnCopyAlt.Enabled = -not $needsSubject
         $slotKey3 = $slot.slot
         $btnCopyAlt.Add_Click({
             [System.Windows.Forms.Clipboard]::SetText($global:PhotoAlts[$slotKey3])
@@ -3092,6 +3095,13 @@ $btnPublishMDX.Add_Click({
         $global:progressPublish.Visible = $false
         return
     }
+    $placeholderSlots = @(Test-EntriesHavePlaceholders -Entries $global:PhotoSlots)
+    if ($placeholderSlots.Count -gt 0) {
+        $global:lblPublishStatus.Text = "[ABORT] Photo labels still lack specific places: $($placeholderSlots -join ', '). Add the finished guide prose on Tab 2 and run Auto Preset before preparing."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        $global:progressPublish.Visible = $false
+        return
+    }
 
     $global:lblPublishStatus.Text = "Preparing $slug locally on branch '$branchName'..."
     [System.Windows.Forms.Application]::DoEvents()
@@ -3169,6 +3179,14 @@ $global:btnTabPublish.Add_Click( {
                 -not $global:txtMetaDestination.Text -and `
                 -not $global:txtMetaHeroAlt.Text
     if ($allEmpty) { AutoFill-Metadata }
+    $draftBody = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+    if (-not (Test-IsGuideDraftBody -Text $draftBody)) {
+        $global:lblPublishStatus.Text = "Photo labels need the finished Tab 2 guide prose. The current text is empty or still a drafting prompt; generic preset labels cannot identify real places."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+    } elseif ($global:PhotoSlots -and @($global:PhotoSlots | Where-Object { Test-IsPlaceholderAlt -Alt $_.alt }).Count -gt 0) {
+        $global:lblPublishStatus.Text = "This preset still has generic photo labels. Click Auto Preset to derive named subjects from the Tab 2 draft and refresh the sidebar."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+    }
 }.GetNewClosure())
 Set-ActiveTab "research"
 
