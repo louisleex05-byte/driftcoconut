@@ -823,20 +823,30 @@ function Build-PresetFromDraft {
 
             $explicitAlt = ""
             if ($line -match '\balt="([^"]+)"') { $explicitAlt = Get-SpecificPhotoSubject $matches[1] }
+            $numberedActivity = ""
+            if ($currentH2 -match '(?i)^Things to do') {
+                for ($k = $i - 1; $k -ge [Math]::Max(0, $i - 15); $k--) {
+                    if ($lines[$k] -match '^##\s+') { break }
+                    if ($lines[$k] -match '^\s*\d+\.\s+(.+)$') {
+                        $numberedActivity = Get-SpecificPhotoSubject $matches[1]
+                        break
+                    }
+                }
+            }
             # A named slot can identify its own subject when the same words
             # appear near the tag. Generic slots must match the current section.
             $slotSubject = ""
-            if ($slot -notmatch '^(?i:hero|whenToGo|activity|localTips|neighborhood\d+|landmark|localFood|transport|sunset)$') {
+            if ($slot -notmatch '^(?i:hero|whenToGo|activity\d*|localTips|neighborhood\d+|landmark|localFood|transport|sunset)$') {
                 $slotWords = [regex]::Replace($slot, '([a-z])([A-Z])', '$1 $2') -replace '[-_]', ' '
                 $nearby = ($lines[[Math]::Max(0, $i - 12)..[Math]::Min($lines.Count - 1, $i + 12)] -join ' ')
                 if ($nearby -match [regex]::Escape($slotWords)) { $slotSubject = $slotWords }
             }
             $sectionFits = ($slot -match '^neighborhood\d+$' -and $currentH2 -match '(?i)^Where to stay') -or
-                           ($slot -eq 'activity' -and $currentH2 -match '(?i)^Things to do') -or
+                           ($slot -match '^activity\d*$' -and $currentH2 -match '(?i)^Things to do') -or
                            ($slot -eq 'whenToGo' -and $currentH2 -match '(?i)^When to go') -or
                            ($slot -eq 'localTips' -and $currentH2 -match '(?i)^Local tips')
             $proseHasPlace = $prevLine -match '(?i)\b(?:Wat|Khao|Koh|Ko|Ban|Baan|Ao|Doi|Phu|Mae|Nong|Chiang|beach|bay|river|temple|market|museum|island|waterfall|village|Songkran)\b'
-            $subject = if ($explicitAlt) { $explicitAlt } elseif ($slotSubject) { $slotSubject } elseif ($context -and $sectionFits) { $context } elseif ($prevLine -and $proseHasPlace -and ($sectionFits -or $slot -notmatch '^(?i:whenToGo|localTips|activity)$')) { $prevLine } else { "" }
+            $subject = if ($explicitAlt) { $explicitAlt } elseif ($slotSubject) { $slotSubject } elseif ($numberedActivity -and $slot -match '^activity\d*$') { $numberedActivity } elseif ($context -and $sectionFits) { $context } elseif ($prevLine -and $proseHasPlace -and ($sectionFits -or $slot -notmatch '^(?i:whenToGo|localTips|activity\d*)$')) { $prevLine } else { "" }
             if (-not $subject) { continue }
             $alt = "$subject, $destDisplay"
 
@@ -1667,11 +1677,11 @@ STRUCTURE (must follow exactly):
 [~300 words. Month-by-month weather + tourism + price patterns. Include specific festival dates from research.]
 
 ## Where to stay
-[~500 words. Cover 4 neighborhoods. For each: character sentence, who it suits, USD price range, 2 named hotels from research, walkable landmarks, nearest transport. End each neighborhood with a natural sentence like:
+[~500 words. Cover 4 neighborhoods. Give each a ### heading naming the actual area or landmark. For each: character sentence, who it suits, USD price range, 2 named hotels from research, walkable landmarks, nearest transport. Put <GuidePhoto slot="neighborhood1" /> directly after the first neighborhood's description, then use neighborhood2, neighborhood3, and neighborhood4 for the next three. Each tag must sit by prose that names its specific place. End each neighborhood with a natural sentence like:
 -> <AffiliateLink type="booking" query="{Neighborhood} $Destination">Browse {neighborhood} hotels on Booking.com</AffiliateLink>]
 
 ## Things to do
-[~400 words. 8 activities organized as: half-day, full-day, multi-day excursions. Name each, describe in 2-3 sentences with cost. For any organized tour, wrap with:
+[~400 words. 8 activities organized as: half-day, full-day, multi-day excursions. Number each activity and start its first sentence with the specific place or event name. Describe each in 2-3 sentences with cost. Put <GuidePhoto slot="activity" /> after the first named activity, then activity2 and activity3 after two other distinct named activities. Do not add a tag unless the nearby prose identifies a real photo subject. For any organized tour, wrap with:
 <AffiliateLink type="klook" query="{Activity} $Destination">book the {activity} on Klook</AffiliateLink>]
 
 ## Getting around
