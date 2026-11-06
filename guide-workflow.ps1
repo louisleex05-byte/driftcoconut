@@ -2486,6 +2486,12 @@ $btnSaveDraft.Add_Click({
     $finalPath = Join-Path $dir "final.md"
     $text = $global:txtDraft.Text
 
+    if (-not (Test-IsGuideDraftBody -Text $text)) {
+        $global:lblDraftStatus.Text = "SAVE DRAFT stopped: Tab 2 still contains a prompt, notes, or an incomplete guide. Paste the finished guide prose before saving final.md."
+        $global:lblDraftStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        return
+    }
+
     Set-Content -Path $draftPath -Value $text -Encoding UTF8
     Set-Content -Path $finalPath -Value $text -Encoding UTF8
 
@@ -3000,6 +3006,11 @@ $btnAssembleMDX.Add_Click({
         return
     }
     $body = Get-Content $srcPath -Raw
+    if (-not (Test-IsGuideDraftBody -Text $body)) {
+        $global:lblPublishStatus.Text = "[ABORT] $srcPath is a drafting prompt or incomplete guide, not publishable prose. Paste the finished guide into Tab 2 and save it first."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        return
+    }
 
     # --- FIX PASS baked in ---
     # 1) Repair mojibake (UTF-8 misinterpreted as Latin-1) if present in the pasted draft
