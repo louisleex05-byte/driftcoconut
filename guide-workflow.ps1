@@ -763,7 +763,7 @@ function Build-PresetFromDraft {
         [string]$Destination,
         [string]$HeroAlt
     )
-    if (-not (Test-IsGuideDraftBody -Text $DraftText) -or -not $Destination) { return @() }
+    if (-not (Test-DraftMatchesDestination -DraftText $DraftText -Destination $Destination)) { return @() }
 
     $entries = @()
     $seenSlots = @{}
@@ -1094,11 +1094,59 @@ function Test-HeroAltMatchesDestination {
     # Mae Hong Son, Chiang Mai, and hyphenated slugs without fuzzy matching.
     $place = ($Destination -split ',')[0].Trim().ToLower().Replace('-', ' ')
     $alt = $HeroAlt.ToLower()
-    $tokens = $place -split '[^a-z0-9]+' | Where-Object { $_.Length -ge 3 -and $_ -notin @('koh', 'ko', 'ban') }
+    $tokens = $place -split '[^a-z0-9]+' | Where-Object { $_.Length -ge 3 -and $_ -notin @('koh', 'ko', 'ban', 'khao', 'chiang', 'mae', 'nakhon') }
     foreach ($token in $tokens) {
-        if ($alt.Contains($token)) { return $true }
+        if ($alt -match "\b$([regex]::Escape($token))\b") { return $true }
     }
     return $false
+}
+
+# The first part of a finished draft must identify its selected guide. This
+# stops an old Tab 2 draft from generating convincing-looking labels for a new
+# slug merely because Build-PresetFromDraft appends that slug to every alt.
+function Test-DraftMatchesDestination {
+    param([string]$DraftText, [string]$Destination)
+    if (-not (Test-IsGuideDraftBody -Text $DraftText) -or -not $Destination) { return $false }
+    $body = $DraftText -replace '(?s)^---\s*\r?\n.*?\r?\n---\s*\r?\n', ''
+    $opening = $body.Substring(0, [Math]::Min(3500, $body.Length))
+    $place = ($Destination -split ',')[0].ToLower().Replace('-', ' ')
+    $tokens = @($place -split '[^a-z0-9]+' | Where-Object {
+        $_.Length -ge 3 -and $_ -notin @('koh', 'ko', 'ban', 'khao', 'chiang', 'mae', 'nakhon')
+    })
+    foreach ($token in $tokens) {
+        if ($opening -match "(?i)\b$([regex]::Escape($token))\b") { return $true }
+    }
+    return $false
+}
+
+function Get-GuideDraftText {
+    param([string]$Slug)
+    if (-not $Slug) { return "" }
+    $destination = Get-GuidePlaceNameFromSlug $Slug
+    $visible = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+    if (Test-DraftMatchesDestination -DraftText $visible -Destination $destination) { return $visible }
+    $savedPath = Join-Path $global:DraftsRoot "$Slug/draft.md"
+    if (Test-Path $savedPath) {
+        $saved = [System.IO.File]::ReadAllText($savedPath)
+        if (Test-DraftMatchesDestination -DraftText $saved -Destination $destination) { return $saved }
+    }
+    return ""
+}
+
+# Check the actual labels at the file-write boundary. A descriptive caption
+# about another guide is still wrong, even when it passes placeholder checks.
+function Get-PresetDestinationError {
+    param([string]$Slug, [array]$Entries)
+    $destination = Get-GuidePlaceNameFromSlug $Slug
+    $hero = @($Entries | Where-Object { $_.slot -eq 'hero' } | Select-Object -First 1)
+    if ($hero.Count -eq 0 -or -not (Test-HeroAltMatchesDestination -HeroAlt $hero[0].alt -Destination $destination)) {
+        return "The hero label does not name '$destination'. Check the guide slug and photo subject."
+    }
+    $matching = @($Entries | Where-Object { Test-HeroAltMatchesDestination -HeroAlt $_.alt -Destination $destination })
+    if ($matching.Count -lt [Math]::Ceiling($Entries.Count / 2)) {
+        return "Only $($matching.Count) of $($Entries.Count) labels name '$destination'. Check for captions carried over from another guide."
+    }
+    return ""
 }
 
 function Test-EntriesHavePlaceholders {
@@ -1252,6 +1300,11 @@ function Append-GuideToTsx {
                   error = "Refused to write placeholder alt texts for slots: $($badSlots -join ', '). Fill in real descriptive alt texts for each slot before saving. The wizard defaults are intentionally invalid and must be replaced." }
     }
 
+    $destinationError = Get-PresetDestinationError -Slug $Slug -Entries $Entries
+    if ($destinationError) {
+        return @{ ok = $false; error = "Refused to write preset '$Slug': $destinationError" }
+    }
+
     # === Existing-preset overwrite check ===
     # If the slug already has real content in GuidePhoto.tsx, refuse unless -Force.
     # Blocks the recurring bug where re-clicking + New Preset clobbers good data.
@@ -1396,7 +1449,9 @@ function Show-NewGuidePresetDialog {
         }
         $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
         if ($status.exists -and $status.hasRealContent) {
-            $lblWarn.Text = "WARNING: '$slug' already exists in GuidePhoto.tsx with real content. Saving will REQUIRE overwrite confirmation. Edit the file directly if you're just tweaking one alt text."
+            $loaded = if ($global:PhotoSlotPresets.Contains($slug)) { $global:PhotoSlotPresets[$slug] } else { @() }
+            $destinationError = if ($loaded.Count -gt 0) { Get-PresetDestinationError -Slug $slug -Entries $loaded } else { "" }
+            $lblWarn.Text = if ($destinationError) { "WARNING: Saved '$slug' labels appear mismatched. Rebuild from the correct draft before overwriting." } else { "WARNING: '$slug' already has saved labels. Saving requires overwrite confirmation." }
             $lblWarn.ForeColor = [System.Drawing.Color]::Firebrick
             $btnOK.Text = "OVERWRITE existing preset"
             $btnOK.BackColor = [System.Drawing.Color]::FromArgb(180, 60, 60)
@@ -1449,12 +1504,14 @@ function Show-NewGuidePresetDialog {
         }
 
         $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
-        if ($status.exists -and $status.hasRealContent -and $global:PhotoSlotPresets.Contains($slug)) {
+        $savedEntries = if ($global:PhotoSlotPresets.Contains($slug)) { $global:PhotoSlotPresets[$slug] } else { @() }
+        if ($status.exists -and $status.hasRealContent -and $savedEntries.Count -gt 0 -and
+            -not (Get-PresetDestinationError -Slug $slug -Entries $savedEntries)) {
             $lines = @()
-            foreach ($e in $global:PhotoSlotPresets[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
+            foreach ($e in $savedEntries) { $lines += "$($e.slot) | $($e.alt)" }
             $tPairs.Text = ($lines -join "`r`n")
         } else {
-            $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+            $draftText = Get-GuideDraftText -Slug $slug
             $destination = Get-GuidePlaceNameFromSlug $slug
             $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
             $entries = @(Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt)
@@ -1520,6 +1577,12 @@ function Show-NewGuidePresetDialog {
             [System.Windows.Forms.MessageBox]::Show(
                 "These slots still have placeholder / REPLACE-ME / too-short alt texts:`n`n  $($bad -join "`n  ")`n`nWrite a real descriptive alt text (20+ characters, no template phrases) for each before saving.",
                 "Placeholder alt text detected", 'OK', 'Warning') | Out-Null
+            continue
+        }
+
+        $destinationError = Get-PresetDestinationError -Slug $slug -Entries $entries
+        if ($destinationError) {
+            [System.Windows.Forms.MessageBox]::Show($destinationError, "Photo labels belong to another guide", 'OK', 'Warning') | Out-Null
             continue
         }
 
@@ -2023,7 +2086,7 @@ $txtHeaderSlug.Add_TextChanged({
 
             # Fallback: derive from draft body
             if (-not $autoEntries -or $autoEntries.Count -lt 2) {
-                $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+                $draftText = Get-GuideDraftText -Slug $raw
                 $destination = Get-GuidePlaceNameFromSlug $raw
                 $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
                 if ($draftText -and $destination) {
@@ -2525,6 +2588,12 @@ $btnSaveDraft.Add_Click({
         $global:lblDraftStatus.ForeColor = [System.Drawing.Color]::Firebrick
         return
     }
+    $destination = Get-GuidePlaceNameFromSlug $global:CurrentSlug
+    if (-not (Test-DraftMatchesDestination -DraftText $text -Destination $destination)) {
+        $global:lblDraftStatus.Text = "SAVE DRAFT stopped: the prose does not identify '$destination' near its opening. Check the Guide slug or load the matching destination draft. Existing draft.md and final.md were not changed."
+        $global:lblDraftStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        return
+    }
 
     Set-Content -Path $draftPath -Value $text -Encoding UTF8
     Set-Content -Path $finalPath -Value $text -Encoding UTF8
@@ -2629,7 +2698,7 @@ $btnAutoPreset.FlatStyle = "Flat"
 $btnAutoPreset.BackColor = [System.Drawing.Color]::FromArgb(180, 130, 40)
 $btnAutoPreset.ForeColor = [System.Drawing.Color]::White
 $btnAutoPreset.Add_Click({
-    $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
+    $draftText = Get-GuideDraftText -Slug $slug
     $slug = $global:CurrentSlug
     $destination = Get-GuidePlaceNameFromSlug $slug
     $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
@@ -2638,8 +2707,8 @@ $btnAutoPreset.Add_Click({
         [System.Windows.Forms.MessageBox]::Show("Set the Guide slug first (top-left field on Tab 3).", "Missing slug", 'OK', 'Warning') | Out-Null
         return
     }
-    if (-not (Test-IsGuideDraftBody -Text $draftText)) {
-        [System.Windows.Forms.MessageBox]::Show("Tab 2 needs the finished guide prose. It currently has no usable guide body (a GPT prompt or notes cannot supply real photo subjects). Paste the drafted guide with named places, then run Auto Preset again.", "Finished draft needed", 'OK', 'Warning') | Out-Null
+    if (-not $draftText) {
+        [System.Windows.Forms.MessageBox]::Show("No finished draft matching '$slug' is available. Load or paste that guide's draft on Tab 2 and save it before building photo labels.", "Matching draft needed", 'OK', 'Warning') | Out-Null
         return
     }
 
@@ -3055,6 +3124,12 @@ $btnAssembleMDX.Add_Click({
     $body = Get-Content $srcPath -Raw
     if (-not (Test-IsGuideDraftBody -Text $body)) {
         $global:lblPublishStatus.Text = "[ABORT] $srcPath is a drafting prompt or incomplete guide, not publishable prose. Paste the finished guide into Tab 2 and save it first."
+        $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
+        return
+    }
+    $destination = Get-GuidePlaceNameFromSlug $global:CurrentSlug
+    if (-not (Test-DraftMatchesDestination -DraftText $body -Destination $destination)) {
+        $global:lblPublishStatus.Text = "[ABORT] $srcPath does not identify '$destination' near its opening. Check the Guide slug and load the matching destination draft before assembly."
         $global:lblPublishStatus.ForeColor = [System.Drawing.Color]::Firebrick
         return
     }
