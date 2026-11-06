@@ -494,6 +494,17 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     aoSalad: { file: "ao-salad.jpg", alt: "Ao Salad fishing village on Koh Kood", wide: true, credit: { author: "josef knecht", source: "https://commons.wikimedia.org/wiki/File:Ko_Kut,_Ban-Aosalad_-_panoramio_(5).jpg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
     jungleBridge: { file: "jungle-bridge.jpg", alt: "Wooden bridge on a forest road on Koh Kood", portrait: true, credit: { author: "josef knecht", source: "https://commons.wikimedia.org/wiki/File:Ko_Kut,_Jungle-Bridge_-_panoramio.jpg", license: "CC BY 3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/" } },
   },
+  "ubon-ratchathani": {
+    hero: { file: "hero.jpg", alt: "Wat Phra That Nong Bua white and gold stupa in Ubon Ratchathani" },
+    neighborhood1: { file: "neighborhood1.jpg", alt: "Thung Si Mueang park and Old Town streets in Ubon Ratchathani" },
+    neighborhood2: { file: "neighborhood2.jpg", alt: "Chayangkun Road commercial corridor in Ubon Ratchathani" },
+    neighborhood3: { file: "neighborhood3.jpg", alt: "Mun River promenade in Nai Mueang, Ubon Ratchathani" },
+    neighborhood4: { file: "neighborhood4.jpg", alt: "Mun and Mekong river confluence at Khong Chiam near Ubon Ratchathani" },
+    activity: { file: "activity.jpg", alt: "Ho Trai wooden scripture hall at Wat Thung Si Mueang, Ubon Ratchathani" },
+    activity2: { file: "activity2.jpg", alt: "Pha Taem National Park sandstone cliffs above the Mekong, Ubon Ratchathani" },
+    activity3: { file: "activity3.jpg", alt: "Sandstone potholes at Sam Phan Bok on the Mekong near Ubon Ratchathani" },
+    activity4: { file: "activity4.jpg", alt: "Wat Sirindhorn Wararam illuminated temple facade in Ubon Ratchathani" },
+  },
 };
 
 export default function GuidePhoto({

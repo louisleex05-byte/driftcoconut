@@ -827,7 +827,8 @@ function Build-PresetFromDraft {
             if ($currentH2 -match '(?i)^Things to do') {
                 for ($k = $i - 1; $k -ge [Math]::Max(0, $i - 15); $k--) {
                     if ($lines[$k] -match '^##\s+') { break }
-                    if ($lines[$k] -match '^\s*\d+\.\s+(.+)$') {
+                    if ($lines[$k] -match '^\s*\d+\.\s+(.+)$' -or
+                        $lines[$k] -match '^\s*\*\*(.+?)\*\*\s*$') {
                         $numberedActivity = Get-SpecificPhotoSubject $matches[1]
                         break
                     }
@@ -876,6 +877,9 @@ function Build-PresetFromDraft {
                 if ($h3 -and $fallbackH2 -match '(?i)^Where to stay\b') { $whereToStayH3 += $h3 }
                 if ($h3 -and $fallbackH2 -match '(?i)^Things to do\b') { $activities += $h3 }
             } elseif ($fallbackH2 -match '(?i)^Things to do\b' -and $line -match '^\s*\d+\.\s+(.+)$') {
+                $activity = Get-SpecificPhotoSubject $matches[1]
+                if ($activity) { $activities += $activity }
+            } elseif ($fallbackH2 -match '(?i)^Things to do\b' -and $line -match '^\s*\*\*(.+?)\*\*\s*$') {
                 $activity = Get-SpecificPhotoSubject $matches[1]
                 if ($activity) { $activities += $activity }
             }
@@ -2547,6 +2551,7 @@ $global:panelPublish = New-Object System.Windows.Forms.Panel
 $global:panelPublish.Location = New-Object System.Drawing.Point(10, $panelTop)
 $global:panelPublish.Size = New-Object System.Drawing.Size(945, $panelH)
 $global:panelPublish.BackColor = [System.Drawing.Color]::White
+$global:panelPublish.AutoScroll = $true
 $global:panelPublish.Visible = $false
 
 # --- Metadata form (compact grid) ---
@@ -2894,6 +2899,15 @@ function Sync-PhotoSlotRows {
         }.GetNewClosure())
         $global:panelPublish.Controls.Add($btnCopyAlt)
     }
+    # Presets can grow after the form starts. Keep actions below every row and
+    # allow scrolling when the full photo list exceeds the panel height.
+    $actionTop = $photoTop + ($global:PhotoSlots.Count * 38) + 20
+    if ($global:btnCopyPhotos) { $global:btnCopyPhotos.Location = New-Object System.Drawing.Point(10, $actionTop) }
+    if ($global:btnAssembleMDX) { $global:btnAssembleMDX.Location = New-Object System.Drawing.Point(280, $actionTop) }
+    if ($global:btnPublishMDX) { $global:btnPublishMDX.Location = New-Object System.Drawing.Point(550, $actionTop) }
+    if ($global:progressPublish) { $global:progressPublish.Location = New-Object System.Drawing.Point(10, ($actionTop + 40)) }
+    if ($global:lblPublishStatus) { $global:lblPublishStatus.Location = New-Object System.Drawing.Point(10, ($actionTop + 65)) }
+    $global:panelPublish.AutoScrollMinSize = New-Object System.Drawing.Size(0, ($actionTop + 190))
 }
 
 # Wire preset change: swap the slot table, re-render rows, refresh metadata.
@@ -2924,16 +2938,19 @@ $actionY = $photoTop + ($global:PhotoSlots.Count * 38) + 20   # per-row height m
 $btnCopyPhotos = New-Object System.Windows.Forms.Button
 $btnCopyPhotos.Text = "Copy Photos -> public/guides/<slug>/"
 $btnCopyPhotos.Location = New-Object System.Drawing.Point(10, $actionY); $btnCopyPhotos.Size = New-Object System.Drawing.Size(260, 32)
+$global:btnCopyPhotos = $btnCopyPhotos
 $global:panelPublish.Controls.Add($btnCopyPhotos)
 
 $btnAssembleMDX = New-Object System.Windows.Forms.Button
 $btnAssembleMDX.Text = "Assemble final.mdx (wrap affiliates)"
 $btnAssembleMDX.Location = New-Object System.Drawing.Point(280, $actionY); $btnAssembleMDX.Size = New-Object System.Drawing.Size(260, 32)
+$global:btnAssembleMDX = $btnAssembleMDX
 $global:panelPublish.Controls.Add($btnAssembleMDX)
 
 $btnPublishMDX = New-Object System.Windows.Forms.Button
 $btnPublishMDX.Text = "Prepare locally (does not publish)"
 $btnPublishMDX.Location = New-Object System.Drawing.Point(550, $actionY); $btnPublishMDX.Size = New-Object System.Drawing.Size(260, 32)
+$global:btnPublishMDX = $btnPublishMDX
 $btnPublishMDX.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
 $btnPublishMDX.ForeColor = [System.Drawing.Color]::White
 $btnPublishMDX.FlatStyle = "Flat"
