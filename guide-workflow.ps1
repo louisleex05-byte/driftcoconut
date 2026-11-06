@@ -579,15 +579,21 @@ $global:PhotoSlotPresets = [ordered]@{
         [pscustomobject]@{ slot="phiPhi";      file="phi-phi.jpg";      alt="Phi Phi Islands turquoise water and limestone cliffs day trip from Phuket" },
         [pscustomobject]@{ slot="khanomJeen";  file="khanom-jeen.jpg";  alt="Southern Thai khanom jeen curry rice noodles with fresh vegetables" }
     )
-    "pai" = @(
-        [pscustomobject]@{ slot="hero";          file="hero.jpg";           alt="Pai valley at sunrise with mist over rice paddies and mountain backdrop in northern Thailand" },
+    "mae-hong-son" = @(
+        [pscustomobject]@{ slot="hero";          file="hero.jpg";           alt="Layers of mist drifting across the Mae Hong Son mountains at sunrise" },
         [pscustomobject]@{ slot="whenToGo";      file="when-to-go.jpg";     alt="Ban Rak Thai Yunnanese Chinese tea village lake at dawn in cool season" },
-        [pscustomobject]@{ slot="pai";           file="pai.jpg";            alt="Pai Walking Street night market with hipster cafes and travelers in Mae Hong Son" },
-        [pscustomobject]@{ slot="maeHongSon";    file="mae-hong-son.jpg";   alt="Wat Chong Klang and Wat Chong Kham twin Burmese temples reflected in Chong Kham Lake" },
+        [pscustomobject]@{ slot="pai";           file="pai.jpg";            alt="Evening visitors and lanterns on Pai Walking Street in Mae Hong Son Province" },
+        [pscustomobject]@{ slot="maeHongSon";    file="mae-hong-son.jpg";   alt="Morning mist over Ban Rak Thai lake with a small boat crossing the water" },
         [pscustomobject]@{ slot="banRakThai";    file="ban-rak-thai.jpg";   alt="Ban Rak Thai Yunnanese Chinese tea plantation village on Myanmar border" },
-        [pscustomobject]@{ slot="yunLai";        file="yun-lai.jpg";        alt="Yun Lai viewpoint at dawn overlooking misty Pai valley in Mae Hong Son" },
+        [pscustomobject]@{ slot="banRakThaiLake"; file="ban-rak-thai-lake.jpg"; alt="Ban Rak Thai village and lake seen through morning mist" },
         [pscustomobject]@{ slot="watChongKlang"; file="wat-chong-klang.jpg"; alt="Wat Chong Klang Burmese-style temple on Chong Kham Lake in Mae Hong Son town" },
-        [pscustomobject]@{ slot="localFood";     file="local-food.jpg";     alt="Yunnanese steamed pork buns and hot tea breakfast at Ban Rak Thai" }
+        [pscustomobject]@{ slot="localFood";     file="local-food.jpg";     alt="Yunnanese steamed pork buns and hot tea breakfast at Ban Rak Thai" },
+        [pscustomobject]@{ slot="doiKongMu";     file="doi-kong-mu.jpg";    alt="Golden and white stupas at Wat Phra That Doi Kong Mu above Mae Hong Son" },
+        [pscustomobject]@{ slot="thamPla";       file="tham-pla.jpg";      alt="Fish swimming in the water at Tham Pla Fish Cave in Mae Hong Son" },
+        [pscustomobject]@{ slot="phaSuea";       file="pha-suea.jpg";      alt="Visitor looking toward the cascades at Pha Suea Waterfall in Mae Hong Son" },
+        [pscustomobject]@{ slot="countryside";   file="countryside.jpg";   alt="Green paddy fields and hillside in Mae Hong Son countryside" },
+        [pscustomobject]@{ slot="townMarket";    file="mae-hong-son-market.jpg"; alt="Roadside produce stalls at a street market in Mae Hong Son" },
+        [pscustomobject]@{ slot="loopRoad";      file="mae-hong-son-loop.jpg"; alt="Minibus travelling on Highway 1095 between Chiang Mai and Pai" }
     )
     "samui" = @(
         [pscustomobject]@{ slot="hero";         file="hero.jpg";          alt="Bophut Fisherman's Village lantern-lit walking street in Koh Samui at dusk" },
