@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/verify-related-guide-cards.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "verify:guide-cards:live": "node scripts/verify-related-guide-cards.mjs --site=https://www.driftcoconut.com/"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
