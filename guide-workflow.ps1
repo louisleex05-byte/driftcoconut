@@ -881,11 +881,9 @@ function Build-PresetFromDraft {
             }
         }
         $activities = @($activities | Select-Object -Unique)
+        $whereToStayH3 = @($whereToStayH3 | Select-Object -Unique)
         if (-not $heroAltFinal -and $activities.Count -gt 0) {
             $heroAltFinal = "$($activities[0]), $destDisplay"
-        }
-        if (-not $heroAltFinal -and $whereToStayH3.Count -gt 0) {
-            $heroAltFinal = "$($whereToStayH3[0]), $destDisplay"
         }
 
         $neighborIdx = 1
@@ -909,14 +907,48 @@ function Build-PresetFromDraft {
         }
     }
 
-    if (-not $heroAltFinal -and $entries.Count -gt 0) {
-        $heroAltFinal = $entries[0].alt
-    }
+    $taggedHero = @($entries | Where-Object { $_.slot -eq 'hero' } | Select-Object -First 1)
+    if (-not $heroAltFinal -and $taggedHero.Count -gt 0) { $heroAltFinal = $taggedHero[0].alt }
+    $entries = @($entries | Where-Object { $_.slot -ne 'hero' })
     if ($heroAltFinal) {
         $entries = @([pscustomobject]@{ slot='hero'; file='hero.jpg'; alt=$heroAltFinal }) + @($entries)
     }
 
     return $entries
+}
+
+function Get-GuidePlaceNameFromSlug {
+    param([string]$Slug)
+    if (-not $Slug) { return "" }
+    return ([System.Globalization.CultureInfo]::InvariantCulture.TextInfo).ToTitleCase($Slug.ToLower().Replace('-', ' '))
+}
+
+# The wizard is an editor, not an automatic fact generator. Keep at least eight
+# visible rows while clearly marking any slot the draft could not identify.
+function Get-PresetEditorLines {
+    param([array]$Entries, [array]$ExistingSlots)
+    $lines = @()
+    $used = @{}
+    if (-not ($Entries | Where-Object { $_.slot -eq 'hero' })) {
+        $lines += 'hero | REPLACE-ME with a named hero subject from this guide'
+        $used['hero'] = $true
+    }
+    foreach ($entry in $Entries) {
+        if ($used.ContainsKey($entry.slot)) { continue }
+        $lines += "$($entry.slot) | $($entry.alt)"
+        $used[$entry.slot] = $true
+    }
+    $candidateSlots = @($ExistingSlots | ForEach-Object { $_.slot }) + @(
+        'hero', 'whenToGo', 'neighborhood1', 'neighborhood2',
+        'activity', 'localTips', 'landmark', 'localFood', 'transport', 'sunset'
+    )
+    foreach ($slot in $candidateSlots) {
+        if ($lines.Count -ge 8) { break }
+        if (-not $slot -or $used.ContainsKey($slot)) { continue }
+        $lines += "$slot | REPLACE-ME with the named place or scene from this guide"
+        $used[$slot] = $true
+    }
+    return $lines
 }
 
 # ===========================================================================
@@ -1365,7 +1397,7 @@ function Show-NewGuidePresetDialog {
             $btnOK.Text = "OVERWRITE existing preset"
             $btnOK.BackColor = [System.Drawing.Color]::FromArgb(180, 60, 60)
         } elseif ($status.exists) {
-            $lblWarn.Text = "Note: '$slug' exists in GuidePhoto.tsx but only has placeholder alt texts. Save will replace them."
+            $lblWarn.Text = "Note: '$slug' has placeholder photo labels. Complete every REPLACE-ME row before saving."
             $lblWarn.ForeColor = [System.Drawing.Color]::DarkOrange
             $btnOK.Text = "Save + Register"
             $btnOK.BackColor = [System.Drawing.Color]::FromArgb(30, 122, 145)
@@ -1395,11 +1427,8 @@ function Show-NewGuidePresetDialog {
     $dlg.CancelButton = $btnCancel
     $dlg.Controls.Add($btnCancel)
 
-    # LAYER 3 + SMART DEFAULTS pre-load, priority order:
-    #   1. If slug already has real content in GuidePhoto.tsx -> load current values (edit mode)
-    #   2. Else if slug is in $global:GuideAltSuggestions -> load ship-ready smart defaults
-    #   3. Else if the draft has <GuidePhoto> tags -> auto-derive from draft context
-    #   4. Else -> keep the REPLACE-ME markers (which Layer 2 will reject on save)
+    # LAYER 3: use the selected guide's real preset first, then its draft,
+    # then known suggestions. Incomplete draft suggestions retain review rows.
     $applySmartDefaults = {
         param($slug)
         if (-not $slug) { return }
@@ -1417,28 +1446,19 @@ function Show-NewGuidePresetDialog {
 
         $status = Get-ExistingPresetStatus -RepoRoot $PSScriptRoot -Slug $slug
         if ($status.exists -and $status.hasRealContent -and $global:PhotoSlotPresets.Contains($slug)) {
-            # Priority 1: existing real content
             $lines = @()
             foreach ($e in $global:PhotoSlotPresets[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
             $tPairs.Text = ($lines -join "`r`n")
-        } elseif ($global:GuideAltSuggestions.ContainsKey($slug)) {
-            # Priority 2: smart defaults (exact match — canonical resolution already ran)
-            $lines = @()
-            foreach ($e in $global:GuideAltSuggestions[$slug]) { $lines += "$($e.slot) | $($e.alt)" }
-            $tPairs.Text = ($lines -join "`r`n")
         } else {
-            # Priority 3: auto-derive from draft body + destination
             $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
-            $destination = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
+            $destination = Get-GuidePlaceNameFromSlug $slug
             $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
-            if ($draftText -and $destination) {
-                $entries = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
-                if ($entries.Count -ge 2) {
-                    $lines = @()
-                    foreach ($e in $entries) { $lines += "$($e.slot) | $($e.alt)" }
-                    $tPairs.Text = ($lines -join "`r`n")
-                }
+            $entries = @(Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt)
+            if ($entries.Count -lt 2 -and $global:GuideAltSuggestions.ContainsKey($slug)) {
+                $entries = @($global:GuideAltSuggestions[$slug])
             }
+            $existingSlots = if ($global:PhotoSlotPresets.Contains($slug)) { $global:PhotoSlotPresets[$slug] } else { @() }
+            $tPairs.Text = (Get-PresetEditorLines -Entries $entries -ExistingSlots $existingSlots) -join "`r`n"
         }
     }.GetNewClosure()
 
@@ -2000,11 +2020,11 @@ $txtHeaderSlug.Add_TextChanged({
             # Fallback: derive from draft body
             if (-not $autoEntries -or $autoEntries.Count -lt 2) {
                 $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
-                $destination = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
+                $destination = Get-GuidePlaceNameFromSlug $raw
                 $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
                 if ($draftText -and $destination) {
                     $derived = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
-                    if ($derived.Count -ge 2) { $autoEntries = $derived }
+                    if ($derived.Count -ge 8) { $autoEntries = $derived }
                 }
             }
 
@@ -2605,16 +2625,12 @@ $btnAutoPreset.BackColor = [System.Drawing.Color]::FromArgb(180, 130, 40)
 $btnAutoPreset.ForeColor = [System.Drawing.Color]::White
 $btnAutoPreset.Add_Click({
     $draftText = if ($global:txtDraft) { $global:txtDraft.Text } else { "" }
-    $destination = if ($global:txtDest) { $global:txtDest.Text.Trim() } else { "" }
     $slug = $global:CurrentSlug
+    $destination = Get-GuidePlaceNameFromSlug $slug
     $heroAlt = if ($global:txtMetaHeroAlt) { $global:txtMetaHeroAlt.Text.Trim() } else { "" }
 
     if (-not $slug) {
         [System.Windows.Forms.MessageBox]::Show("Set the Guide slug first (top-left field on Tab 3).", "Missing slug", 'OK', 'Warning') | Out-Null
-        return
-    }
-    if (-not $destination) {
-        [System.Windows.Forms.MessageBox]::Show("Set the Destination on Tab 1 first.", "Missing destination", 'OK', 'Warning') | Out-Null
         return
     }
     if (-not (Test-IsGuideDraftBody -Text $draftText)) {
@@ -2625,6 +2641,10 @@ $btnAutoPreset.Add_Click({
     $entries = Build-PresetFromDraft -DraftText $draftText -Destination $destination -HeroAlt $heroAlt
     if ($entries.Count -lt 2) {
         [System.Windows.Forms.MessageBox]::Show("No specific photo subjects found. Add named place headings or numbered Things to do entries, or add <GuidePhoto slot=`"...`" alt=`"specific place`" /> beside the relevant prose.", "No grounded photo labels", 'OK', 'Warning') | Out-Null
+        return
+    }
+    if ($entries.Count -lt 8 -or -not ($entries | Where-Object { $_.slot -eq 'hero' })) {
+        [System.Windows.Forms.MessageBox]::Show("The draft identifies only $($entries.Count) photo subjects and needs a distinct hero plus at least 8 total slots. Use + New Preset to review the named suggestions and fill the remaining REPLACE-ME rows with specific places before saving.", "More photo subjects needed", 'OK', 'Warning') | Out-Null
         return
     }
     $draftSlots = [regex]::Matches($draftText, '<GuidePhoto\b[^>]*\bslot="([^"]+)"|<!--\s*PHOTO\s+SLOT:\s*(\S+)\s*-->')
