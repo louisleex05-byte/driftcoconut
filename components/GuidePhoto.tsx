@@ -510,6 +510,11 @@ const GUIDES: Record<string, Record<string, PhotoEntry>> = {
     activity2: { file: "activity2.jpg", alt: "Pha Taem National Park sandstone cliffs above the Mekong, Ubon Ratchathani" },
     activity3: { file: "activity3.jpg", alt: "Sandstone potholes at Sam Phan Bok on the Mekong near Ubon Ratchathani" },
     activity4: { file: "activity4.jpg", alt: "Wat Sirindhorn Wararam illuminated temple facade in Ubon Ratchathani" },
+    candleFloat: { file: "candle-float.jpg", alt: "Candle Festival float sculpture at Thung Si Mueang park", credit: { author: "Christophe95", source: "https://commons.wikimedia.org/wiki/File:Thung_Si_Muang_Ubon_Ratchathani_3.jpg", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/" } },
+    khongChiam: { file: "khong-chiam.jpg", alt: "Mekong riverbank and wooded hills near Khong Chiam", credit: { author: "::::=UT=::::", source: "https://commons.wikimedia.org/wiki/File:Khong_Chiam_-_panoramio.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" } },
+    market: { file: "market.jpg", alt: "Produce vendors inside a Ubon Ratchathani market", credit: { author: "Christophe95", source: "https://commons.wikimedia.org/wiki/File:Ubon_Ratchathani_market.jpg", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/" } },
+    phaTaemView: { file: "pha-taem-view.jpg", alt: "Mekong valley seen from the sandstone rocks of Pha Taem", wide: true, credit: { author: "Martin Künzel", source: "https://commons.wikimedia.org/wiki/File:Pha_Taem_National_Park_Thailand.jpg", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/" } },
+    sirindhornDaylight: { file: "sirindhorn-daylight.jpg", alt: "Wat Sirindhorn Wararam temple facade in daylight", credit: { author: "Supanut Arunoprayote", source: "https://commons.wikimedia.org/wiki/File:Wat_Sirindhorn_Wararam_Phu_Phrao_20251227.jpg", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/" } },
   },
 };
 
