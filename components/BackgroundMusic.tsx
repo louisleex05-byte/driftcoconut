@@ -114,7 +114,7 @@ export default function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/melody.mp3" preload="auto" autoPlay loop playsInline />
+      <audio ref={audioRef} src="/audio/melody.mp3?v=sky-forgot-to-fall" preload="auto" autoPlay loop playsInline />
       <button
         type="button"
         className="drift-music-control"
