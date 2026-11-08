@@ -5,13 +5,12 @@ import matter from "gray-matter";
 // Where published guide MDX files live. Add a new guide by dropping bangkok.mdx-style
 // files into this folder; the /guides index picks them up automatically.
 //
-// Locale variants: append a locale suffix before .mdx, e.g. `bangkok.zh.mdx` for
-// Simplified Chinese. English is the default and uses `bangkok.mdx` (no suffix).
-// If a locale variant is missing, we transparently fall back to the English file
-// so partial translations don't break the site.
+// Locale variants append a locale suffix before .mdx. English is the default.
+// Chinese retains the historic English fallback; Thai pages exist only for
+// slugs with a real .th.mdx translation.
 const GUIDES_DIR = path.join(process.cwd(), "content", "guides");
 
-export type GuideLocale = "en" | "zh"; // Thai guides not yet drafted; add "th" when ready
+export type GuideLocale = "en" | "zh" | "th";
 
 export type GuideFrontmatter = {
   slug: string;
@@ -29,15 +28,45 @@ export type GuideSummary = GuideFrontmatter & { readingMinutes: number; locale?:
 
 export type GuideFull = GuideSummary & { content: string; hasLocale: GuideLocale[] };
 
+function getReadingMinutes(content: string, locale: GuideLocale): number {
+  if (locale === "zh") {
+    // Chinese prose is not space-delimited. Count CJK characters at an
+    // approximate 400 characters per minute, while retaining a small allowance
+    // for place names, prices, and other Latin-script text.
+    const visibleText = content
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+    const hanCharacters = (visibleText.match(/[\u3400-\u9fff]/g) ?? []).length;
+    const latinWords = visibleText
+      .replace(/[\u3400-\u9fff]/g, " ")
+      .match(/[A-Za-z0-9]+(?:[’'-][A-Za-z0-9]+)*/g)?.length ?? 0;
+    return Math.max(1, Math.round(hanCharacters / 400 + latinWords / 220));
+  }
+
+  if (locale === "th") {
+    const visibleText = content.replace(/<[^>]+>/g, " ").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+    const thaiCharacters = (visibleText.match(/[\u0e00-\u0e7f]/g) ?? []).length;
+    const latinWords = visibleText.match(/[A-Za-z0-9]+(?:[’'-][A-Za-z0-9]+)*/g)?.length ?? 0;
+    return Math.max(1, Math.round(thaiCharacters / 600 + latinWords / 220));
+  }
+
+  const words = content.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}
+
 // Try locale-specific file first, then fall back to English.
 async function readGuideFile(slug: string, locale: GuideLocale = "en"): Promise<GuideFull | null> {
-  const filenames = locale === "en" ? [`${slug}.mdx`] : [`${slug}.${locale}.mdx`, `${slug}.mdx`];
+  const filenames = locale === "en" ? [`${slug}.mdx`] : locale === "th" ? [`${slug}.th.mdx`] : [`${slug}.zh.mdx`, `${slug}.mdx`];
 
   // Detect which locale variants exist on disk (for hreflang generation)
   const hasLocale: GuideLocale[] = ["en"];
   try {
     await fs.access(path.join(GUIDES_DIR, `${slug}.zh.mdx`));
     hasLocale.push("zh");
+  } catch {}
+  try {
+    await fs.access(path.join(GUIDES_DIR, `${slug}.th.mdx`));
+    hasLocale.push("th");
   } catch {}
 
   for (const name of filenames) {
@@ -46,7 +75,7 @@ async function readGuideFile(slug: string, locale: GuideLocale = "en"): Promise<
       const { data, content } = matter(raw);
       const fm = data as GuideFrontmatter;
       const words = content.split(/\s+/).filter(Boolean).length;
-      const readingMinutes = Math.max(1, Math.round(words / 220));
+      const readingMinutes = locale === "th" ? getReadingMinutes(content, locale) : Math.max(1, Math.round(words / 220));
       return { ...fm, content, readingMinutes, locale, hasLocale };
     } catch {
       // fall through to next candidate
@@ -69,7 +98,8 @@ export async function listGuides(locale: GuideLocale = "en"): Promise<GuideSumma
   // Base slugs = English files (no `.zh.` etc.). Locale variants are looked up per slug.
   const slugs = entries
     .filter((f) => f.endsWith(".mdx") && !f.match(/\.(zh|th)\.mdx$/))
-    .map((f) => f.replace(/\.mdx$/, ""));
+    .map((f) => f.replace(/\.mdx$/, ""))
+    .filter((slug) => locale !== "th" || entries.includes(`${slug}.th.mdx`));
   const guides = await Promise.all(slugs.map((s) => readGuideFile(s, locale)));
 
   // Sort priority for the guides index:
@@ -88,7 +118,7 @@ export async function listGuides(locale: GuideLocale = "en"): Promise<GuideSumma
     .map(({ content: _content, hasLocale: _h, ...summary }) => summary);
 }
 
-export async function getGuideSlugs(): Promise<string[]> {
-  const guides = await listGuides();
+export async function getGuideSlugs(locale: GuideLocale = "en"): Promise<string[]> {
+  const guides = await listGuides(locale);
   return guides.map((g) => g.slug);
 }

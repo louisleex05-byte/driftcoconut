@@ -27,14 +27,14 @@ export function inspectGuideHtml(html, slug, locale) {
     ?.replace(/<[^>]+>/g, "").trim();
   const expectedHeading = locale === "en"
     ? heading === "Related destinations"
-    : /^(相关目的地|周边目的地|延伸目的地|延伸阅读)$/.test(heading ?? "");
+    : locale === "th" ? heading === "เที่ยวต่อที่ไหนดี" : /^(相关目的地|周边目的地|延伸目的地|延伸阅读)$/.test(heading ?? "");
   if (!expectedHeading) errors.push(`cards are not immediately after the related-destinations section (last heading: ${heading ?? "none"})`);
   const planner = html.indexOf('aria-label="Trip planner"', section.index + section[0].length);
   if (planner < 0) errors.push("trip planner is missing or appears before related cards");
 
   const anchors = [...section[0].matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)];
   if (anchors.length < 3) errors.push(`expected at least 3 photo cards, found ${anchors.length}`);
-  const prefix = `${locale === "zh" ? "/zh" : ""}/guides/`;
+  const prefix = `${locale === "zh" ? "/zh" : locale === "th" ? "/th" : ""}/guides/`;
   const hrefs = new Set();
   const images = [];
   for (const [, attrs, body] of anchors) {
@@ -61,14 +61,17 @@ async function mapLimited(items, limit, fn) {
 
 async function check() {
   const filenames = await readdir(join(root, "content", "guides"));
-  const slugs = filenames.filter((name) => name.endsWith(".mdx") && !name.endsWith(".zh.mdx"))
+  const slugs = filenames.filter((name) => name.endsWith(".mdx") && !/\.(zh|th)\.mdx$/.test(name))
     .map((name) => name.slice(0, -4)).sort();
+  const thaiSlugs = new Set(filenames.filter((name) => name.endsWith(".th.mdx")).map((name) => name.slice(0, -7)));
   const failures = [];
   const imagePaths = new Set();
-  await mapLimited(slugs.flatMap((slug) => [
+  const routes = slugs.flatMap((slug) => [
     { slug, locale: "en" }, { slug, locale: "zh" },
-  ]), 6, async ({ slug, locale }) => {
-    const route = `${locale === "zh" ? "/zh" : ""}/guides/${slug}`;
+    ...(thaiSlugs.has(slug) ? [{ slug, locale: "th" }] : []),
+  ]);
+  await mapLimited(routes, 6, async ({ slug, locale }) => {
+    const route = `${locale === "zh" ? "/zh" : locale === "th" ? "/th" : ""}/guides/${slug}`;
     try {
       let html;
       if (site) {
@@ -105,7 +108,7 @@ async function check() {
     failures.sort().forEach((failure) => console.error(`FAIL: ${failure}`));
     process.exitCode = 1;
   } else {
-    console.log(`PASS: ${slugs.length * 2} rendered guides have related photo cards beside destination links; ${imagePaths.size} distinct hero images exist${site ? " on the live site" : " in the build"}.`);
+    console.log(`PASS: ${routes.length} rendered guides have related photo cards beside destination links; ${imagePaths.size} distinct hero images exist${site ? " on the live site" : " in the build"}.`);
   }
 }
 

@@ -24,3 +24,11 @@ test("fails when cards lose their images or use wrong-language links", () => {
   assert.ok(inspectGuideHtml(noImage, "bangkok", "en").errors.some((error) => error.includes("no local hero image")));
   assert.ok(inspectGuideHtml(guide, "bangkok", "zh").errors.some((error) => error.includes("invalid or duplicate related link")));
 });
+
+test("accepts the five-guide Thai route and rejects English links there", () => {
+  const thaiCards = ["nan", "chiangrai", "khao-kho"].map((slug) => card(slug).replace('href="/guides/', 'href="/th/guides/')).join("");
+  const thaiGuide = `<h2>เที่ยวต่อที่ไหนดี</h2><section id="related-destination-cards">${thaiCards}</section><div aria-label="Trip planner"></div>`;
+  assert.deepEqual(inspectGuideHtml(thaiGuide, "khao-yai", "th").errors, []);
+  assert.ok(inspectGuideHtml(guide.replace("Related destinations", "เที่ยวต่อที่ไหนดี"), "khao-yai", "th")
+    .errors.some((error) => error.includes("invalid or duplicate related link")));
+});

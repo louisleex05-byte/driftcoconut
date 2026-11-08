@@ -556,7 +556,7 @@ export function GuidePhotoCredits({
 }: {
   guideSlug: string;
   content: string;
-  locale?: "en" | "zh";
+  locale?: "en" | "zh" | "th";
 }) {
   const guide = GUIDES[guideSlug];
   if (!guide) return null;
@@ -571,7 +571,7 @@ export function GuidePhotoCredits({
   return (
     <details className="mt-8 border-t border-sea-100 pt-4 text-xs text-slate-500">
       <summary className="cursor-pointer font-semibold text-sea-700">
-        {locale === "zh" ? "照片来源与授权" : "Photo credits"}
+        {locale === "zh" ? "照片来源与授权" : locale === "th" ? "ที่มาและสิทธิ์การใช้ภาพ" : "Photo credits"}
       </summary>
       <ul className="mt-3 space-y-2 list-disc pl-5">
         {photos.map((photo) => (
