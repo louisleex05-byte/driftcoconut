@@ -6,7 +6,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { bookingCJSearch } from "@/lib/booking";
 import { getGuide, getGuideSlugs } from "@/lib/guides";
 import AffiliateLink from "@/components/AffiliateLink";
-import GuidePhoto from "@/components/GuidePhoto";
+import GuidePhoto, { GuidePhotoCredits } from "@/components/GuidePhoto";
 import TripPlanner from "@/components/TripPlanner";
 import RelatedGuides from "@/components/RelatedGuides";
 import GuideQuickLinks from "@/components/GuideQuickLinks";
@@ -186,6 +186,7 @@ export default async function GuidePage({
           <Link href="/guides" className="hover:text-sea-600">← All destination guides</Link>
         </p>
       </div>
+      <GuidePhotoCredits guideSlug={slug} content={guide.content} />
     </article>
   );
 }

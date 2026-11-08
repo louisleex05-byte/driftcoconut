@@ -544,16 +544,46 @@ export default function GuidePhoto({
       </div>
       <figcaption className="mt-2 text-xs text-slate-500 italic">
         {caption ?? meta.alt}
-        {meta.credit && (
-          <span className="ml-1 not-italic">
-            — <a href={meta.credit.source} target="_blank" rel="noopener noreferrer" className="underline">{meta.credit.author}</a>
-            {meta.credit.license && meta.credit.licenseUrl && (
-              <> · <a href={meta.credit.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline">{meta.credit.license}</a></>
-            )}
-            {meta.credit.license?.startsWith("CC BY") && " · resized"}
-          </span>
-        )}
       </figcaption>
     </figure>
+  );
+}
+
+export function GuidePhotoCredits({
+  guideSlug,
+  content,
+  locale = "en",
+}: {
+  guideSlug: string;
+  content: string;
+  locale?: "en" | "zh";
+}) {
+  const guide = GUIDES[guideSlug];
+  if (!guide) return null;
+  const slots = new Set(
+    [...content.matchAll(/<GuidePhoto\b[^>]*\bslot\s*=\s*["']([^"']+)["']/g)].map((match) => match[1]),
+  );
+  const photos = [...slots]
+    .map((slot) => guide[slot])
+    .filter((photo): photo is PhotoEntry & { credit: NonNullable<PhotoEntry["credit"]> } => Boolean(photo?.credit));
+  if (photos.length === 0) return null;
+
+  return (
+    <details className="mt-8 border-t border-sea-100 pt-4 text-xs text-slate-500">
+      <summary className="cursor-pointer font-semibold text-sea-700">
+        {locale === "zh" ? "照片来源与授权" : "Photo credits"}
+      </summary>
+      <ul className="mt-3 space-y-2 list-disc pl-5">
+        {photos.map((photo) => (
+          <li key={photo.file}>
+            {photo.alt} — <a href={photo.credit.source} target="_blank" rel="noopener noreferrer" className="underline">{photo.credit.author}</a>
+            {photo.credit.license && photo.credit.licenseUrl && (
+              <> · <a href={photo.credit.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline">{photo.credit.license}</a></>
+            )}
+            {photo.credit.license?.startsWith("CC BY") && " · resized"}
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
