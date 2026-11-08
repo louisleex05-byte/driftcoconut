@@ -9,7 +9,7 @@ import type { GuideSummary } from "@/lib/guides";
  * Homepage funnel fix (Sep 2026): GA4 showed the homepage bouncing at 42.6%
  * while individual guide pages bounced at 0-21% — visitors who reach a guide
  * stick around, but the homepage wasn't surfacing guide content, only external
- * Booking.com search CTAs. This section puts 3 real guides above the fold
+ * Booking.com search CTAs. This section puts real guides above the fold
  * (right after search) so first-time visitors have an obvious path into the
  * content that actually holds attention.
  *
@@ -44,7 +44,7 @@ export default function FeaturedGuides({
         <div className="mx-auto mt-3 h-1 w-16 rounded-full bg-coral-gradient" />
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {guides.map((g) => (
           <GuideCard key={g.slug} guide={g} hrefPrefix={hrefPrefix} />
         ))}
