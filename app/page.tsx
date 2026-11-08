@@ -22,15 +22,16 @@ export const metadata: Metadata = {
 // BOTH locale variants of the featured guides here and let FeaturedGuides
 // (client-side, locale-aware) pick the right one at render time — otherwise
 // toggling to Chinese would leave the guide cards themselves stuck in English.
-// Hand-picked homepage guides — put the highest-traffic pages up front.
-const FEATURED_SLUGS = ["cha-am", "kanchanaburi", "mae-hong-son"];
+// Hand-picked homepage guides in display order.
+const FEATURED_SLUGS = ["phang-nga-khao-lak", "kanchanaburi", "mae-hong-son", "khao-kho"];
 
 export default async function HomePage() {
   const [guidesEn, guidesZh] = await Promise.all([listGuides("en"), listGuides("zh")]);
   const featuredEn = FEATURED_SLUGS
     .map((s) => guidesEn.find((g) => g.slug === s))
     .filter((g): g is NonNullable<typeof g> => g != null);
-  const featuredSlugs = new Set(featuredEn.map((g) => g.slug));
-  const featuredZh = guidesZh.filter((g) => featuredSlugs.has(g.slug));
+  const featuredZh = FEATURED_SLUGS
+    .map((s) => guidesZh.find((g) => g.slug === s))
+    .filter((g): g is NonNullable<typeof g> => g != null);
   return <HomeClient guidesEn={featuredEn} guidesZh={featuredZh} />;
 }
