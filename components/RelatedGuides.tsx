@@ -9,7 +9,7 @@ export default async function RelatedGuides({
   locale,
 }: {
   slug: string;
-  locale: "en" | "zh";
+  locale: "en" | "zh" | "th";
 }) {
   const all = await listGuides(locale);
   const bySlug = new Map(all.map((g) => [g.slug, g]));
@@ -18,16 +18,16 @@ export default async function RelatedGuides({
   const country = bySlug.get(slug)?.destination.split(",").at(-1)?.trim();
   for (const guide of all) {
     if (guides.length >= 3) break;
-    if (guide.slug !== slug && !guides.some((g) => g.slug === guide.slug) && country && guide.destination.endsWith(country)) {
+    if (guide.slug !== slug && !guides.some((g) => g.slug === guide.slug) && (locale === "th" || (country && guide.destination.endsWith(country)))) {
       guides.push(guide);
     }
   }
   if (guides.length === 0) return null;
 
-  const prefix = locale === "zh" ? "/zh" : "";
+  const prefix = locale === "zh" ? "/zh" : locale === "th" ? "/th" : "";
 
   return (
-    <section id="related-destination-cards" className="mt-6" aria-label={locale === "zh" ? "相关目的地指南" : "Related destination guides"}>
+    <section id="related-destination-cards" className="mt-6" aria-label={locale === "zh" ? "相关目的地指南" : locale === "th" ? "คู่มือจุดหมายใกล้เคียง" : "Related destination guides"}>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {guides.map((g) => (
           <Link
@@ -47,7 +47,7 @@ export default async function RelatedGuides({
               </div>
             )}
             <div className="p-4">
-              {g === guides[0] && <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-coral-600">{locale === "zh" ? "推荐下一站" : "Next destination"}</p>}
+              {g === guides[0] && <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-coral-600">{locale === "zh" ? "推荐下一站" : locale === "th" ? "จุดหมายถัดไป" : "Next destination"}</p>}
               <p className="text-xs uppercase tracking-wide text-sea-500 mb-1">{g.destination}</p>
               <p className="font-display text-base font-semibold text-sea-800 leading-snug">
                 {g.title}

@@ -30,16 +30,18 @@ export async function generateMetadata({
   const { slug } = await params;
   const guide = await getGuide(slug, "zh");
   if (!guide) return { title: "指南未找到" };
+  const languages: Record<string, string> = {
+    en: `/guides/${slug}`,
+    "zh-CN": `/zh/guides/${slug}`,
+    "x-default": `/guides/${slug}`,
+  };
+  if (guide.hasLocale.includes("th")) languages.th = `/th/guides/${slug}`;
   return {
     title: guide.title,
     description: guide.description,
     alternates: {
       canonical: `/zh/guides/${slug}`,
-      languages: {
-        en: `/guides/${slug}`,
-        "zh-CN": `/zh/guides/${slug}`,
-        "x-default": `/guides/${slug}`,
-      },
+      languages,
     },
     openGraph: {
       title: guide.title,

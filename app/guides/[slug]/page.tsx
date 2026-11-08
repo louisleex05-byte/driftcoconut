@@ -39,6 +39,9 @@ export async function generateMetadata({
   if (guide.hasLocale?.includes("zh")) {
     languages["zh-CN"] = `/zh/guides/${slug}`;
   }
+  if (guide.hasLocale?.includes("th")) {
+    languages.th = `/th/guides/${slug}`;
+  }
 
   return {
     title: guide.title,

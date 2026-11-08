@@ -7,11 +7,12 @@ import type { Locale } from "@/lib/i18n";
 // Paths that have a real /zh/... twin: /, /about, /privacy, /terms, /guides, /guides/<slug>.
 // Add a path here when you create its /zh page.
 const HAS_ZH_ROUTE = /^\/(about|privacy|terms|guides(\/[^/]+)?)?\/?$/;
+const THAI_GUIDES = new Set(["khao-yai", "khao-kho", "chiangrai", "nan", "mae-hong-son"]);
 
 // Toggle between EN / TH / 中文.
 // Chinese has real routed pages under /zh/... — clicking 中文 navigates there
 // so users get the Chinese guide content, not just Chinese UI chrome.
-// EN/TH stay on the same URL (they share content routes for now).
+// The five translated Thai guides have real /th/guides/... pages.
 export default function LanguageToggle() {
   const { locale, setLocale, t } = useLanguage();
   const router = useRouter();
@@ -19,15 +20,14 @@ export default function LanguageToggle() {
 
   const pick = (next: Locale) => {
     setLocale(next);
-    // Route swap for Chinese: /guides/bangkok  <->  /zh/guides/bangkok
-    // Only swap when a /zh counterpart exists (home, about, guides). Other pages
-    // (privacy, terms, search, hotel) have no /zh route, so they stay on the same
-    // URL and only the UI language changes. Otherwise the toggle would 404.
-    if (next === "zh" && pathname && !pathname.startsWith("/zh") && HAS_ZH_ROUTE.test(pathname)) {
-      router.push(`/zh${pathname === "/" ? "" : pathname}`);
-    } else if (next !== "zh" && pathname?.startsWith("/zh")) {
-      const stripped = pathname.replace(/^\/zh/, "") || "/";
-      router.push(stripped);
+    const base = pathname?.replace(/^\/(zh|th)(?=\/|$)/, "") || "/";
+    const thaiGuide = base.match(/^\/guides\/([^/]+)\/?$/)?.[1];
+    if (next === "th" && (base === "/guides" || (thaiGuide && THAI_GUIDES.has(thaiGuide)))) {
+      router.push(`/th${base}`);
+    } else if (next === "zh" && HAS_ZH_ROUTE.test(base)) {
+      router.push(`/zh${base === "/" ? "" : base}`);
+    } else if (pathname?.startsWith("/zh") || pathname?.startsWith("/th")) {
+      router.push(base);
     }
   };
 

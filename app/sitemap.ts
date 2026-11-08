@@ -12,9 +12,8 @@ import path from "node:path";
 //  - individual guides: monthly / 0.8 (long-form content, changes slowly)
 //  - about + legal: yearly / 0.3 (static)
 //
-// Multilingual: Chinese (/zh/...) URLs are emitted with hreflang alternates
-// so Google/Baidu/Bing know the pages are linked language variants.
-// A guide only appears in /zh/... if a bangkok.zh.mdx variant file exists.
+// Multilingual: advertise Chinese and Thai variants only when their MDX files
+// exist. The Thai index lists the five fully translated guides.
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://driftcoconut.com").replace(/\/$/, "");
 
@@ -55,6 +54,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${SITE_URL}/zh/guides`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/th/guides`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
@@ -129,9 +134,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const g of guides) {
     // Check if a Chinese variant exists so we only advertise real content
     let hasZh = false;
+    let hasTh = false;
     try {
       await fs.access(path.join(guidesDir, `${g.slug}.zh.mdx`));
       hasZh = true;
+    } catch {}
+    try {
+      await fs.access(path.join(guidesDir, `${g.slug}.th.mdx`));
+      hasTh = true;
     } catch {}
 
     guideEntries.push({
@@ -139,11 +149,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: g.lastUpdated ? new Date(g.lastUpdated) : now,
       changeFrequency: "monthly",
       priority: 0.8,
-      alternates: hasZh
+      alternates: hasZh || hasTh
         ? {
             languages: {
               en: `${SITE_URL}/guides/${g.slug}`,
-              "zh-CN": `${SITE_URL}/zh/guides/${g.slug}`,
+              ...(hasZh && { "zh-CN": `${SITE_URL}/zh/guides/${g.slug}` }),
+              ...(hasTh && { th: `${SITE_URL}/th/guides/${g.slug}` }),
             },
           }
         : undefined,
@@ -155,6 +166,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: g.lastUpdated ? new Date(g.lastUpdated) : now,
         changeFrequency: "monthly",
         priority: 0.7,
+      });
+    }
+    if (hasTh) {
+      guideEntries.push({
+        url: `${SITE_URL}/th/guides/${g.slug}`,
+        lastModified: now,
+        changeFrequency: "monthly",
+        priority: 0.7,
+        alternates: {
+          languages: {
+            en: `${SITE_URL}/guides/${g.slug}`,
+            ...(hasZh && { "zh-CN": `${SITE_URL}/zh/guides/${g.slug}` }),
+            th: `${SITE_URL}/th/guides/${g.slug}`,
+          },
+        },
       });
     }
   }
