@@ -800,17 +800,17 @@ function buildHtml(d) {
     const srcSum = Math.max(d.sourceRows.reduce((s, r) => s + r.sess, 0), 1);
     const sMix = clampN(d.sourceRows.filter(r => r.sess / srcSum >= 0.05).length * 2.5, 0, 10);
     return [
-      { k: 'Growth', w: 25, s: sGrowth, color: '#0891b2', tip: 'Publish or share more often. This is compared with the week before.' },
-      { k: 'Engagement', w: 20, s: sEng, color: '#7c3aed', tip: 'Add links between guides and more photos so visitors read further.' },
-      { k: 'Google search', w: 20, s: sSearch, color: '#f59e0b', tip: 'Sharpen page titles and add guides to climb Google rankings.' },
-      { k: 'Real visitors', w: 15, s: sReal, color: '#dc2626', tip: 'Exclude your own visits in Google Analytics so the numbers show real people.' },
-      { k: 'Returning visitors', w: 10, s: sRet, color: '#16a34a', tip: 'Give people a reason to come back: an email list or regular social posts.' },
-      { k: 'Traffic mix', w: 10, s: sMix, color: '#ec4899', tip: 'Add another traffic source so you rely less on one channel.' },
+      { k: 'Growth', w: 20, s: sGrowth, color: '#0891b2', tip: 'Publish or share more often. This is compared with the week before.' },
+      { k: 'Engagement', w: 22, s: sEng, color: '#7c3aed', tip: 'Add links between guides and more photos so visitors read further.' },
+      { k: 'Google search', w: 22, s: sSearch, color: '#f59e0b', tip: 'Sharpen page titles and add guides to climb Google rankings.' },
+      { k: 'Estimated external visits', w: 15, s: sReal, color: '#dc2626', tip: 'This is a source-based estimate. Exclude operator visits in GA4 before trusting it.' },
+      { k: 'Returning visitors', w: 11, s: sRet, color: '#16a34a', tip: 'Give people a reason to come back: an email list or regular social posts.' },
+      { k: 'Channel diversity', w: 10, s: sMix, color: '#ec4899', tip: 'Build a repeatable source beyond direct visits; channel count alone does not prove demand.' },
     ].map(p => ({ ...p, gain: (p.w / 100) * (10 - p.s) }));
   })();
   const overallScore = scoreParts.reduce((s, p) => s + (p.w / 100) * p.s, 0);
   const gainTotal = scoreParts.reduce((s, p) => s + p.gain, 0);
-  const scoreLabel = overallScore >= 8.5 ? 'Great' : overallScore >= 7 ? 'Good' : overallScore >= 5 ? 'Fair' : 'Needs work';
+  const scoreLabel = d.kpi.sessions < 200 ? 'Early data' : overallScore >= 8.5 ? 'Great' : overallScore >= 7 ? 'Good' : overallScore >= 5 ? 'Fair' : 'Needs work';
   const gainParts = scoreParts.filter(p => p.gain > 0.005).sort((a, b) => b.gain - a.gain);
   const donutSvg = (() => {
     const R = 60, C = 2 * Math.PI * R;
@@ -825,8 +825,8 @@ function buildHtml(d) {
   })();
   const scoreHtml = `
 <div class="section">
-  <div class="section-title">🏁 Overall Score</div>
-  <div class="section-desc">One number for how the site is doing, from the current numbers and this week vs last week. The chart shows where the missing points are.</div>
+  <div class="section-title">🏁 Audience Health Score</div>
+  <div class="section-desc">Custom traffic and engagement rubric, not a Google or global success rating. Based on ${d.kpi.sessions} sessions in 28 days; under 200 sessions is marked early data. Affiliate revenue and Core Web Vitals are not in this score.</div>
   <div class="os-grid">
     <div class="card">
       <div class="os-big"><span class="os-n">${f1(overallScore)}</span><span class="os-o">/10</span><span class="os-badge">${scoreLabel}</span></div>
