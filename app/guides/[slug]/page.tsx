@@ -11,6 +11,8 @@ import TripPlanner from "@/components/TripPlanner";
 import RelatedGuides from "@/components/RelatedGuides";
 import GuideQuickLinks from "@/components/GuideQuickLinks";
 
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://driftcoconut.com").replace(/\/$/, "");
+
 // Statically generate all guide slugs at build time.
 export async function generateStaticParams() {
   const slugs = await getGuideSlugs();
@@ -71,7 +73,7 @@ export default async function GuidePage({
   // Bind guideSlug so MDX authors can write `<GuidePhoto slot="oldCity" />`
   // and the correct per-guide photo dict is used automatically.
   const BoundGuidePhoto = (props: { slot: string; caption?: string }) => (
-    <GuidePhoto slot={props.slot} caption={props.caption} guideSlug={slug} />
+    <GuidePhoto slot={props.slot} guideSlug={slug} caption={props.caption} />
   );
   const mdxComponents = {
     AffiliateLink,
@@ -79,8 +81,38 @@ export default async function GuidePage({
   };
   if (!guide) notFound();
 
+  const guideUrl = `${SITE_URL}/guides/${slug}`;
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: guide.title,
+      description: guide.description,
+      mainEntityOfPage: guideUrl,
+      datePublished: guide.publishDate,
+      dateModified: guide.lastUpdated,
+      inLanguage: "en",
+      author: { "@type": "Person", name: guide.author },
+      publisher: { "@type": "Organization", name: "driftcoconut", url: SITE_URL },
+      ...(guide.hero && { image: new URL(guide.hero, SITE_URL).toString() }),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Guides", item: `${SITE_URL}/guides` },
+        { "@type": "ListItem", position: 3, name: guide.destination, item: guideUrl },
+      ],
+    },
+  ];
+
   return (
     <article className="max-w-3xl mx-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       {/* Breadcrumb */}
       <nav className="text-xs text-slate-500 mb-6">
         <Link href="/" className="hover:text-sea-600">Home</Link>

@@ -11,6 +11,8 @@ import TripPlanner from "@/components/TripPlanner";
 import RelatedGuides from "@/components/RelatedGuides";
 import GuideQuickLinks from "@/components/GuideQuickLinks";
 
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://driftcoconut.com").replace(/\/$/, "");
+
 // Statically generate all guide slugs at build time (Chinese variants).
 // Falls back to English content if `.zh.mdx` doesn't exist for a slug.
 export async function generateStaticParams() {
@@ -62,7 +64,7 @@ export default async function GuidePageZh({
   const { slug } = await params;
   const guide = await getGuide(slug, "zh");
   const BoundGuidePhoto = (props: { slot: string; caption?: string }) => (
-    <GuidePhoto slot={props.slot} caption={props.caption} guideSlug={slug} />
+    <GuidePhoto slot={props.slot} guideSlug={slug} caption={props.caption} />
   );
   const mdxComponents = {
     AffiliateLink,
@@ -70,8 +72,38 @@ export default async function GuidePageZh({
   };
   if (!guide) notFound();
 
+  const guideUrl = `${SITE_URL}/zh/guides/${slug}`;
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: guide.title,
+      description: guide.description,
+      mainEntityOfPage: guideUrl,
+      datePublished: guide.publishDate,
+      dateModified: guide.lastUpdated,
+      inLanguage: "zh-CN",
+      author: { "@type": "Person", name: guide.author },
+      publisher: { "@type": "Organization", name: "driftcoconut", url: SITE_URL },
+      ...(guide.hero && { image: new URL(guide.hero, SITE_URL).toString() }),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "首页", item: `${SITE_URL}/zh` },
+        { "@type": "ListItem", position: 2, name: "指南", item: `${SITE_URL}/zh/guides` },
+        { "@type": "ListItem", position: 3, name: guide.destination, item: guideUrl },
+      ],
+    },
+  ];
+
   return (
     <article className="max-w-3xl mx-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       {/* Breadcrumb */}
       <nav className="text-xs text-slate-500 mb-6">
         <Link href="/zh" className="hover:text-sea-600">首页</Link>
