@@ -431,7 +431,7 @@ Paragraph 3 — THE OPPORTUNITY: Use the Google Search, affiliate_click and scro
 
   // Providers tried in order. OpenAI first (if key present), Gemini as fallback.
   const attempts = [];
-  if (OPENAI_API_KEY) for (const m of ['gpt-5-nano', 'gpt-4.1-nano', 'gpt-4o-mini']) attempts.push({ provider: 'openai', model: m });
+  if (OPENAI_API_KEY) attempts.push({ provider: 'openai', model: 'gpt-5.6-luna' });
   if (GEMINI_API_KEY) for (const m of ['gemini-3.5-flash-lite', 'gemini-3.5-flash']) attempts.push({ provider: 'gemini', model: m }); // prepay fallback
 
   async function callProvider({ provider, model }) {
@@ -439,11 +439,10 @@ Paragraph 3 — THE OPPORTUNITY: Use the Google Search, affiliate_click and scro
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
-        // gpt-5 family = reasoning models: no custom temperature, and hidden reasoning
-        // tokens count toward the cap, so use minimal effort + a roomy limit.
+        // Luna supports no reasoning effort; keep the report inexpensive on prepaid credits.
         body: JSON.stringify(
           model.startsWith('gpt-5')
-            ? { model, messages: [{ role: 'user', content: prompt }], reasoning_effort: 'minimal', max_completion_tokens: 2500 }
+            ? { model, messages: [{ role: 'user', content: prompt }], reasoning_effort: 'none', max_completion_tokens: 2500 }
             : { model, messages: [{ role: 'user', content: prompt }], temperature: 0.6, max_completion_tokens: 900 }
         ),
       });
