@@ -79,9 +79,11 @@ export default function BackgroundMusic() {
     window.addEventListener("pageshow", playWhenAllowed);
 
     syncPlayingState();
-    playWhenAllowed();
+    // Let the first homepage hero image use the connection before starting audio.
+    const initialPlayTimer = window.setTimeout(playWhenAllowed, window.location.pathname === "/" ? 1500 : 0);
 
     return () => {
+      window.clearTimeout(initialPlayTimer);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", syncPlayingState);
       audio.removeEventListener("canplay", playWhenAllowed);
@@ -114,7 +116,7 @@ export default function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/melody.mp3?v=sky-forgot-to-fall" preload="auto" autoPlay loop playsInline />
+      <audio ref={audioRef} src="/audio/melody.mp3?v=sky-forgot-to-fall" preload="none" loop playsInline />
       <button
         type="button"
         className="drift-music-control"
