@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
 import { useLanguage } from "@/contexts/LanguageProvider";
 
-const ROTATE_MS = 3000;
+const FIRST_ROTATE_MS = 10000;
+const ROTATE_MS = 5000;
 
 export default function Hero() {
   const { locale, t } = useLanguage();
@@ -26,10 +27,13 @@ export default function Hero() {
   }, [index]);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      if (imageLoaded) showSlide((index + 1) % HERO_PHOTOS.length);
-    }, ROTATE_MS);
-    return () => clearInterval(id);
+    if (!imageLoaded) return;
+    // Give the first photo time to paint before starting the carousel.
+    const id = setTimeout(
+      () => showSlide((index + 1) % HERO_PHOTOS.length),
+      index === 0 ? FIRST_ROTATE_MS : ROTATE_MS,
+    );
+    return () => clearTimeout(id);
   }, [imageLoaded, index]);
 
   useEffect(() => {
