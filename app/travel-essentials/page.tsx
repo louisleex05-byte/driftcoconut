@@ -146,6 +146,21 @@ export default function TravelEssentialsPage() {
         })}
       </div>
 
+      <section className="mb-10 rounded-2xl border border-sea-100 bg-white/85 p-6 text-center shadow-sm">
+        <h2 className="font-display text-2xl font-semibold text-sea-900">Planning an outdoor trip?</h2>
+        <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+          For camping and nature-focused travel, explore the wider gear collection at LezzCamp.
+        </p>
+        <a
+          href="https://lezzcamp.com/en/gear"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex rounded-full border border-sea-600 px-5 py-2.5 text-sm font-semibold text-sea-800 transition-colors hover:bg-sea-50"
+        >
+          Explore LezzCamp gear ↗
+        </a>
+      </section>
+
       <section className="mb-10 rounded-2xl border border-sea-100 bg-sea-50/70 p-6 text-center">
         <h2 className="font-display text-2xl font-semibold text-sea-900">More Thailand planning help</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-slate-600">
