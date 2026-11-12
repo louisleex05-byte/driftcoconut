@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HERO_PHOTOS } from "@/lib/heroPhotos";
 import { useLanguage } from "@/contexts/LanguageProvider";
 
@@ -11,42 +10,65 @@ const ROTATE_MS = 3000;
 export default function Hero() {
   const { locale, t } = useLanguage();
   const [index, setIndex] = useState(0);
+  const [previousIndex, setPreviousIndex] = useState<number | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  const showSlide = (nextIndex: number) => {
+    if (nextIndex === index) return;
+    setPreviousIndex(index);
+    setImageLoaded(false);
+    setIndex(nextIndex);
+  };
+
+  useEffect(() => {
+    if (imageRef.current?.complete) setImageLoaded(true);
+  }, [index]);
 
   useEffect(() => {
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % HERO_PHOTOS.length);
+      if (imageLoaded) showSlide((index + 1) % HERO_PHOTOS.length);
     }, ROTATE_MS);
     return () => clearInterval(id);
-  }, []);
+  }, [imageLoaded, index]);
+
+  useEffect(() => {
+    if (previousIndex === null || !imageLoaded) return;
+    const id = setTimeout(() => setPreviousIndex(null), 1000);
+    return () => clearTimeout(id);
+  }, [imageLoaded, previousIndex]);
 
   const current = HERO_PHOTOS[index];
+  const currentBase = current.src.replace(/\.jpg$/, "");
 
   return (
     <section className="relative -mt-6 sm:-mt-8 rounded-b-2xl sm:rounded-b-3xl overflow-hidden">
       {/* Show more of each rotating photo on wide screens while keeping mobile proportions. */}
       <div className="relative aspect-[3/4] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[12/5] w-full min-h-[550px] sm:min-h-[380px] lg:min-h-[520px]">
-        {HERO_PHOTOS.map((photo, i) => (
-          <Image
-            key={photo.src}
-            src={photo.src}
-            alt={photo.alt}
-            fill
-            priority={i === 0}
+        {previousIndex !== null && (
+          <img
+            key={`previous-${HERO_PHOTOS[previousIndex].src}`}
+            src={HERO_PHOTOS[previousIndex].src.replace(/\.jpg$/, "-1920.webp")}
+            srcSet={`${HERO_PHOTOS[previousIndex].src.replace(/\.jpg$/, "")}-1200.webp 1200w, ${HERO_PHOTOS[previousIndex].src.replace(/\.jpg$/, "")}-1920.webp 1920w`}
+            alt=""
             sizes="100vw"
-            // Bypass Vercel's image optimizer for hero photos.
-            // Rationale: 22 rotating slides x every deploy = quota hits on the free
-            // tier -> intermittent 500s / blanks. Files are already reasonable size
-            // (200-1200 KB), so serving them raw from the CDN is cheaper AND more
-            // reliable than paying quota to convert them to WebP on the fly.
-            unoptimized
-            loading={i === 0 ? "eager" : "lazy"}
-            className="object-cover transition-opacity duration-1000 ease-in-out"
-            style={{
-              objectPosition: photo.position,
-              opacity: i === index ? 1 : 0,
-            }}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: HERO_PHOTOS[previousIndex].position }}
           />
-        ))}
+        )}
+        <img
+          key={current.src}
+          ref={imageRef}
+          src={`${currentBase}-1920.webp`}
+          srcSet={`${currentBase}-1200.webp 1200w, ${currentBase}-1920.webp 1920w`}
+          alt={current.alt}
+          fetchPriority={index === 0 ? "high" : undefined}
+          sizes="100vw"
+          loading="eager"
+          onLoad={() => setImageLoaded(true)}
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out"
+          style={{ objectPosition: current.position, opacity: previousIndex === null || imageLoaded ? 1 : 0 }}
+        />
 
         {/* Dark gradient overlay for text legibility */}
         <div
@@ -88,7 +110,7 @@ export default function Hero() {
           {HERO_PHOTOS.map((_, i) => (
             <button
               key={i}
-              onClick={() => setIndex(i)}
+              onClick={() => showSlide(i)}
               aria-label={`Show slide ${i + 1}`}
               className={`h-1.5 rounded-full transition-all ${
                 i === index ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
