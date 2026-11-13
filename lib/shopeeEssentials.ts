@@ -89,7 +89,7 @@ export const SHOPEE_ESSENTIALS: ShopeeEssential[] = [
   },
   {
     id: "17081465548",
-    category: "power",
+    category: "backpack",
     name: "MOTOWOLF MDL 0714 backpack",
     imageUrl: "https://down-bs-th.img.susercontent.com/9a1ee9dd76e492f15ae568ba4b2e9189.webp",
     sourceProductUrl: "https://shopee.co.th/product/60401191/17081465548",
@@ -98,7 +98,7 @@ export const SHOPEE_ESSENTIALS: ShopeeEssential[] = [
   },
   {
     id: "53271055902",
-    category: "power",
+    category: "backpack",
     name: "Commuter and motorcycle travel backpack",
     imageUrl: "https://down-bs-th.img.susercontent.com/sg-11134201-825b5-mv1ap577j2td17.webp",
     sourceProductUrl: "https://shopee.co.th/product/1914675362/53271055902",
@@ -115,7 +115,7 @@ export const SHOPEE_ESSENTIALS: ShopeeEssential[] = [
   },
   {
     id: "47319781244",
-    category: "power",
+    category: "backpack",
     name: "S431 30L patrol backpack",
     imageUrl: "https://down-zl-th.img.susercontent.com/sg-11134201-8257y-munhkjxtpxqbae.webp",
     sourceProductUrl: "https://shopee.co.th/product/1934412192/47319781244",
@@ -124,7 +124,7 @@ export const SHOPEE_ESSENTIALS: ShopeeEssential[] = [
   },
   {
     id: "53069750649",
-    category: "power",
+    category: "backpack",
     name: "S429 12L mini backpack",
     imageUrl: "https://down-zl-th.img.susercontent.com/sg-11134201-8259r-mun0sp5perk219.webp",
     sourceProductUrl: "https://shopee.co.th/product/1934412192/53069750649",
@@ -133,7 +133,7 @@ export const SHOPEE_ESSENTIALS: ShopeeEssential[] = [
   },
   {
     id: "55061120901",
-    category: "power",
+    category: "backpack",
     name: "Anmei Road 30L hiking backpack",
     imageUrl: "https://down-zl-th.img.susercontent.com/sg-11134201-823pz-mooh5xitmcy433.webp",
     sourceProductUrl: "https://shopee.co.th/product/1825427368/55061120901",
@@ -150,7 +150,7 @@ export const SHOPEE_ESSENTIALS: ShopeeEssential[] = [
   },
   {
     id: "54507489361",
-    category: "power",
+    category: "backpack",
     name: "WIS PSHP black backpack",
     imageUrl: "https://down-zl-th.img.susercontent.com/id-11134207-822wh-mm2wcb402i338e.webp",
     sourceProductUrl: "https://shopee.co.th/product/877231766/54507489361",
