@@ -9,6 +9,7 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "cf.shopee.co.th" },
       { protocol: "https", hostname: "down-bs-th.img.susercontent.com" },
+      { protocol: "https", hostname: "down-th.img.susercontent.com" },
       { protocol: "https", hostname: "down-zl-th.img.susercontent.com" },
     ],
   },
