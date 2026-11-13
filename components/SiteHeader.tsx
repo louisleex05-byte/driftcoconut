@@ -32,6 +32,7 @@ export default function SiteHeader() {
           </Link>
           <Link
             href="/travel-essentials"
+            prefetch={false}
             className="inline-flex items-center gap-1 whitespace-nowrap transition-colors hover:text-sea-600"
           >
             <span aria-hidden="true" className="text-base sm:hidden">🧳</span>
