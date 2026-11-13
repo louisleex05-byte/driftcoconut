@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CITIES } from "@/lib/cities";
-import { trackFormSubmit } from "@/lib/analytics";
+import { trackBookingSearch } from "@/lib/analytics";
 import { bookingCJSearchWithParams } from "@/lib/booking";
 import { useT } from "@/contexts/LanguageProvider";
 
@@ -68,9 +68,7 @@ export default function SearchForm() {
    * applied. No internal sample-listings page in between — Booking.com's real
    * live inventory for the exact destination + dates + guests they picked.
    *
-   * Opens in a new tab so the user keeps driftcoconut.com open (helps repeat
-   * visits + return-to-guide navigation). Booking.com attributes commission
-   * back to driftcoconut via the CJ publisher ID in the wrapped URL.
+   * Booking.com attributes commission through the CJ publisher ID in the URL.
    */
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,17 +80,14 @@ export default function SearchForm() {
       checkOut,
       adults,
     });
-    trackFormSubmit({
+    trackBookingSearch({
       formId: "booking-hotel-search",
       formName: "Booking.com hotel search",
       destination: "booking.com",
       result: "external_redirect",
       searchTerm: city.name,
       submitText: t("search_submit"),
-    });
-    // Open in same tab so mobile users don't lose the search context;
-    // no need for _blank since Booking.com is the intended destination.
-    window.location.href = href;
+    }, () => { window.location.href = href; });
   }
 
   return (

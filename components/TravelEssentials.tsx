@@ -36,6 +36,8 @@ function EssentialCard({ e }: { e: Essential }) {
       href={AFFILIATE_LINKS[e.key]}
       target="_blank"
       rel="noopener sponsored"
+      data-affiliate-partner={e.key}
+      data-affiliate-placement="travel_essentials"
       className="group bg-white/80 backdrop-blur border border-sea-100 rounded-lg p-2.5 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col relative"
     >
       {e.hot && (
@@ -62,14 +64,14 @@ function EssentialCard({ e }: { e: Essential }) {
 }
 
 function AlternativeCard({
-  href,
+  partner,
   emoji,
   bg,
   titleKey,
   subtitleKey,
   titleColor,
 }: {
-  href: string;
+  partner: keyof typeof AFFILIATE_LINKS;
   emoji: string;
   bg: string;
   titleKey: TranslationKey;
@@ -79,9 +81,11 @@ function AlternativeCard({
   const t = useT();
   return (
     <a
-      href={href}
+      href={AFFILIATE_LINKS[partner]}
       target="_blank"
       rel="noopener sponsored"
+      data-affiliate-partner={partner}
+      data-affiliate-placement="travel_essentials"
       className="group bg-white/80 backdrop-blur border border-sea-100 rounded-lg p-2.5 hover:border-sea-300 hover:shadow-sm transition-all flex flex-col relative"
     >
       <div className="absolute top-1 right-1 text-[8px] uppercase tracking-wider text-sea-600 font-semibold bg-sea-50 px-1.5 py-[1px] rounded-full">
@@ -140,7 +144,7 @@ export default function TravelEssentials({
             {/* Tiqets stacked under Klook */}
             {e.key === "klook" && (
               <AlternativeCard
-                href={AFFILIATE_LINKS.tiqets}
+                partner="tiqets"
                 emoji="🎫"
                 bg="bg-fuchsia-50"
                 titleKey="card_tiqets_title"
@@ -153,7 +157,7 @@ export default function TravelEssentials({
             {e.key === "yesim" && (
               <>
                 <AlternativeCard
-                  href={AFFILIATE_LINKS.drimsim}
+                  partner="drimsim"
                   emoji="📱"
                   bg="bg-sky-50"
                   titleKey="card_drimsim_title"
@@ -161,7 +165,7 @@ export default function TravelEssentials({
                   titleColor="text-sky-700"
                 />
                 <AlternativeCard
-                  href={AFFILIATE_LINKS.airalo}
+                  partner="airalo"
                   emoji="🌐"
                   bg="bg-indigo-50"
                   titleKey="card_airalo_title"

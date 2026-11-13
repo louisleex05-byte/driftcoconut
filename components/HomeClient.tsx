@@ -111,6 +111,9 @@ export default function HomeClient({
                   onClick={reshuffle}
                   target="_blank"
                   rel="sponsored nofollow noopener"
+                  data-affiliate-partner="booking"
+                  data-affiliate-query={dest}
+                  data-affiliate-placement="homepage_deals"
                   className={`group relative bg-gradient-to-br ${c.theme.bg} backdrop-blur rounded-2xl border ${c.theme.border} p-6 hover:shadow-tropical-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer block overflow-hidden`}
                 >
                   <div className="text-4xl drift-bob inline-block">{c.emoji}</div>
