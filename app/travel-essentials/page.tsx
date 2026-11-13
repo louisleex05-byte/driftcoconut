@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import TripPlanner from "@/components/TripPlanner";
+import ShopeeProductLink from "@/components/ShopeeProductLink";
 import {
   SHOPEE_ESSENTIAL_CATEGORIES,
   SHOPEE_ESSENTIALS,
@@ -15,22 +16,24 @@ export const metadata: Metadata = {
 
 function ProductCard({ product }: { product: ShopeeEssential }) {
   const label = product.affiliateUrl
-    ? "Affiliate link verified"
+    ? "Shopee affiliate link"
     : product.status === "under-review"
       ? "Under review"
       : "Link being prepared";
 
   const card = (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-sea-100 bg-white/85 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:border-sea-200 group-hover:shadow-md">
-      <div className="relative aspect-[4/3] overflow-hidden border-b border-sea-50 bg-white">
-        <Image
-          src={product.imageUrl}
-          alt={product.name}
-          fill
-          sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"
-          className="object-contain p-4 transition-transform duration-300 hover:scale-[1.03]"
-        />
-      </div>
+      {product.imageUrl && (
+        <div className="relative aspect-[4/3] overflow-hidden border-b border-sea-50 bg-white">
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            fill
+            sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 100vw"
+            className="object-contain p-4 transition-transform duration-300 hover:scale-[1.03]"
+          />
+        </div>
+      )}
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-3">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-sea-600">
@@ -40,27 +43,30 @@ function ProductCard({ product }: { product: ShopeeEssential }) {
             Shopee Thailand
           </span>
         </div>
-        <h2 className="mt-3 font-display text-xl font-semibold leading-tight text-sea-900">{product.name}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600">{product.reason}</p>
+        <h3 className="mt-3 font-display text-xl font-semibold leading-tight text-sea-900">{product.name}</h3>
+        {product.reason && <p className="mt-2 text-sm leading-relaxed text-slate-600">{product.reason}</p>}
 
-        <dl className="mt-5 grid grid-cols-2 gap-x-3 gap-y-2 border-y border-sea-50 py-4 text-xs">
-          <div>
-            <dt className="text-slate-400">Price checked</dt>
-            <dd className="mt-0.5 font-semibold text-slate-700">{product.observedPrice}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-400">Demand</dt>
-            <dd className="mt-0.5 font-semibold text-slate-700">{product.observedDemand}</dd>
-          </div>
-          <div className="col-span-2">
-            <dt className="text-slate-400">Listing signal</dt>
-            <dd className="mt-0.5 font-semibold text-slate-700">{product.observedRating}</dd>
-          </div>
-        </dl>
-
-        <p className="mt-4 text-[11px] leading-relaxed text-slate-400">
-          Observed {product.observedAt}. Price, stock, and availability can change.
-        </p>
+        {product.observedAt && (
+          <>
+            <dl className="mt-5 grid grid-cols-2 gap-x-3 gap-y-2 border-y border-sea-50 py-4 text-xs">
+              <div>
+                <dt className="text-slate-400">Price checked</dt>
+                <dd className="mt-0.5 font-semibold text-slate-700">{product.observedPrice}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-400">Demand</dt>
+                <dd className="mt-0.5 font-semibold text-slate-700">{product.observedDemand}</dd>
+              </div>
+              <div className="col-span-2">
+                <dt className="text-slate-400">Listing signal</dt>
+                <dd className="mt-0.5 font-semibold text-slate-700">{product.observedRating}</dd>
+              </div>
+            </dl>
+            <p className="mt-4 text-[11px] leading-relaxed text-slate-400">
+              Observed {product.observedAt}. Price, stock, and availability can change.
+            </p>
+          </>
+        )}
 
         <span
           className={`mt-5 inline-flex items-center justify-center rounded-full px-4 py-2.5 text-sm font-semibold ${
@@ -78,15 +84,13 @@ function ProductCard({ product }: { product: ShopeeEssential }) {
   if (!product.affiliateUrl) return card;
 
   return (
-    <a
+    <ShopeeProductLink
       href={product.affiliateUrl}
-      target="_blank"
-      rel="sponsored noopener noreferrer"
-      aria-label={`View ${product.name} on Shopee`}
-      className="group block h-full rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-sea-600 focus-visible:ring-offset-2"
+      productId={product.id}
+      name={product.name}
     >
       {card}
-    </a>
+    </ShopeeProductLink>
   );
 }
 
@@ -183,7 +187,7 @@ export default function TravelEssentialsPage() {
           Note
         </h2>
         <p>
-          We may earn a commission when affiliate links are added and used, at no extra cost to you. Product facts are checked before publication and can change on the retailer site.
+          We may earn a commission from purchases made through affiliate links, at no extra cost to you. Check Shopee for current prices and availability.
         </p>
       </aside>
     </div>
