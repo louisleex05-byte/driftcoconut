@@ -66,10 +66,21 @@ export default function GoogleAnalytics() {
           document.addEventListener('click', recordAffiliateClick, true);
           document.addEventListener('auxclick', recordAffiliateClick, true);
 
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
-          document.head.appendChild(s);
+          function loadAnalyticsLibrary() {
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
+            document.head.appendChild(s);
+          }
+          // Keep the page-view and affiliate-click queue active immediately,
+          // but let the homepage hero paint before downloading the large library.
+          if (location.pathname === '/' || location.pathname === '/zh') {
+            var afterLoad = function() { window.setTimeout(loadAnalyticsLibrary, 500); };
+            if (document.readyState === 'complete') afterLoad();
+            else window.addEventListener('load', afterLoad, { once: true });
+          } else {
+            loadAnalyticsLibrary();
+          }
           }
         `}
       </Script>
