@@ -18,8 +18,22 @@ export default function CueLinksScript() {
     const cid = process.env.NEXT_PUBLIC_CUELINKS_CID;
     if (!cid) return;
 
+    // Stop CueLinks' anchor handlers from rewriting direct Shopee links.
+    // Propagation stops here, but the browser still follows the anchor.
+    function preserveShopeeLink(event: Event) {
+      if (event.target instanceof Element && event.target.closest('a[data-affiliate-partner="shopee"]')) {
+        event.stopPropagation();
+      }
+    }
+    document.addEventListener("mousedown", preserveShopeeLink, true);
+    document.addEventListener("click", preserveShopeeLink, true);
+    const cleanup = () => {
+      document.removeEventListener("mousedown", preserveShopeeLink, true);
+      document.removeEventListener("click", preserveShopeeLink, true);
+    };
+
     // Guard against double-injection on route changes
-    if (document.querySelector('script[src*="cuelinksv2"]')) return;
+    if (document.querySelector('script[src*="cuelinksv2"]')) return cleanup;
 
     // Set the global cId that cuelinksv2.js reads on load
     (window as unknown as { cId: string }).cId = cid;
@@ -33,6 +47,7 @@ export default function CueLinksScript() {
         ? "https://cdn0.cuelinks.com/js/"
         : "http://cdn0.cuelinks.com/js/") + "cuelinksv2.js";
     document.getElementsByTagName("body")[0].appendChild(s);
+    return cleanup;
   }, []);
 
   return null;
