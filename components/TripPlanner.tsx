@@ -216,17 +216,6 @@ export default function TripPlanner({
   const { locale } = useLanguage();
   const widgetLocale = locale === "th" ? "th" : "en";
 
-  const track = (partner: string, stage: StageId, tileId: string) => {
-    window.gtag?.("event", "affiliate_click", {
-      affiliate_partner: partner,
-      affiliate_query: destination ?? "",
-      page_path: pathname,
-      trip_stage: stage,
-      trip_tile: tileId,
-      placement: "trip_planner",
-    });
-  };
-
   const profile = plannerProfile(destination);
 
   const stages = STAGES.map((s) => ({
@@ -336,7 +325,11 @@ export default function TripPlanner({
                     href={href}
                     target="_blank"
                     rel="noopener sponsored"
-                    onClick={() => track(tile.partner, stage.id, id)}
+                    data-affiliate-partner={tile.partner}
+                    data-affiliate-query={destination}
+                    data-affiliate-placement="trip_planner"
+                    data-trip-stage={stage.id}
+                    data-trip-tile={id}
                     className={cardClass}
                   >
                     {body}
@@ -351,7 +344,11 @@ export default function TripPlanner({
                             href={AFFILIATE_LINKS[a.partner]}
                             target="_blank"
                             rel="noopener sponsored"
-                            onClick={() => track(a.partner, stage.id, id)}
+                            data-affiliate-partner={a.partner}
+                            data-affiliate-query={destination}
+                            data-affiliate-placement="trip_planner"
+                            data-trip-stage={stage.id}
+                            data-trip-tile={id}
                             className="underline underline-offset-2 hover:text-sea-700"
                           >
                             {a.label}

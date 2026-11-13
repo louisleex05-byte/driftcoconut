@@ -37,3 +37,30 @@ export function trackFormSubmit({
     transport_type: "beacon",
   });
 }
+
+/** Record a completed hotel search before handing the tab to Booking.com. */
+export function trackBookingSearch(details: FormSubmitDetails, navigate: () => void): void {
+  if (!window.gtag) {
+    navigate();
+    return;
+  }
+
+  trackFormSubmit(details);
+
+  let navigated = false;
+  const finish = () => {
+    if (navigated) return;
+    navigated = true;
+    window.clearTimeout(timeout);
+    navigate();
+  };
+  const timeout = window.setTimeout(finish, 400);
+  window.gtag("event", "affiliate_click", {
+    affiliate_partner: "booking",
+    affiliate_query: details.searchTerm ?? "",
+    page_path: window.location.pathname,
+    placement: details.formId === "header-destination-search" ? "header_search" : "hotel_search",
+    event_callback: finish,
+    event_timeout: 400,
+  });
+}

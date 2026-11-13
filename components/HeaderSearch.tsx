@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CITIES } from "@/lib/cities";
-import { trackFormSubmit } from "@/lib/analytics";
+import { trackBookingSearch, trackFormSubmit } from "@/lib/analytics";
 import { useT } from "@/contexts/LanguageProvider";
 
 function tomorrow(offset = 0) {
@@ -33,15 +33,14 @@ export default function HeaderSearch() {
         adults: "2",
       });
       const destination = `/search?${params.toString()}`;
-      trackFormSubmit({
+      trackBookingSearch({
         formId: "header-destination-search",
         formName: "Header destination search",
         destination,
         result: "matched",
         searchTerm: match.name,
         submitText: "Search",
-      });
-      router.push(destination);
+      }, () => router.push(destination));
     } else {
       // No match — scroll to the main search form on homepage
       trackFormSubmit({

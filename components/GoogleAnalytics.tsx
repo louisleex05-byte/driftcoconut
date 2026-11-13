@@ -21,10 +21,6 @@ export default function GoogleAnalytics() {
       <Script id="ga4-init" strategy="afterInteractive">
         {`
           if (/(^|\\.)driftcoconut\\.com$/.test(location.hostname)) {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
-          document.head.appendChild(s);
           window.dataLayer = window.dataLayer || [];
           window.gtag = window.gtag || function(){dataLayer.push(arguments);};
           // Owner device flag: open any page once with ?me=1 to mark this browser as internal
@@ -42,6 +38,38 @@ export default function GoogleAnalytics() {
           try { if (new URLSearchParams(location.search).get('debug') === '1') cfg.debug_mode = true; } catch (e) {}
           window.gtag('js', new Date());
           window.gtag('config', '${gaId}', cfg);
+
+          // Capture sponsored links rendered by both server and client components.
+          function recordAffiliateClick(event) {
+            if (event.type === 'auxclick' && event.button !== 1) return;
+            var link = event.target instanceof Element
+              ? event.target.closest('a[rel~="sponsored"][href]')
+              : null;
+            if (!link) return;
+
+            var partner = link.dataset.affiliatePartner;
+            if (!partner && link.hostname === 'www.tkqlhce.com') partner = 'booking';
+            if (!partner && link.hostname === 's.shopee.co.th') partner = 'shopee';
+            if (!partner) return;
+
+            window.gtag('event', 'affiliate_click', {
+              affiliate_partner: partner,
+              affiliate_query: link.dataset.affiliateQuery || '',
+              page_path: location.pathname,
+              link_domain: link.hostname,
+              placement: link.dataset.affiliatePlacement,
+              trip_stage: link.dataset.tripStage,
+              trip_tile: link.dataset.tripTile,
+              product_id: link.dataset.productId
+            });
+          }
+          document.addEventListener('click', recordAffiliateClick, true);
+          document.addEventListener('auxclick', recordAffiliateClick, true);
+
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=${gaId}';
+          document.head.appendChild(s);
           }
         `}
       </Script>
