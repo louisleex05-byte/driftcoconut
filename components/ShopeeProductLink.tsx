@@ -1,7 +1,7 @@
-export default function ShopeeProductLink({ href, productId, name, children }: {
+export default function ShopeeProductLink({ href, productId, label, children }: {
   href: string;
   productId: string;
-  name: string;
+  label: string;
   children: React.ReactNode;
 }) {
   return (
@@ -9,7 +9,7 @@ export default function ShopeeProductLink({ href, productId, name, children }: {
       href={href}
       target="_blank"
       rel="sponsored noopener noreferrer"
-      aria-label={`View ${name} on Shopee`}
+      aria-label={label}
       data-affiliate-partner="shopee"
       data-affiliate-placement="productcard"
       data-product-id={productId}

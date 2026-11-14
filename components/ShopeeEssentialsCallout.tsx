@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useT } from "@/contexts/LanguageProvider";
+import { useLanguage } from "@/contexts/LanguageProvider";
+import { TRAVEL_ESSENTIALS_PATHS } from "@/lib/travelEssentials";
 
 export default function ShopeeEssentialsCallout() {
-  const t = useT();
+  const { locale, t } = useLanguage();
 
   return (
     <section
@@ -27,7 +28,7 @@ export default function ShopeeEssentialsCallout() {
         </div>
 
         <Link
-          href="/travel-essentials"
+          href={TRAVEL_ESSENTIALS_PATHS[locale]}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-sea-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-sea-800 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sea-700"
         >
           <span aria-hidden="true">🧳</span>

@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageProvider";
 import type { Locale } from "@/lib/i18n";
+import { TRAVEL_ESSENTIALS_PATHS } from "@/lib/travelEssentials";
 
 // Paths that have a real /zh/... twin: /, /about, /privacy, /terms, /guides, /guides/<slug>.
 // Add a path here when you create its /zh page.
@@ -22,7 +23,9 @@ export default function LanguageToggle() {
     setLocale(next);
     const base = pathname?.replace(/^\/(zh|th)(?=\/|$)/, "") || "/";
     const thaiGuide = base.match(/^\/guides\/([^/]+)\/?$/)?.[1];
-    if (next === "th" && (base === "/guides" || (thaiGuide && THAI_GUIDES.has(thaiGuide)))) {
+    if (base === TRAVEL_ESSENTIALS_PATHS.en) {
+      router.push(TRAVEL_ESSENTIALS_PATHS[next]);
+    } else if (next === "th" && (base === "/guides" || (thaiGuide && THAI_GUIDES.has(thaiGuide)))) {
       router.push(`/th${base}`);
     } else if (next === "zh" && HAS_ZH_ROUTE.test(base)) {
       router.push(`/zh${base === "/" ? "" : base}`);
