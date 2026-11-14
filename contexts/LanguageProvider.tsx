@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { DEFAULT_LOCALE, dictionary, LOCALES, type Locale, type TranslationKey } from "@/lib/i18n";
+import { TRAVEL_ESSENTIALS_LANG, TRAVEL_ESSENTIALS_PATHS } from "@/lib/travelEssentials";
 
 const STORAGE_KEY = "driftcoconut.locale";
 
@@ -14,7 +16,12 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const [selectedLocale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const pathname = usePathname();
+  // The Essentials pages render their copy on the server. Keep shared UI and the
+  // embedded trip planner in the route's language, even with an older saved choice.
+  const essentialsLocale = LOCALES.find((locale) => TRAVEL_ESSENTIALS_PATHS[locale] === pathname);
+  const locale = essentialsLocale ?? selectedLocale;
 
   // Load persisted choice on mount (client only — avoids hydration mismatch).
   // Routed Chinese and Thai guide URLs override a saved UI preference.
@@ -24,30 +31,30 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       const path = typeof window !== "undefined" ? window.location.pathname : "";
       if (path.startsWith("/zh")) {
         setLocaleState("zh");
-        document.documentElement.lang = "zh-CN";
         return;
       }
       if (path.startsWith("/th")) {
         setLocaleState("th");
-        document.documentElement.lang = "th";
         return;
       }
       // Otherwise honour persisted preference
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (saved && (LOCALES as string[]).includes(saved) && saved !== "zh") {
         setLocaleState(saved as Locale);
-        document.documentElement.lang = saved;
       }
     } catch {
       // localStorage unavailable — silently fall back to default
     }
   }, []);
 
+  useEffect(() => {
+    document.documentElement.lang = TRAVEL_ESSENTIALS_LANG[locale];
+  }, [locale]);
+
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
-      document.documentElement.lang = next;
     } catch {}
   }, []);
 

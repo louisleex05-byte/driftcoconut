@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listGuides } from "@/lib/guides";
+import { TRAVEL_ESSENTIALS_ALTERNATES, TRAVEL_ESSENTIALS_PATHS } from "@/lib/travelEssentials";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -64,12 +65,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.8,
     },
-    {
-      url: `${SITE_URL}/travel-essentials`,
+    ...Object.values(TRAVEL_ESSENTIALS_PATHS).map((pathname) => ({
+      url: `${SITE_URL}${pathname}`,
       lastModified: now,
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.7,
-    },
+      alternates: {
+        languages: Object.fromEntries(Object.entries(TRAVEL_ESSENTIALS_ALTERNATES).map(
+          ([locale, alternatePath]) => [locale, `${SITE_URL}${alternatePath}`],
+        )),
+      },
+    })),
     {
       url: `${SITE_URL}/about`,
       lastModified: now,

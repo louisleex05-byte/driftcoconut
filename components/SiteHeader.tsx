@@ -4,10 +4,11 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import HeaderSearch from "@/components/HeaderSearch";
 import LanguageToggle from "@/components/LanguageToggle";
-import { useT } from "@/contexts/LanguageProvider";
+import { useLanguage } from "@/contexts/LanguageProvider";
+import { TRAVEL_ESSENTIALS_PATHS } from "@/lib/travelEssentials";
 
 export default function SiteHeader() {
-  const t = useT();
+  const { locale, t } = useLanguage();
   return (
     <header className="bg-white/70 backdrop-blur border-b border-sea-100 sticky top-0 z-30">
       <div className="max-w-screen-2xl mx-auto px-2 py-2 sm:px-4 sm:py-0 sm:h-20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1 sm:gap-3">
@@ -31,7 +32,7 @@ export default function SiteHeader() {
             {t("nav_deals")}
           </Link>
           <Link
-            href="/travel-essentials"
+            href={TRAVEL_ESSENTIALS_PATHS[locale]}
             prefetch={false}
             className="inline-flex items-center gap-1 whitespace-nowrap transition-colors hover:text-sea-600"
           >
